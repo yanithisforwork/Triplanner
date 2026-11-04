@@ -96,7 +96,7 @@ dialog label{display:block;margin:12px 0 4px;color:var(--mute);font-size:13px}
 dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg)}
 .dact{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:18px}
 .hint{color:var(--mute);font-size:13px;margin:12px 0 0}
-.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.toast{max-width:90vw;text-align:center;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 .toast.show{opacity:1}
 .ro #back,.ro #save,.ro #share,.ro #inv,.ro #exp,.ro .acts,.ro .add,.ro [data-adddays],.ro [data-delday],.ro .kr,.ro .note:placeholder-shown{display:none}
 .ro input,.ro textarea,.ro select{border-color:transparent!important;background:none!important;appearance:none;-webkit-appearance:none;pointer-events:none}
@@ -196,8 +196,13 @@ const imgUrl=(f,w)=>"https://drive.google.com/thumbnail?id="+encodeURIComponent(
 const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
 const persist=()=>{try{localStorage.setItem(SK,JSON.stringify(store))}catch(e){}};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),m.length>20?6000:1800)}
 const sync=t=>$("sync").textContent=t;
+function errMsg(x){const m=String(x&&x.message||x||"");
+  if(/Failed to fetch|NetworkError|Load failed|network/i.test(m))return "連不到後端。請確認網址是 /exec 結尾、部署的「誰可以存取」選「所有人」，且不是在 claude.ai 預覽裡開啟";
+  if(/Unexpected token|JSON|<html/i.test(m))return "後端回傳的不是資料，通常是「誰可以存取」沒有選「所有人」，或網址不是最新部署的 /exec";
+  if(m==="沒有權限"||m==="密碼錯誤")return "密碼不對或沒有權限，請到頁面最下方重新設定雲端";
+  return m||"未知錯誤"}
 (function(){if(Object.keys(store.trips).length||new URLSearchParams(location.search).get("v"))return;
   let o=null;try{o=JSON.parse(localStorage.getItem("busan-yeosu-itinerary-v1"))}catch(e){}
   if(!o||!o.days)return;
@@ -215,8 +220,8 @@ function group(rows){const T={};rows.sort((a,b)=>a[3]-b[3]||a[6]-b[6]).forEach(r
   Object.values(T).forEach(t=>t.days=t.days.filter(Boolean));return T}
 async function saveCloud(id){const t=store.trips[id];if(!t)return;
   try{sync("存檔中…");const r=await call({action:"save",id,token:t.token,rows:toRows(t)},true);
-    if(r.ok){delete store.dirty[id];persist();sync("已存檔 "+new Date().toLocaleTimeString("zh-TW",{hour12:false}))}else sync("存檔失敗："+(r.error||"未知錯誤"))}
-  catch(e){sync("存檔失敗，請檢查雲端設定")}}
+    if(r.ok){delete store.dirty[id];persist();sync("已存檔 "+new Date().toLocaleTimeString("zh-TW",{hour12:false}))}else sync("存檔失敗："+errMsg(r.error||"未知錯誤"))}
+  catch(e){sync("存檔失敗："+errMsg(e))}}
 function schedule(id){if(!cloud.url)return;sync("尚未存檔…");clearTimeout(tm);tm=setTimeout(()=>saveCloud(id),1500)}
 function save(){store.dirty[tid]=1;persist();schedule(tid)}
 async function pull(){if(!cloud.url||!cloud.key)return;
@@ -364,7 +369,7 @@ $("pf").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f||RO)retur
       else if(pickMode==="cover"){data.cover=r.fid;save();render()}
       else{const it=data.days[cur].items[pickIdx];(it.imgs=it.imgs||[]).push(r.fid);save();render()}
       toast("已加入圖片")}
-    catch(x){toast("上傳失敗："+(x.message||"請檢查雲端設定"))}};
+    catch(x){toast("上傳失敗："+errMsg(x))}};
   im.onerror=()=>toast("無法讀取這張圖片");im.src=URL.createObjectURL(f)};
 $("ndays").onchange=()=>{if(RO)return;const n=Math.min(30,Math.max(1,+$("ndays").value||1)),a=data.days;
   if(n<a.length){if(a.slice(n).some(d=>d.items.length)&&!confirm("減少天數會刪除最後 "+(a.length-n)+" 天的內容，確定嗎？")){$("ndays").value=a.length;return}a.length=n}
@@ -387,7 +392,11 @@ $("exp").onclick=()=>{const a=document.createElement("a");
 $("cfg").onclick=()=>{const u=prompt("貼上 Apps Script 網頁應用程式網址（結尾為 /exec）",cloud.url||"");if(u===null)return;
   const k=prompt("輸入密碼（需與 Code.gs 裡的 KEY 相同）",cloud.key||"");if(k===null)return;
   cloud={url:u.trim(),key:k.trim()};try{localStorage.setItem(CK,JSON.stringify(cloud))}catch(e){}
-  toast("已儲存雲端設定");Promise.all(Object.keys(store.dirty).map(saveCloud)).then(pull)};
+  if(!/\/exec$/.test(cloud.url)){alert("網址結尾必須是 /exec，請回到 Apps Script 的「部署 → 管理部署作業」複製「網頁應用程式」網址。");return}
+  toast("正在測試連線…");
+  call({action:"view",id:"test"}).then(r=>{if(!Array.isArray(r.rows))throw new Error("後端沒有正確回應");return call({action:"all"})})
+    .then(r=>{if(r.error)throw new Error(r.error);toast("連線成功");return Promise.all(Object.keys(store.dirty).map(saveCloud))}).then(pull)
+    .catch(x=>toast("連線失敗："+errMsg(x)))};
 $("nd").oninput=()=>{$("nnt").value=Math.max(0,(+$("nd").value||1)-1)};
 $("dcancel").onclick=()=>$("dlg").close();
 $("dok").onclick=()=>{const n=$("nn").value.trim();if(!n){$("nn").focus();return}
