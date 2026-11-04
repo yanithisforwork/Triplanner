@@ -126,7 +126,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 </div>
 <nav><div class="tabs" id="tabs"></div></nav>
 <main id="main"></main>
-<div class="foot" id="foot"><button id="cfg">雲端設定</button></div></section>
+<div class="foot" id="foot"><button id="cfg">雲端設定</button><button id="diag">連線診斷</button></div></section>
 <dialog id="dlg"><h3>新增行程</h3>
   <label for="nn">行程名稱</label><input id="nn" placeholder="例如：東京五日">
   <label for="nd">天數</label><input id="nd" type="number" min="1" max="30" value="3">
@@ -198,9 +198,13 @@ const persist=()=>{try{localStorage.setItem(SK,JSON.stringify(store))}catch(e){}
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),m.length>20?6000:1800)}
 const sync=t=>$("sync").textContent=t;
+async function why(x){const m=errMsg(x);if(!/連不到後端/.test(m))return m;
+  try{await fetch(cloud.url+"?action=view&id=test",{mode:"no-cors"});
+    return "能連到 Google，但回應被瀏覽器擋下。多半是公司（Workspace）帳號不允許公開存取，或後端網址被導向登入頁。請用無痕視窗開啟「網址?action=view&id=test」，看到登入畫面就是這個原因"}
+  catch(e2){return "完全連不到 script.google.com。請確認不是在 claude.ai 預覽裡開啟，暫時關閉廣告攔截或隱私外掛，並檢查網路或 VPN"}}
 function errMsg(x){const m=String(x&&x.message||x||"");
   if(/Failed to fetch|NetworkError|Load failed|network/i.test(m))return "連不到後端。請確認網址是 /exec 結尾、部署的「誰可以存取」選「所有人」，且不是在 claude.ai 預覽裡開啟";
-  if(/Unexpected token|JSON|<html/i.test(m))return "後端回傳的不是資料，通常是「誰可以存取」沒有選「所有人」，或網址不是最新部署的 /exec";
+  if(/^後端回傳/.test(m))return m+"。通常是「誰可以存取」沒有選「所有人」，或網址不是最新部署的 /exec";
   if(m==="沒有權限"||m==="密碼錯誤")return "密碼不對或沒有權限，請到頁面最下方重新設定雲端";
   return m||"未知錯誤"}
 (function(){if(Object.keys(store.trips).length||new URLSearchParams(location.search).get("v"))return;
@@ -209,8 +213,8 @@ function errMsg(x){const m=String(x&&x.message||x||"");
   const id=uid();store.trips[id]={id,title:o.title||"釜山麗水",nights:Math.max(0,o.days.length-1),days:o.days};store.dirty[id]=1;persist()})();
 /* cloud */
 async function call(o,post){const u=cloud.url;if(!u)throw new Error("nourl");
-  if(post){const r=await fetch(u,{method:"POST",body:JSON.stringify({...o,key:cloud.key})});return r.json()}
-  return (await fetch(u+"?"+new URLSearchParams({...o,key:cloud.key}))).json()}
+  const res=await (post?fetch(u,{method:"POST",body:JSON.stringify({...o,key:cloud.key})}):fetch(u+"?"+new URLSearchParams({...o,key:cloud.key})));
+  const t=await res.text();try{return JSON.parse(t)}catch(e){throw new Error("後端回傳的不是資料："+t.replace(/\s+/g," ").slice(0,60))}}
 const toRows=t=>t.days.flatMap((d,di)=>{const h=[t.id,t.title,t.nights||0,di+1,d.label,d.date];
   return d.items.length?d.items.map((it,i)=>[...h,i+1,it.time,it.name,it.type,it.stay,it.next,it.note,it.kr||"",t.token||"",(it.imgs||[]).join(","),t.cover||""]):[[...h,0,"","","","","","","",t.token||"","",t.cover||""]]});
 function group(rows){const T={};rows.sort((a,b)=>a[3]-b[3]||a[6]-b[6]).forEach(r=>{
@@ -221,7 +225,9 @@ function group(rows){const T={};rows.sort((a,b)=>a[3]-b[3]||a[6]-b[6]).forEach(r
 async function saveCloud(id){const t=store.trips[id];if(!t)return;
   try{sync("存檔中…");const r=await call({action:"save",id,token:t.token,rows:toRows(t)},true);
     if(r.ok){delete store.dirty[id];persist();sync("已存檔 "+new Date().toLocaleTimeString("zh-TW",{hour12:false}))}else sync("存檔失敗："+errMsg(r.error||"未知錯誤"))}
-  catch(e){sync("存檔失敗："+errMsg(e))}}
+  catch(e){try{const v=await call({action:"view",id}),m=r=>JSON.stringify(r.map(x=>x.map((c,i)=>i===14?"":String(c))));
+    if(Array.isArray(v.rows)&&m(v.rows)===m(toRows(t))){delete store.dirty[id];persist();sync("已存檔（讀回確認）"+new Date().toLocaleTimeString("zh-TW",{hour12:false}));return}}catch(e2){}
+    sync("存檔失敗："+await why(e))}}
 function schedule(id){if(!cloud.url)return;sync("尚未存檔…");clearTimeout(tm);tm=setTimeout(()=>saveCloud(id),1500)}
 function save(){store.dirty[tid]=1;persist();schedule(tid)}
 async function pull(){if(!cloud.url||!cloud.key)return;
@@ -355,7 +361,7 @@ document.addEventListener("pointerup",endDrag);document.addEventListener("pointe
 /* buttons */
 let pickIdx=0,pickMode="item";
 function drawH(){$("hl").innerHTML=(store.home||[]).map((f,i)=>`<div class="pic"><img src="${imgUrl(f,300)}" alt=""><button class="x" data-hx="${i}" aria-label="移除">✕</button></div>`).join("")+`<button class="addimg" id="hadd">＋ 上傳</button>`}
-function setHome(){persist();renderHero();if(cloud.url&&cloud.key)call({action:"sethome",home:store.home},true).catch(()=>toast("輪播照片同步失敗"))}
+function setHome(){persist();renderHero();if(cloud.url&&cloud.key)call({action:"sethome",home:store.home},true).catch(async()=>{try{const r=await call({action:"all"});if(JSON.stringify(r.home)===JSON.stringify(store.home))return}catch(e){}toast("輪播照片同步失敗")})}
 $("homepics").onclick=()=>{drawH();$("hdlg").showModal()};
 $("hdone").onclick=()=>$("hdlg").close();
 $("cvr").onclick=()=>{pickMode="cover";$("pf").click()};
@@ -364,12 +370,13 @@ $("pf").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f||RO)retur
   if(!cloud.url){toast("請先到頁面最下方設定雲端");return}
   const im=new Image();im.onload=async()=>{const k=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement("canvas");
     c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);toast("圖片上傳中…");
-    try{const r=await call({action:"upload",id:pickMode==="home"?"home":tid,token:pickMode==="home"?"":data.token,data:c.toDataURL("image/jpeg",.72)},true);
+    try{const nonce=uid(),pl={action:"upload",id:pickMode==="home"?"home":tid,token:pickMode==="home"?"":data.token,data:c.toDataURL("image/jpeg",.72),nonce};let r;
+      try{r=await call(pl,true)}catch(x){const v=await call({action:"up",nonce}).catch(()=>null);if(v&&v.fid)r={ok:true,fid:v.fid};else throw x}
       if(!r.ok)throw new Error(r.error);if(pickMode==="home"){store.home.push(r.fid);setHome();drawH()}
       else if(pickMode==="cover"){data.cover=r.fid;save();render()}
       else{const it=data.days[cur].items[pickIdx];(it.imgs=it.imgs||[]).push(r.fid);save();render()}
       toast("已加入圖片")}
-    catch(x){toast("上傳失敗："+errMsg(x))}};
+    catch(x){toast("上傳失敗："+await why(x))}};
   im.onerror=()=>toast("無法讀取這張圖片");im.src=URL.createObjectURL(f)};
 $("ndays").onchange=()=>{if(RO)return;const n=Math.min(30,Math.max(1,+$("ndays").value||1)),a=data.days;
   if(n<a.length){if(a.slice(n).some(d=>d.items.length)&&!confirm("減少天數會刪除最後 "+(a.length-n)+" 天的內容，確定嗎？")){$("ndays").value=a.length;return}a.length=n}
@@ -396,7 +403,11 @@ $("cfg").onclick=()=>{const u=prompt("貼上 Apps Script 網頁應用程式網�
   toast("正在測試連線…");
   call({action:"view",id:"test"}).then(r=>{if(!Array.isArray(r.rows))throw new Error("後端沒有正確回應");return call({action:"all"})})
     .then(r=>{if(r.error)throw new Error(r.error);toast("連線成功");return Promise.all(Object.keys(store.dirty).map(saveCloud))}).then(pull)
-    .catch(x=>toast("連線失敗："+errMsg(x)))};
+    .catch(async x=>toast("連線失敗："+await why(x)))};
+$("diag").onclick=async()=>{if(!cloud.url){alert("請先按「雲端設定」");return}
+  const t=[];for(const [n,f] of [["讀取（GET）",()=>call({action:"view",id:"test"})],["寫入（POST）",()=>call({action:"ping"},true)]]){
+    try{await f();t.push(n+"：成功")}catch(e){t.push(n+"：失敗（"+(e.message||e)+"）")}}
+  alert("連線診斷\n"+t.join("\n"))};
 $("nd").oninput=()=>{$("nnt").value=Math.max(0,(+$("nd").value||1)-1)};
 $("dcancel").onclick=()=>$("dlg").close();
 $("dok").onclick=()=>{const n=$("nn").value.trim();if(!n){$("nn").focus();return}
