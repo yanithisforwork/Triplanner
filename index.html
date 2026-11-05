@@ -20,6 +20,8 @@ button{border:1px solid var(--line);background:var(--card);border-radius:10px;pa
 button:hover{border-color:var(--rose)}
 button.primary{background:var(--pri);border-color:var(--pri);color:var(--on)}
 :focus-visible{outline:2px solid var(--rose);outline-offset:2px}
+.name:focus-visible,.time input:focus-visible,.title:focus-visible,.dayhead input:focus-visible,.gap input:focus-visible{outline:none;background:var(--soft);border-radius:6px}
+.row input:focus-visible,.row select:focus-visible,.note:focus-visible{outline:none;border-color:var(--rose);box-shadow:0 0 0 2px var(--soft)}
 .wrap{max-width:780px;margin:auto;padding:0 20px}
 .homehead{display:flex;align-items:flex-end;gap:10px;padding:44px 0 22px;flex-wrap:wrap}
 h1{margin:0;font-size:30px;letter-spacing:.08em;flex:1}
@@ -58,7 +60,8 @@ main{max-width:780px;margin:auto;padding:18px 20px 80px}
 .dayhead{display:flex;gap:8px;align-items:center;margin-bottom:14px}
 .dayhead input{border:0;border-bottom:1px dashed var(--line);background:none;padding:4px 2px;font-size:18px;font-weight:700;width:9em;font-family:"Noto Serif TC",serif}
 .dayhead input.date{font-weight:500;font-size:15px;color:var(--mute);width:7em;font-family:inherit}
-.stop{display:grid;grid-template-columns:64px 1fr;gap:12px}
+.stop{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px}
+.card,.gap{min-width:0}
 .time{padding-top:14px;text-align:right}
 .time input{width:100%;text-align:right;border:0;background:none;font-weight:700;font-size:17px;padding:0}
 .card{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;padding:10px 14px;--c:var(--t-spot)}
@@ -67,11 +70,12 @@ main{max-width:780px;margin:auto;padding:18px 20px 80px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--mute);font-size:13px}
 .row select,.row input{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
 .row input.stay{width:9em}.row input.kr{width:11em}
-.note{width:100%;margin-top:6px;border:1px dashed var(--line);border-radius:8px;background:none;padding:6px 8px;resize:vertical;min-height:34px;font-size:14px}
+.note{width:100%;margin-top:6px;border:1px dashed var(--line);border-radius:8px;background:none;padding:6px 8px;resize:vertical;min-height:34px;font-size:14px;line-height:1.55;overflow:hidden;display:block}
 .acts{display:flex;gap:4px;margin-left:auto}
 .acts button{padding:0 8px;font-size:13px;line-height:24px}
 .grip{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:0 8px;font-size:18px;line-height:24px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
 .stop.dragging{opacity:.45}.stop.over .card{outline:2px dashed var(--rose)}
+.row input.kr{order:2;flex:1 1 100%;width:100%}.row a.nv{order:3}.row .acts{order:4}
 .gap{grid-column:2;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0 4px 6px;color:var(--mute);font-size:13px;border-left:2px dotted var(--line);padding:6px 0 6px 14px}
 .gap input{border:0;border-bottom:1px dashed var(--line);background:none;width:11em;padding:0 2px;color:var(--mute)}
 a.nv{color:var(--pri);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;background:var(--bg)}
@@ -88,6 +92,16 @@ a.nv:hover{border-color:var(--rose)}
 .lb{position:fixed;inset:0;background:rgba(40,25,22,.85);display:none;align-items:center;justify-content:center;z-index:30;padding:20px;cursor:zoom-out}
 .lb.on{display:flex}.lb img{max-width:100%;max-height:100%;border-radius:12px}
 .lb button{position:absolute;top:14px;right:18px;border:0;background:none;color:#fff;font-size:28px}
+.ltitle{margin:0;font:700 18px "Noto Serif TC",serif}.lcount{color:var(--mute);font-size:13px}.tabsep{width:1px;background:var(--line);margin:6px 6px;flex:none}
+.li{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.li input[type=checkbox]{width:22px;height:22px;margin-top:5px;accent-color:var(--pri);flex:none}
+.lf{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.lf input{border:0;background:none;padding:2px 0;width:100%;border-radius:6px}
+.lf .lt{font-weight:700;font-size:16px}.lf .ln{color:var(--mute);font-size:13px}
+.lf input:focus-visible{outline:none;background:var(--soft)}
+.li.done .lf input{text-decoration:line-through;opacity:.5}
+.li>button{padding:0 9px;line-height:28px;flex:none}
+.cvbar{height:110px;border-radius:14px;overflow:hidden;margin:8px 0 4px;background:var(--soft)}.cvbar img{width:100%;height:100%;object-fit:cover;display:block}
+@media (max-width:480px){.cvbar{height:90px}}
 .foot{max-width:780px;margin:0 auto;padding:0 20px 60px}.foot button{color:var(--mute);font-size:13px}
 dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:24px;width:min(92vw,400px)}
 dialog::backdrop{background:rgba(60,40,35,.4)}
@@ -106,9 +120,10 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 #pv h1{font-size:24px;margin:0 0 2px}#pv .sub{color:#666;margin-bottom:14px}
 #pv h2{font:700 18px "Noto Serif TC",serif;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #999;break-after:avoid}
 #pv .pi{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:3px 0;break-inside:avoid}
-#pv .pi b{text-align:right}#pv .pi small{color:#666}#pv .mv{margin-left:64px;color:#777;font-size:12px;break-inside:avoid}#pv .pi img{width:110px;margin:6px 6px 0 0;border-radius:6px}}
+#pv .pi b{text-align:right}#pv .pi small{color:#666}#pv .mv{margin-left:64px;color:#777;font-size:12px;break-inside:avoid}#pv .pi img{width:110px;margin:6px 6px 0 0;border-radius:6px}
+#pv .pgb{break-before:page}#pv .lp{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #ddd;break-inside:avoid;font-size:15px}#pv .lp .bl{height:20px}#pv .lp small{color:#666}#pv .pcv{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px}}
 .dayhead button{white-space:nowrap}
-@media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px 1fr;gap:8px}.time input{font-size:15px}.title{font-size:24px}}
+@media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
 </style>
 </head>
 <body>
@@ -120,6 +135,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 <section id="editor" hidden><div class="wrap">
   <div class="bar"><button id="back">← 首頁</button><span id="sync" class="sync"></span><span class="sp"></span>
     <button id="save" class="primary">存檔</button><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button></div>
+  <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
   <div class="brand">旅遊行程規劃</div>
   <div class="titlebox"><input id="title" class="title" aria-label="行程名稱" placeholder="行程名稱">
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span><button id="cvr">設定封面</button><button id="cvx">清除封面</button></div>
@@ -180,8 +196,9 @@ S("19:16","金海機場國際線 Dunkin’","food","1小時")]}
 ]};
 const $=id=>document.getElementById(id);
 const SK="trip-store-v2",CK="itinerary-cloud-v1";
-let store={trips:{},dirty:{}},cloud={},RO=false,tid=null,data=null,cur=0,tm,shareUrl="";
+let store={trips:{},dirty:{}},cloud={},RO=false,tid=null,data=null,cur=0,view="day",tm,shareUrl="";
 try{store=JSON.parse(localStorage.getItem(SK))||store}catch(e){}
+store.lists=store.lists||{};
 store.home=store.home||[];
 try{cloud=JSON.parse(localStorage.getItem(CK))||{}}catch(e){}
 (async function(){const q=new URLSearchParams(location.search),h=location.hash.match(/^#t=(.+)$/);
@@ -203,6 +220,7 @@ async function why(x){const m=errMsg(x);if(!/連不到後端/.test(m))return m;
     return "能連到 Google，但回應被瀏覽器擋下。多半是公司（Workspace）帳號不允許公開存取，或後端網址被導向登入頁。請用無痕視窗開啟「網址?action=view&id=test」，看到登入畫面就是這個原因"}
   catch(e2){return "完全連不到 script.google.com。請確認不是在 claude.ai 預覽裡開啟，暫時關閉廣告攔截或隱私外掛，並檢查網路或 VPN"}}
 function errMsg(x){const m=String(x&&x.message||x||"");
+  if(/abort/i.test(m))return "連線逾時：網路太慢或後端沒有回應";
   if(/Failed to fetch|NetworkError|Load failed|network/i.test(m))return "連不到後端。請確認網址是 /exec 結尾、部署的「誰可以存取」選「所有人」，且不是在 claude.ai 預覽裡開啟";
   if(/^後端回傳/.test(m))return m+"。通常是「誰可以存取」沒有選「所有人」，或網址不是最新部署的 /exec";
   if(m==="沒有權限"||m==="密碼錯誤")return "密碼不對或沒有權限，請到頁面最下方重新設定雲端";
@@ -212,9 +230,11 @@ function errMsg(x){const m=String(x&&x.message||x||"");
   if(!o||!o.days)return;
   const id=uid();store.trips[id]={id,title:o.title||"釜山麗水",nights:Math.max(0,o.days.length-1),days:o.days};store.dirty[id]=1;persist()})();
 /* cloud */
+let netTimeout=25000;
 async function call(o,post){const u=cloud.url;if(!u)throw new Error("nourl");
-  const res=await (post?fetch(u,{method:"POST",body:JSON.stringify({...o,key:cloud.key})}):fetch(u+"?"+new URLSearchParams({...o,key:cloud.key})));
-  const t=await res.text();try{return JSON.parse(t)}catch(e){throw new Error("後端回傳的不是資料："+t.replace(/\s+/g," ").slice(0,60))}}
+  const body=post?JSON.stringify({...o,key:cloud.key}):null,ac=new AbortController(),to=setTimeout(()=>ac.abort(),o.action==="upload"?Math.max(netTimeout,60000):netTimeout);
+  let t;try{const res=await (post?fetch(u,{method:"POST",body,keepalive:flushing&&body.length<60000,signal:ac.signal}):fetch(u+"?"+new URLSearchParams({...o,key:cloud.key}),{cache:"no-store",signal:ac.signal}));t=await res.text()}finally{clearTimeout(to)}
+ try{return JSON.parse(t)}catch(e){throw new Error("後端回傳的不是資料："+t.replace(/\s+/g," ").slice(0,60))}}
 const toRows=t=>t.days.flatMap((d,di)=>{const h=[t.id,t.title,t.nights||0,di+1,d.label,d.date];
   return d.items.length?d.items.map((it,i)=>[...h,i+1,it.time,it.name,it.type,it.stay,it.next,it.note,it.kr||"",t.token||"",(it.imgs||[]).join(","),t.cover||""]):[[...h,0,"","","","","","","",t.token||"","",t.cover||""]]});
 function group(rows){const T={};rows.sort((a,b)=>a[3]-b[3]||a[6]-b[6]).forEach(r=>{
@@ -222,24 +242,31 @@ function group(rows){const T={};rows.sort((a,b)=>a[3]-b[3]||a[6]-b[6]).forEach(r
   const d=t.days[k]=t.days[k]||{label:String(r[4]),date:String(r[5]),items:[]};
   if(+r[6]>0)d.items.push({time:String(r[7]),name:String(r[8]),type:r[9]||"spot",stay:String(r[10]),next:String(r[11]),note:String(r[12]),kr:String(r[13]||""),imgs:String(r[15]||"").split(",").filter(Boolean)})});
   Object.values(T).forEach(t=>t.days=t.days.filter(Boolean));return T}
-async function saveCloud(id){const t=store.trips[id];if(!t)return;
-  try{sync("存檔中…");const r=await call({action:"save",id,token:t.token,rows:toRows(t)},true);
-    if(r.ok){delete store.dirty[id];persist();sync("已存檔 "+new Date().toLocaleTimeString("zh-TW",{hour12:false}))}else sync("存檔失敗："+errMsg(r.error||"未知錯誤"))}
-  catch(e){try{const v=await call({action:"view",id}),m=r=>JSON.stringify(r.map(x=>x.map((c,i)=>i===14?"":String(c))));
-    if(Array.isArray(v.rows)&&m(v.rows)===m(toRows(t))){delete store.dirty[id];persist();sync("已存檔（讀回確認）"+new Date().toLocaleTimeString("zh-TW",{hour12:false}));return}}catch(e2){}
-    sync("存檔失敗："+await why(e))}}
+let flushing=false;const inflight={},again={},sv={};
+async function saveOnce(id){const t=store.trips[id];if(!t)return;store.ver=store.ver||{};const ver=store.ver[id]||0;sv[id]=ver;
+  const done=txt=>{if((store.ver[id]||0)===ver){delete store.dirty[id];persist();sync(txt+new Date().toLocaleTimeString("zh-TW",{hour12:false}))}else sync("尚未存檔…")};
+  const m=r=>JSON.stringify(r.map(x=>x.map((c,i)=>i===14?"":String(c)))),want=toRows(t);
+  try{sync("存檔中…");const r=await call({action:"save",id,token:t.token,rows:want},true);
+    if(r.ok)done("已存檔 ");else sync("存檔失敗："+errMsg(r.error||"未知錯誤"))}
+  catch(e){let ok=false;for(let k=0;k<4&&!ok;k++){if(k)await new Promise(z=>setTimeout(z,1500));
+      try{const v=await call({action:"view",id});ok=Array.isArray(v.rows)&&m(v.rows)===m(want)}catch(e2){}}
+    if(ok)done("已存檔（讀回確認）");else sync("存檔失敗："+await why(e))}}
+function saveCloud(id){if(inflight[id]){if(((store.ver||{})[id]||0)>(sv[id]||0))again[id]=1;return inflight[id]}
+  return inflight[id]=(async()=>{try{do{again[id]=0;await saveOnce(id)}while(again[id])}finally{delete inflight[id]}})()}
 function schedule(id){if(!cloud.url)return;sync("尚未存檔…");clearTimeout(tm);tm=setTimeout(()=>saveCloud(id),1500)}
-function save(){store.dirty[tid]=1;persist();schedule(tid)}
+function save(){store.ver=store.ver||{};store.ver[tid]=(store.ver[tid]||0)+1;store.dirty[tid]=1;persist();schedule(tid)}
 async function pull(){if(!cloud.url||!cloud.key)return;
   try{const r=await call({action:"all"});if(r.error||!r.rows)throw 0;const T=group(r.rows);if(Array.isArray(r.home))store.home=r.home;
     for(const id in T)if(!store.dirty[id])store.trips[id]=T[id];
     for(const id in store.trips)if(!T[id]&&!store.dirty[id])delete store.trips[id];
     persist();if(!tid)renderHome()}catch(e){toast("無法連線雲端，目前顯示本機資料")}}
-async function refreshTrip(id){if(!cloud.url||RO||store.dirty[id])return;
+async function refreshTrip(id){if(!cloud.url||RO||store.dirty[id]||inflight[id])return;
   try{const r=await call({action:"view",id}),T=group(r.rows||[])[id];
     if(T)T.token=(store.trips[id]||{}).token||"";
     if(T&&tid===id&&!store.dirty[id]&&JSON.stringify(T)!==JSON.stringify(store.trips[id])){store.trips[id]=T;data=T;persist();if(cur>=T.days.length)cur=0;showEditor()}}catch(e){}}
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&tid)refreshTrip(tid)});
+function flush(){if(tid&&store.dirty[tid]&&cloud.url&&!RO){clearTimeout(tm);flushing=true;try{saveCloud(tid)}finally{flushing=false}}}
+document.addEventListener("visibilitychange",()=>{if(document.hidden)flush();else if(tid)refreshTrip(tid)});
+addEventListener("pagehide",flush);
 /* home */
 const PAL=[["#f3d6da","#e8b4bc"],["#ecd9cf","#c9a58f"],["#f7e4df","#dc9aa6"],["#dcc6ba","#a87f68"]];
 const cover=t=>{if(t.cover)return t.cover;for(const d of t.days)for(const it of d.items)if(it.imgs&&it.imgs[0])return it.imgs[0];return null};
@@ -260,19 +287,22 @@ function renderHero(){const h=$("hero");clearInterval(heroTimer);
   if(L.length<2)return;let n=0;
   heroTimer=setInterval(()=>{if(document.hidden||$("home").hidden)return;const s=h.querySelectorAll(".hs"),d=h.querySelectorAll(".dots i");
     s[n].classList.remove("on");d[n].classList.remove("on");n=(n+1)%s.length;s[n].classList.add("on");d[n].classList.add("on")},4500)}
-function renderHome(){const own=cloud.key||!cloud.url;$("grid").innerHTML=(own?`<button class="tc new" id="newtrip">＋ 新增行程</button>`:"")+(own&&!Object.keys(store.trips).length?`<button class="tc new" id="sample">載入範例：釜山麗水行程</button>`:"")+Object.values(store.trips).map(t=>{const c=cover(t),k=[...t.id].reduce((a,ch)=>a+ch.charCodeAt(0),0)%PAL.length,p=PAL[k];return `<article class="tc" data-open="${t.id}" tabindex="0"><div class="cv">${c?`<img src="${imgUrl(c,500)}" alt="" loading="lazy">`:coverArt(p,k)}</div><h3>${esc(t.title)}</h3><p>${t.days.length}天${+t.nights||0}夜</p><div class="tcact"><button data-share="${t.id}">分享</button>${own?`<button data-del="${t.id}">刪除</button>`:""}</div></article>`}).join("");$("homepics").hidden=!own;renderHero()}
+function renderHome(){const own=cloud.key||!cloud.url;$("grid").innerHTML=(own?`<button class="tc new" id="newtrip">＋ 新增行程</button>`:"")+(own&&!Object.keys(store.trips).length?`<button class="tc new" id="sample">載入範例：釜山麗水行程</button>`:"")+Object.values(store.trips).map(t=>{const c=cover(t),k=[...t.id].reduce((a,ch)=>a+ch.charCodeAt(0),0)%PAL.length,p=PAL[k];return `<article class="tc" data-open="${t.id}" tabindex="0"><div class="cv">${c?`<img src="${imgUrl(c,500)}" alt="" loading="lazy">`:coverArt(p,k)}</div><h3>${esc(t.title)}</h3><p>${t.days.length}天${+t.nights||0}夜${store.dirty[t.id]&&cloud.url?" · 尚未同步":""}</p><div class="tcact"><button data-share="${t.id}">分享</button>${own?`<button data-del="${t.id}">刪除</button>`:""}</div></article>`}).join("");$("homepics").hidden=!own;renderHero()}
 function showHome(){tid=null;data=null;$("editor").hidden=true;$("home").hidden=false;document.title="旅遊行程規劃";renderHome()}
 function showEditor(){$("home").hidden=true;$("editor").hidden=false;$("title").value=data.title;$("nights").value=data.nights||0;document.title=data.title;sync("");$("inv").hidden=RO||!cloud.key;$("foot").hidden=RO||(!cloud.key&&!!cloud.url);render()}
+function lockShare(on,msg){["cp","line","sys"].forEach(i=>$(i).disabled=on);if(msg)$("shint").textContent=msg}
+async function syncThen(id,okMsg){if(!store.dirty[id]&&!inflight[id])return;
+  lockShare(true,"正在同步最新內容…");await saveCloud(id);
+  lockShare(false,store.dirty[id]?"同步失敗：對方可能看不到最新內容，請稍後按「存檔」，確認成功後再分享":okMsg)}
 async function shareTrip(id){if(!cloud.url){toast("請先到行程頁最下方設定雲端");return}
   const sid=(cloud.url.match(/\/s\/([^/]+)\/exec/)||[])[1];if(!sid){toast("雲端網址格式不正確");return}
-  toast("正在存檔…");await saveCloud(id);if(store.dirty[id]){toast("存檔失敗，無法產生分享連結");return}
-  openShare(location.origin+location.pathname+"?v="+id+"&s="+sid,"分享行程","對方只能檢視，無法修改。")}
+  const msg="對方只能檢視，無法修改。";openShare(location.origin+location.pathname+"?v="+id+"&s="+sid,"分享行程",msg);await syncThen(id,msg)}
 async function inviteTrip(id){if(!cloud.url){toast("請先到行程頁最下方按「雲端設定」");return}
   const t=store.trips[id],sid=(cloud.url.match(/\/s\/([^/]+)\/exec/)||[])[1];if(!sid){toast("雲端網址格式不正確");return}
   if(!t.token){t.token=uid()+uid();store.dirty[id]=1;persist()}
-  toast("正在存檔…");await saveCloud(id);if(store.dirty[id]){toast("存檔失敗，無法產生邀請連結");return}
-  openShare(location.origin+location.pathname+"?s="+sid+"&i="+id+"#t="+encodeURIComponent(t.token),"邀請共同編輯","拿到連結的人可以編輯「"+t.title+"」這個行程，但看不到也改不了你的其他行程。")}
-function openShare(u,h,hint){shareUrl=u;$("sh3").textContent=h;$("shint").textContent=hint;$("lnk").value=u;$("sys").hidden=!navigator.share;$("shr").showModal()}
+  const msg="拿到連結的人可以編輯「"+t.title+"」這個行程，但看不到也改不了你的其他行程。";
+  openShare(location.origin+location.pathname+"?s="+sid+"&i="+id+"#t="+encodeURIComponent(t.token),"邀請共同編輯",msg);await syncThen(id,msg)}
+function openShare(u,h,hint){lockShare(false);shareUrl=u;$("sh3").textContent=h;$("shint").textContent=hint;$("lnk").value=u;$("sys").hidden=!navigator.share;$("shr").showModal()}
 /* editor */
 const hm=t=>{const m=String(t||"").match(/(\d{1,2}):(\d{2})/);return m?+m[1]*60+ +m[2]:null};
 const dur=v=>{v=String(v||"");const h=v.match(/(\d+)\s*小時/),m=v.match(/(\d+)\s*分/);return(h?+h[1]*60:0)+(m?+m[1]:0)};
@@ -280,10 +310,24 @@ const fm=n=>{n=((n%1440)+1440)%1440;return String(Math.floor(n/60)).padStart(2,"
 function recalc(d){const a=d.items;let t=hm(a[0]&&a[0].time);if(t===null)return;
   for(let i=1;i<a.length;i++){const p=a[i-1],lv=hm(p.stay);t=(lv!==null?Math.max(lv,t):t+dur(p.stay))+dur(p.next);a[i].time=fm(t)}}
 function paint(){const d=data.days[cur];document.querySelectorAll(".time input").forEach((x,i)=>{if(d.items[i]&&document.activeElement!==x)x.value=d.items[i].time})}
+const lists=()=>store.lists[tid]=store.lists[tid]||{gift:[],shop:[]};
+const cnt=L=>L.length?" "+L.filter(x=>x.c).length+"/"+L.length:"";
+const LT={gift:["送禮名單","送給誰","想送什麼、預算"],shop:["購物清單","想買的東西","品牌、店家、價格"]};
+function renderList(){const L=lists()[view],T=LT[view];
+  $("main").innerHTML=`<div class="dayhead"><h2 class="ltitle">${T[0]}</h2><span class="lcount">已完成 ${L.filter(x=>x.c).length}/${L.length}</span></div>`+
+  L.map((x,i)=>`<div class="li ${x.c?"done":""}"><input type="checkbox" data-lc="${i}" ${x.c?"checked":""} aria-label="完成"><div class="lf"><input class="lt" data-lt="${i}" value="${esc(x.t)}" placeholder="${T[1]}"><input class="ln" data-ln="${i}" value="${esc(x.n)}" placeholder="${T[2]}"></div><button data-ld="${i}" aria-label="刪除">✕</button></div>`).join("")+
+  `<button class="add" data-la>＋ 新增項目</button><p class="hint">這份清單只存在這台裝置，不會同步到 Google Sheet，也不會出現在分享連結。</p>`}
+const fit=el=>{el.style.height="auto";el.style.height=Math.max(34,el.scrollHeight+2)+"px"};
+const kw=it=>/^https?:/i.test(it.kr||"")?it.name:(it.kr||it.name);
+const nvUrl=it=>/naver\.(com|me)/i.test(it.kr||"")?it.kr:"https://map.naver.com/p/search/"+encodeURIComponent(kw(it));
+const ggUrl=it=>/google\.[a-z.]+\/maps|goo\.gl|maps\.app/i.test(it.kr||"")?it.kr:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(kw(it));
 function render(){
+  const cvSrc=cover(data);$("cvbar").hidden=!cvSrc;if(cvSrc)$("cvimg").src=imgUrl(cvSrc,900);
   $("cvr").hidden=RO;$("cvr").textContent=data.cover?"更換封面":"設定封面";$("cvx").hidden=RO||!data.cover;
   if(document.activeElement!==$("ndays"))$("ndays").value=data.days.length;
-  $("tabs").innerHTML=data.days.map((d,i)=>`<button class="tab ${i==cur?"on":""}" data-tab="${i}">${esc(d.label)}</button>`).join("")+`<button class="tab" data-adddays>＋ 新增一天</button>`;
+  if(RO)view="day";const LC=RO?null:lists();
+  $("tabs").innerHTML=data.days.map((d,i)=>`<button class="tab ${view==="day"&&i==cur?"on":""}" data-tab="${i}">${esc(d.label)}</button>`).join("")+`<button class="tab" data-adddays>＋ 新增一天</button>`+(RO?"":`<i class="tabsep"></i><button class="tab ${view==="gift"?"on":""}" data-view="gift">送禮名單${cnt(LC.gift)}</button><button class="tab ${view==="shop"?"on":""}" data-view="shop">購物清單${cnt(LC.shop)}</button>`);
+  if(view!=="day"){renderList();return}
   const d=data.days[cur];
   let h=`<div class="dayhead"><input data-f="label" value="${esc(d.label)}" aria-label="天數名稱"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期" aria-label="日期"><span style="flex:1"></span><button data-delday>刪除此天</button></div>`;
   d.items.forEach((it,i)=>{
@@ -293,21 +337,23 @@ function render(){
       <div class="row">
         <select data-i="${i}" data-k="type" aria-label="類型">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${k==it.type?"selected":""}>${v}</option>`).join("")}</select>
         <span>停留</span><input class="stay" data-i="${i}" data-k="stay" value="${esc(it.stay)}">
-        <input class="kr" data-i="${i}" data-k="kr" value="${esc(it.kr)}" placeholder="韓文名稱（選填）" aria-label="韓文搜尋名稱"><a class="nv" target="_blank" rel="noopener" href="https://map.naver.com/p/search/${encodeURIComponent(it.kr||it.name)}">Naver 地圖</a><a class="nv" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(it.name)}">Google 地圖</a>
+        <input class="kr" data-i="${i}" data-k="kr" value="${esc(it.kr)}" placeholder="韓文店名或地圖連結（選填，搜尋更準）" aria-label="韓文搜尋名稱"><a class="nv" target="_blank" rel="noopener" href="${nvUrl(it)}">Naver 地圖</a><a class="nv" target="_blank" rel="noopener" href="${ggUrl(it)}">Google 地圖</a>
         <span class="acts"><span class="grip" data-grip title="按住拖曳排序">⠿</span><button data-up="${i}" title="上移">↑</button><button data-down="${i}" title="下移">↓</button><button data-del="${i}" title="刪除">✕</button></span>
       </div>
       <textarea class="note" data-i="${i}" data-k="note" placeholder="備註（訂位、票價、車次…）" rows="1">${esc(it.note)}</textarea>
       <div class="pics">${(it.imgs||[]).map((f,j)=>`<div class="pic" data-z="${i}:${j}"><img src="${imgUrl(f,300)}" alt="備註圖片" loading="lazy"><button class="cvb ${data.cover===f?"on":""}" data-cv="${i}:${j}" aria-label="設為封面" title="設為封面">★</button><button class="x" data-pd="${i}:${j}" aria-label="移除圖片">✕</button></div>`).join("")}<button class="addimg" data-addimg="${i}">＋ 圖片</button></div>
     </div></div>`;
-    if(i<d.items.length-1)h+=`<div class="gap">移動 <input data-i="${i}" data-k="next" value="${esc(it.next)}" placeholder="交通方式與時間"> <a class="nv" target="_blank" rel="noopener" href="https://map.naver.com/p/directions/-/-/-/transit">Naver 路線</a> <a class="nv" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(it.name)}&destination=${encodeURIComponent(d.items[i+1].name)}&travelmode=transit">Google 路線</a></div>`;
+    if(i<d.items.length-1)h+=`<div class="gap">移動 <input data-i="${i}" data-k="next" value="${esc(it.next)}" placeholder="交通方式與時間"> <a class="nv" target="_blank" rel="noopener" href="https://map.naver.com/p/directions/-/-/-/transit">Naver 路線</a> <a class="nv" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(kw(it))}&destination=${encodeURIComponent(kw(d.items[i+1]))}&travelmode=transit">Google 路線</a></div>`;
   });
   h+=`<button class="add" data-add>＋ 新增行程</button>`;
   $("main").innerHTML=h;
   if(RO){document.querySelectorAll("#main input,#main textarea").forEach(x=>x.readOnly=true);document.querySelectorAll("#main select").forEach(x=>x.disabled=true)}
-  buildPrint()
+  document.querySelectorAll(".note").forEach(fit);buildPrint()
 }
 document.addEventListener("input",e=>{
   const t=e.target;if(RO)return;
+  if(t.dataset.lt!==undefined||t.dataset.ln!==undefined){const it=lists()[view][+(t.dataset.lt??t.dataset.ln)];if(t.dataset.lt!==undefined)it.t=t.value;else it.n=t.value;persist();return}
+  if(t.classList&&t.classList.contains("note"))fit(t);
   if(t.id==="title"){data.title=t.value;document.title=t.value||"旅遊行程規劃";save();return}
   if(t.id==="nights"){data.nights=+t.value||0;save();return}
   if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
@@ -316,6 +362,9 @@ document.addEventListener("input",e=>{
     const k=t.dataset.k,i=+t.dataset.i;if(k==="stay"||k==="next"||(k==="time"&&i===0)){recalc(data.days[cur]);paint()}
     save()}
 });
+document.addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.lc!==undefined&&!RO){lists()[view][+t.dataset.lc].c=t.checked;persist();render()}});
+addEventListener("resize",()=>document.querySelectorAll(".note").forEach(fit));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>document.querySelectorAll(".note").forEach(fit));
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.dataset&&e.target.dataset.open)location.hash="#e="+e.target.dataset.open});
 document.addEventListener("click",e=>{
   const b=e.target.closest("button"),ds=b?b.dataset:{};
@@ -326,15 +375,20 @@ document.addEventListener("click",e=>{
     if(b&&b.id==="newtrip"){$("nn").value="";$("nd").value=3;$("nnt").value=2;$("dlg").showModal();return}
     if(ds.share){shareTrip(ds.share);return}
     if(ds.del){const t=store.trips[ds.del];if(!confirm(cloud.key?"確定刪除「"+t.title+"」？雲端 Sheet 裡的這份行程也會一併刪除。":"確定從這台裝置移除「"+t.title+"」？雲端上的行程不會被刪除。"))return;
-      delete store.trips[ds.del];delete store.dirty[ds.del];persist();renderHome();
+      delete store.trips[ds.del];delete store.dirty[ds.del];delete store.lists[ds.del];persist();renderHome();
       if(cloud.url&&cloud.key)call({action:"delete",id:ds.del},true).catch(()=>toast("雲端刪除失敗，請稍後再試"));return}
     const c=e.target.closest("[data-open]");if(c&&!b)location.hash="#e="+c.dataset.open;return}
   const z=e.target.closest("[data-z]");
   if(z&&data&&!(b&&(b.dataset.pd!==undefined||b.dataset.cv!==undefined))){const [zi,zj]=z.dataset.z.split(":").map(Number);$("big").src=imgUrl(data.days[cur].items[zi].imgs[zj],1200);$("lb").classList.add("on");return}
   if(e.target.closest("#lb")){$("lb").classList.remove("on");return}
+  if(b&&data&&!RO&&(ds.view!==undefined||ds.la!==undefined||ds.ld!==undefined)){
+    if(ds.view!==undefined)view=ds.view;
+    else if(ds.la!==undefined){lists()[view].push({t:"",n:"",c:false});persist()}
+    else{lists()[view].splice(+ds.ld,1);persist()}
+    render();if(ds.la!==undefined){const a=document.querySelectorAll(".lt");a[a.length-1].focus()}return}
   if(!b||!data)return;const d=data.days[cur];
   if(RO&&ds.tab===undefined)return;
-  if(ds.tab!==undefined){cur=+ds.tab}
+  if(ds.tab!==undefined){cur=+ds.tab;view="day"}
   else if(ds.adddays!==undefined){data.days.push({label:"第"+(data.days.length+1)+"天",date:"",items:[]});cur=data.days.length-1}
   else if(ds.delday!==undefined){if(!confirm("確定刪除「"+d.label+"」？"))return;data.days.splice(cur,1);if(!data.days.length)data.days.push({label:"第1天",date:"",items:[]});cur=0}
   else if(ds.add!==undefined){d.items.push({time:"",name:"",type:"spot",stay:"",next:"",note:"",kr:""})}
@@ -371,7 +425,7 @@ $("pf").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f||RO)retur
   const im=new Image();im.onload=async()=>{const k=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement("canvas");
     c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);toast("圖片上傳中…");
     try{const nonce=uid(),pl={action:"upload",id:pickMode==="home"?"home":tid,token:pickMode==="home"?"":data.token,data:c.toDataURL("image/jpeg",.72),nonce};let r;
-      try{r=await call(pl,true)}catch(x){const v=await call({action:"up",nonce}).catch(()=>null);if(v&&v.fid)r={ok:true,fid:v.fid};else throw x}
+      try{r=await call(pl,true)}catch(x){toast("確認上傳結果…");let fid=null;for(let k=0;k<6&&!fid;k++){await new Promise(z=>setTimeout(z,1500));try{const v=await call({action:"up",nonce});fid=v&&v.fid||null}catch(e2){}}if(fid)r={ok:true,fid};else throw x}
       if(!r.ok)throw new Error(r.error);if(pickMode==="home"){store.home.push(r.fid);setHome();drawH()}
       else if(pickMode==="cover"){data.cover=r.fid;save();render()}
       else{const it=data.days[cur].items[pickIdx];(it.imgs=it.imgs||[]).push(r.fid);save();render()}
@@ -383,11 +437,15 @@ $("ndays").onchange=()=>{if(RO)return;const n=Math.min(30,Math.max(1,+$("ndays")
   else while(a.length<n)a.push({label:"第"+(a.length+1)+"天",date:"",items:[]});
   data.nights=Math.max(0,n-1);$("nights").value=data.nights;if(cur>=a.length)cur=a.length-1;save();render()};
 $("back").onclick=()=>{location.hash=""};
+function listPrint(k){const L=(store.lists[tid]||{})[k]||[],T=LT[k];
+  const rows=L.map(x=>`<div class="lp"><span>${x.c?"☑":"☐"}</span><div><b>${esc(x.t)}</b>${x.n?` <small>${esc(x.n)}</small>`:""}</div></div>`).join("");
+  const blank=Array.from({length:Math.max(0,14-L.length)},()=>`<div class="lp"><span>☐</span><div class="bl"></div></div>`).join("");
+  return `<div class="pgb"><h2>${T[0]}</h2>${rows}${blank}</div>`}
 function buildPrint(){if(!data)return;
-  $("pv").innerHTML=`<h1>${esc(data.title)}</h1><div class="sub">${data.days.length}天${+data.nights||0}夜</div>`+data.days.map(d=>
+  $("pv").innerHTML=(cover(data)?`<img class="pcv" src="${imgUrl(cover(data),700)}" alt="">`:"")+`<h1>${esc(data.title)}</h1><div class="sub">${data.days.length}天${+data.nights||0}夜</div>`+data.days.map(d=>
     `<h2>${esc(d.label)}${d.date?"　"+esc(d.date):""}</h2>`+d.items.map((it,i)=>
       `<div class="pi"><b>${esc(it.time)}</b><div>${esc(it.name)}<br><small>${TYPES[it.type]||""}${it.stay?"・停留 "+esc(it.stay):""}</small>${it.note?`<br><small>${esc(it.note)}</small>`:""}${(it.imgs||[]).length?"<br>"+it.imgs.map(f=>`<img src="${imgUrl(f,300)}" alt="">`).join(""):""}</div></div>`+
-      (it.next&&i<d.items.length-1?`<div class="mv">↓ ${esc(it.next)}</div>`:"")).join("")).join("")}
+      (it.next&&i<d.items.length-1?`<div class="mv">↓ ${esc(it.next)}</div>`:"")).join("")).join("")+(RO||!tid?"":listPrint("gift")+listPrint("shop"))}
 addEventListener("beforeprint",buildPrint);
 $("print").onclick=()=>print();
 $("save").onclick=()=>{if(!cloud.url){toast("請先到頁面最下方按「雲端設定」");return}clearTimeout(tm);saveCloud(tid)};
@@ -427,7 +485,7 @@ async function openView(id,s){RO=true;document.body.classList.add("ro");$("title
 function route(){const q=new URLSearchParams(location.search);
   if(q.get("v")){openView(q.get("v"),q.get("s")||"");return}
   const m=location.hash.match(/^#e=(.+)$/);
-  if(m&&store.trips[m[1]]){tid=m[1];data=store.trips[tid];cur=0;showEditor();refreshTrip(tid)}else{showHome();pull()}}
+  if(m&&store.trips[m[1]]){tid=m[1];data=store.trips[tid];cur=0;view="day";showEditor();refreshTrip(tid)}else{showHome();pull()}}
 window.onhashchange=route;route();
 </script>
 </body>
