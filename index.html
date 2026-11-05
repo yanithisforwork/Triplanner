@@ -124,6 +124,11 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 #pv .pgb{break-before:page}#pv .lp{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #ddd;break-inside:avoid;font-size:15px}#pv .lp .bl{height:20px}#pv .lp small{color:#666}#pv .pcv{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px}#pv .lp img{width:46px;height:46px;object-fit:cover;border-radius:5px;margin-right:8px;vertical-align:middle}#pv .subs div{padding:1px 0}}
 .dayhead button{white-space:nowrap}
 @media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
+.titlebox{display:block}
+#cvr,#cvx{margin:6px 0 0 8px}
+.title{display:block;width:calc(100% + 10px);resize:none;overflow:hidden;line-height:1.35;min-height:0;font-size:26px}
+.meta{display:inline-block;margin-top:2px}
+.time input{padding:4px 0!important}
 /* 輸入框內距放寬 */
 .card .name{padding:4px 10px;margin:0 -10px;width:calc(100% + 20px)}
 .time input{padding:4px 8px}.dayhead input{padding:6px 10px}.gap input{padding:4px 8px}
@@ -154,7 +159,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
     <button id="save" class="primary">存檔</button><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button></div>
   <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
   <div class="brand">旅遊行程規劃</div>
-  <div class="titlebox"><input id="title" class="title" aria-label="行程名稱" placeholder="行程名稱">
+  <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span><button id="cvr">設定封面</button><button id="cvx">清除封面</button></div>
 </div>
 <nav><div class="tabs" id="tabs"></div></nav>
@@ -272,7 +277,7 @@ function renderHero(){const h=$("hero");clearInterval(heroTimer);
     s[n].classList.remove("on");d[n].classList.remove("on");n=(n+1)%s.length;s[n].classList.add("on");d[n].classList.add("on")},4500)}
 function renderHome(){const own=cloud.key||!cloud.url;$("grid").innerHTML=(own?`<button class="tc new" id="newtrip">＋ 新增行程</button>`:"")+Object.values(store.trips).map(t=>{const c=cover(t),k=[...t.id].reduce((a,ch)=>a+ch.charCodeAt(0),0)%PAL.length,p=PAL[k];return `<article class="tc" data-open="${t.id}" tabindex="0"><div class="cv">${c?`<img src="${imgUrl(c,500)}" alt="" loading="lazy">`:coverArt(p,k)}</div><h3>${esc(t.title)}</h3><p>${t.days.length}天${+t.nights||0}夜${store.dirty[t.id]&&cloud.url?" · 尚未同步":""}</p><div class="tcact"><button data-share="${t.id}">分享</button>${own?`<button data-del="${t.id}">刪除</button>`:""}</div></article>`}).join("");$("homepics").hidden=!own;renderHero()}
 function showHome(){tid=null;data=null;$("editor").hidden=true;$("home").hidden=false;document.title="旅遊行程規劃";renderHome()}
-function showEditor(){$("home").hidden=true;$("editor").hidden=false;$("title").value=data.title;$("nights").value=data.nights||0;document.title=data.title;sync("");$("inv").hidden=RO||!cloud.key;$("foot").hidden=RO||(!cloud.key&&!!cloud.url);render()}
+function showEditor(){$("home").hidden=true;$("editor").hidden=false;$("title").value=data.title;fit($("title"));$("nights").value=data.nights||0;document.title=data.title;sync("");$("inv").hidden=RO||!cloud.key;$("foot").hidden=RO||(!cloud.key&&!!cloud.url);render()}
 function lockShare(on,msg){["cp","line","sys"].forEach(i=>$(i).disabled=on);if(msg)$("shint").textContent=msg}
 async function syncThen(id,okMsg){if(!store.dirty[id]&&!inflight[id])return;
   lockShare(true,"正在同步最新內容…");await saveCloud(id);
@@ -349,7 +354,7 @@ function render(){
       <textarea class="note" data-i="${i}" data-k="note" placeholder="備註（訂位、票價、車次…）" rows="1">${esc(it.note)}</textarea>
       <div class="pics">${(it.imgs||[]).map((f,j)=>`<div class="pic" data-z="${i}:${j}"><img src="${imgUrl(f,300)}" alt="備註圖片" loading="lazy"><button class="cvb ${data.cover===f?"on":""}" data-cv="${i}:${j}" aria-label="設為封面" title="設為封面">★</button><button class="x" data-pd="${i}:${j}" aria-label="移除圖片">✕</button></div>`).join("")}<button class="addimg" data-addimg="${i}">＋ 圖片</button></div>
     </div></div>`;
-    if(i<d.items.length-1)h+=`<div class="gap">移動 <input data-i="${i}" data-k="next" value="${esc(it.next)}" placeholder="交通方式與時間"> <a class="nv" target="_blank" rel="noopener" data-nr="${i}" href="https://map.naver.com/p/directions/-/-/-/transit">Naver 路線</a> <a class="nv" target="_blank" rel="noopener" data-rt="${i}" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(kw(it))}&destination=${encodeURIComponent(kw(d.items[i+1]))}&travelmode=transit">Google 路線</a></div>`;
+    if(i<d.items.length-1)h+=`<div class="gap">移動 <input data-i="${i}" data-k="next" value="${esc(it.next)}" placeholder="交通方式與時間"> <a class="nv" target="_blank" rel="noopener" data-nr="${i}" href="https://map.naver.com/p/directions/-/-/-/transit">Naver 路線</a> <a class="nv" target="_blank" rel="noopener" data-rt="${i}" href="${rtUrl(it,d.items[i+1])}">Google 路線</a></div>`;
   });
   h+=`<button class="add" data-add>＋ 新增行程</button>`;
   $("main").innerHTML=h;
@@ -362,7 +367,7 @@ document.addEventListener("input",e=>{
   if(t.dataset.st!==undefined){const [i,j]=t.dataset.st.split(":").map(Number);lists().gift[i].subs[j].t=t.value;listSave();return}
   if(t.dataset.lt!==undefined||t.dataset.ln!==undefined){const it=lists().shop[+(t.dataset.lt??t.dataset.ln)];if(t.dataset.lt!==undefined)it.t=t.value;else it.n=t.value;listSave();return}
   if(t.classList&&t.classList.contains("note"))fit(t);
-  if(t.id==="title"){data.title=t.value;document.title=t.value||"旅遊行程規劃";save();return}
+  if(t.id==="title"){fit(t);data.title=t.value;document.title=t.value||"旅遊行程規劃";save();return}
   if(t.id==="nights"){data.nights=+t.value||0;save();return}
   if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
   if(t.dataset.k){const it=data.days[cur].items[+t.dataset.i];it[t.dataset.k]=t.value;if(t.dataset.k==="name"||t.dataset.k==="kr")refreshLinks();
@@ -374,11 +379,12 @@ document.addEventListener("change",e=>{const t=e.target,d=t.dataset;if(!d||RO)re
   if(d.lc!==undefined){lists().shop[+d.lc].c=t.checked;listSave();render()}
   else if(d.gc!==undefined){const p=lists().gift[+d.gc];if(p.subs.length)p.subs.forEach(x=>x.c=t.checked);else p.c=t.checked;listSave();render()}
   else if(d.sc!==undefined){const [i,j]=d.sc.split(":").map(Number),p=lists().gift[i];p.subs[j].c=t.checked;p.c=p.subs.every(x=>x.c);listSave();render()}});
-document.addEventListener("keydown",e=>{const d=e.target.dataset;if(e.key!=="Enter"||!d||RO||!tid)return;
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="title"){e.preventDefault();e.target.blur();return}
+  const d=e.target.dataset;if(e.key!=="Enter"||!d||RO||!tid)return;
   if(d.st!==undefined){e.preventDefault();const [i,j]=d.st.split(":").map(Number),p=lists().gift[i];p.subs.splice(j+1,0,{t:"",c:false});p.c=false;listSave();render();const a=document.querySelector('[data-st="'+i+":"+(j+1)+'"]');if(a)a.focus()}
   else if(d.lt!==undefined){e.preventDefault();const n=document.querySelector('[data-ln="'+d.lt+'"]');if(n)n.focus()}});
-addEventListener("resize",()=>document.querySelectorAll(".note").forEach(fit));
-if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>document.querySelectorAll(".note").forEach(fit));
+addEventListener("resize",()=>{document.querySelectorAll(".note").forEach(fit);fit($("title"))});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{document.querySelectorAll(".note").forEach(fit);fit($("title"))});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.dataset&&e.target.dataset.open)location.hash="#e="+e.target.dataset.open});
 document.addEventListener("click",e=>{
   const b=e.target.closest("button"),ds=b?b.dataset:{};
