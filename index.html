@@ -93,7 +93,7 @@ a.nv:hover{border-color:var(--rose)}
 .lb.on{display:flex}.lb img{max-width:100%;max-height:100%;border-radius:12px}
 .lb button{position:absolute;top:14px;right:18px;border:0;background:none;color:#fff;font-size:28px}
 .ltitle{margin:0;font:700 18px "Noto Serif TC",serif}.lcount{color:var(--mute);font-size:13px}.tabsep{width:1px;background:var(--line);margin:6px 6px;flex:none}
-.li{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.li{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px}
 .li input[type=checkbox]{width:22px;height:22px;margin-top:5px;accent-color:var(--pri);flex:none}
 .lf{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.lf input{border:0;background:none;padding:2px 0;width:100%;border-radius:6px}
 .lf .lt{font-weight:700;font-size:16px}.lf .ln{color:var(--mute);font-size:13px}
@@ -102,6 +102,7 @@ a.nv:hover{border-color:var(--rose)}
 .li>button{padding:0 9px;line-height:28px;flex:none}
 .cvbar{height:110px;border-radius:14px;overflow:hidden;margin:8px 0 4px;background:var(--soft)}.cvbar img{width:100%;height:100%;object-fit:cover;display:block}
 @media (max-width:480px){.cvbar{height:90px}}
+.nc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 60px}.nc p{margin:6px 0 12px;color:var(--mute)}.nc button{margin-right:8px}
 .foot{max-width:780px;margin:0 auto;padding:0 20px 60px}.foot button{color:var(--mute);font-size:13px}
 dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);padding:24px;width:min(92vw,400px)}
 dialog::backdrop{background:rgba(60,40,35,.4)}
@@ -125,7 +126,9 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .dayhead button{white-space:nowrap}
 @media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
 .titlebox{display:block}
-#cvr,#cvx{margin:6px 0 0 8px}
+.bar2{display:flex;gap:8px;flex-wrap:wrap;padding:0 0 8px}
+.bar .sp{display:none}.sync{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.cvtools{display:flex;justify-content:flex-end;gap:8px;margin:6px 0 4px}.ro .cvtools{display:none}
 .title{display:block;width:calc(100% + 10px);resize:none;overflow:hidden;line-height:1.35;min-height:0;font-size:26px}
 .meta{display:inline-block;margin-top:2px}
 .time input{padding:4px 0!important}
@@ -142,9 +145,9 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .sx{border:0;background:none;color:var(--mute);padding:0 6px;font-size:12px;line-height:24px}
 .subadd{align-self:flex-start;border:0;background:none;color:var(--pri);font-size:13px;padding:4px 10px}
 .li.done .sub .st{opacity:.5}
-.thumb{position:relative;width:56px;height:56px;border-radius:10px;overflow:hidden;border:1px solid var(--line);flex:none;cursor:zoom-in}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.thumb .x{position:absolute;top:2px;right:2px;width:18px;height:18px;padding:0;border-radius:50%;background:rgba(60,40,35,.72);color:#fff;border:0;font-size:10px;line-height:18px}
+.thumb{position:relative;width:60px;height:60px;flex:none;cursor:zoom-in}
+.thumb img{width:100%;height:100%;object-fit:contain;display:block;border-radius:10px;border:1px solid var(--line);background:#fff;padding:2px}
+.thumb .x{position:absolute;top:-7px;right:-7px;width:18px;height:18px;padding:0;border-radius:50%;background:rgba(60,40,35,.72);color:#fff;border:0;font-size:10px;line-height:18px}
 .thumbadd{width:56px;height:56px;flex:none;border:1px dashed var(--rose);border-radius:10px;background:none;color:var(--pri);font-size:12px;padding:0}
 </style>
 </head>
@@ -153,18 +156,19 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
   <div class="homehead"><h1>旅遊行程規劃</h1><button id="homepics">輪播照片</button></div>
   <div class="hero" id="hero"></div>
   <div class="grid" id="grid"></div>
+  <div id="homenote"></div>
 </div></section>
 <section id="editor" hidden><div class="wrap">
-  <div class="bar"><button id="back">← 首頁</button><span id="sync" class="sync"></span><span class="sp"></span>
-    <button id="save" class="primary">存檔</button><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button></div>
-  <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
-  <div class="brand">旅遊行程規劃</div>
+  <div class="bar"><button id="back">← 首頁</button><span id="sync" class="sync"></span><button id="save" class="primary">存檔</button></div>
+  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button></div>
   <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
-    <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span><button id="cvr">設定封面</button><button id="cvx">清除封面</button></div>
+    <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span></div>
+  <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
+  <div class="cvtools"><button id="cvr">設定封面</button><button id="cvx">清除封面</button></div>
 </div>
 <nav><div class="tabs" id="tabs"></div></nav>
 <main id="main"></main>
-<div class="foot" id="foot"><button id="cfg">雲端設定</button><button id="diag">連線診斷</button></div></section>
+<div class="foot" id="foot"><button id="cfg">雲端設定</button><button id="cfglink">複製裝置設定連結</button><button id="diag">連線診斷</button></div></section>
 <dialog id="dlg"><h3>新增行程</h3>
   <label for="nn">行程名稱</label><input id="nn" placeholder="例如：東京五日">
   <label for="nd">天數</label><input id="nd" type="number" min="1" max="30" value="3">
@@ -187,6 +191,9 @@ try{store=JSON.parse(localStorage.getItem(SK))||store}catch(e){}
 store.lists=store.lists||{};
 store.home=store.home||[];
 try{cloud=JSON.parse(localStorage.getItem(CK))||{}}catch(e){}
+(function(){const q=new URLSearchParams(location.search),h=location.hash.match(/^#o=(.+)$/);
+  if(q.get("s")&&h&&!q.get("v")&&!q.get("i")){cloud={url:"https://script.google.com/macros/s/"+q.get("s")+"/exec",key:decodeURIComponent(h[1])};
+    try{localStorage.setItem(CK,JSON.stringify(cloud))}catch(e){}history.replaceState(null,"",location.pathname);setTimeout(()=>toast("已連接雲端，正在載入你的行程…"),300)}})();
 (async function(){const q=new URLSearchParams(location.search),h=location.hash.match(/^#t=(.+)$/);
   if(!(q.get("i")&&q.get("s")&&h&&!q.get("v")))return;
   const id=q.get("i"),tok=decodeURIComponent(h[1]),url="https://script.google.com/macros/s/"+q.get("s")+"/exec";
@@ -228,7 +235,7 @@ function group(rows){const T={};rows.sort((a,b)=>a[3]-b[3]||a[6]-b[6]).forEach(r
   const d=t.days[k]=t.days[k]||{label:String(r[4]),date:String(r[5]),items:[]};
   if(+r[6]>0)d.items.push({time:String(r[7]),name:String(r[8]),type:r[9]||"spot",stay:String(r[10]),next:String(r[11]),note:String(r[12]),kr:String(r[13]||""),imgs:String(r[15]||"").split(",").filter(Boolean)})});
   Object.values(T).forEach(t=>t.days=t.days.filter(Boolean));return T}
-let flushing=false;const inflight={},again={},sv={};
+let pullState="";let flushing=false;const inflight={},again={},sv={};
 async function saveOnce(id){const t=store.trips[id];if(!t)return;store.ver=store.ver||{};const ver=store.ver[id]||0;sv[id]=ver;
   const done=txt=>{if((store.ver[id]||0)===ver){delete store.dirty[id];persist();sync(txt+new Date().toLocaleTimeString("zh-TW",{hour12:false}))}else sync("尚未存檔…")};
   const m=r=>JSON.stringify(r.map(x=>x.map((c,i)=>i===14?"":String(c)))),want=toRows(t);
@@ -241,12 +248,12 @@ function saveCloud(id){if(inflight[id]){if(((store.ver||{})[id]||0)>(sv[id]||0))
   return inflight[id]=(async()=>{try{do{again[id]=0;await saveOnce(id)}while(again[id])}finally{delete inflight[id]}})()}
 function schedule(id){if(!cloud.url)return;sync("尚未存檔…");clearTimeout(tm);tm=setTimeout(()=>saveCloud(id),1500)}
 function save(){store.ver=store.ver||{};store.ver[tid]=(store.ver[tid]||0)+1;store.dirty[tid]=1;persist();schedule(tid)}
-async function pull(){if(!cloud.url||!cloud.key)return;
+async function pull(){if(!cloud.url||!cloud.key)return;pullState="loading";
   try{const r=await call({action:"all"});if(r.error||!r.rows)throw 0;const T=group(r.rows);if(Array.isArray(r.home))store.home=r.home;
     for(const id in T)if(!store.dirty[id])store.trips[id]=T[id];
     if(r.lists)for(const id in r.lists)if(!store.ldirty[id])store.lists[id]=r.lists[id];
     for(const id in store.trips)if(!T[id]&&!store.dirty[id])delete store.trips[id];
-    persist();if(!tid)renderHome()}catch(e){toast("無法連線雲端，目前顯示本機資料")}}
+    pullState=Object.keys(T).length?"ok":"empty";persist();if(!tid)renderHome()}catch(e){pullState="fail";toast("無法連線雲端，目前顯示本機資料");if(!tid)renderHome()}}
 async function refreshTrip(id){if(!cloud.url||RO||store.dirty[id]||inflight[id])return;
   try{const r=await call({action:"view",id}),T=group(r.rows||[])[id];
     if(T)T.token=(store.trips[id]||{}).token||"";
@@ -275,9 +282,14 @@ function renderHero(){const h=$("hero");clearInterval(heroTimer);
   if(L.length<2)return;let n=0;
   heroTimer=setInterval(()=>{if(document.hidden||$("home").hidden)return;const s=h.querySelectorAll(".hs"),d=h.querySelectorAll(".dots i");
     s[n].classList.remove("on");d[n].classList.remove("on");n=(n+1)%s.length;s[n].classList.add("on");d[n].classList.add("on")},4500)}
-function renderHome(){const own=cloud.key||!cloud.url;$("grid").innerHTML=(own?`<button class="tc new" id="newtrip">＋ 新增行程</button>`:"")+Object.values(store.trips).map(t=>{const c=cover(t),k=[...t.id].reduce((a,ch)=>a+ch.charCodeAt(0),0)%PAL.length,p=PAL[k];return `<article class="tc" data-open="${t.id}" tabindex="0"><div class="cv">${c?`<img src="${imgUrl(c,500)}" alt="" loading="lazy">`:coverArt(p,k)}</div><h3>${esc(t.title)}</h3><p>${t.days.length}天${+t.nights||0}夜${store.dirty[t.id]&&cloud.url?" · 尚未同步":""}</p><div class="tcact"><button data-share="${t.id}">分享</button>${own?`<button data-del="${t.id}">刪除</button>`:""}</div></article>`}).join("");$("homepics").hidden=!own;renderHero()}
+function renderHome(){const own=cloud.key||!cloud.url;$("grid").innerHTML=(own?`<button class="tc new" id="newtrip">＋ 新增行程</button>`:"")+Object.values(store.trips).map(t=>{const c=cover(t),k=[...t.id].reduce((a,ch)=>a+ch.charCodeAt(0),0)%PAL.length,p=PAL[k];return `<article class="tc" data-open="${t.id}" tabindex="0"><div class="cv">${c?`<img src="${imgUrl(c,500)}" alt="" loading="lazy">`:coverArt(p,k)}</div><h3>${esc(t.title)}</h3><p>${t.days.length}天${+t.nights||0}夜${store.dirty[t.id]&&cloud.url?" · 尚未同步":""}</p><div class="tcact"><button data-share="${t.id}">分享</button>${own?`<button data-del="${t.id}">刪除</button>`:""}</div></article>`}).join("");$("homepics").hidden=!own;renderHero();renderNote()}
+function renderNote(){const el=$("homenote");let h="";const none=!Object.keys(store.trips).length;
+  if(!cloud.url)h=`<div class="nc"><b>這台裝置還沒連接雲端</b><p>你存在 Google Sheet 的行程不會自動出現，要先連接才看得到，行程並沒有不見。</p><button class="primary" id="cfghome">連接雲端</button></div>`;
+  else if(pullState==="fail")h=`<div class="nc"><b>無法連線雲端</b><p>目前顯示的是這台裝置上的資料，可能不是最新的。</p><button class="primary" id="retry">重試</button><button id="cfghome">雲端設定</button></div>`;
+  else if(pullState==="empty"&&none)h=`<div class="nc"><b>雲端上目前沒有行程</b><p>如果你以為這裡應該有行程，請確認密碼和網址是不是連到正確的 Google Sheet。</p><button id="cfghome">雲端設定</button></div>`;
+  el.innerHTML=h}
 function showHome(){tid=null;data=null;$("editor").hidden=true;$("home").hidden=false;document.title="旅遊行程規劃";renderHome()}
-function showEditor(){$("home").hidden=true;$("editor").hidden=false;$("title").value=data.title;fit($("title"));$("nights").value=data.nights||0;document.title=data.title;sync("");$("inv").hidden=RO||!cloud.key;$("foot").hidden=RO||(!cloud.key&&!!cloud.url);render()}
+function showEditor(){$("home").hidden=true;$("editor").hidden=false;$("title").value=data.title;fit($("title"));$("nights").value=data.nights||0;document.title=data.title;sync("");$("inv").hidden=RO||!cloud.key;$("cfglink").hidden=!cloud.key;$("foot").hidden=RO||(!cloud.key&&!!cloud.url);render()}
 function lockShare(on,msg){["cp","line","sys"].forEach(i=>$(i).disabled=on);if(msg)$("shint").textContent=msg}
 async function syncThen(id,okMsg){if(!store.dirty[id]&&!inflight[id])return;
   lockShare(true,"正在同步最新內容…");await saveCloud(id);
@@ -391,12 +403,16 @@ document.addEventListener("click",e=>{
   if(!$("home").hidden){
     if(b&&b.id==="hadd"){pickMode="home";$("pf").click();return}
     if(ds.hx!==undefined){store.home.splice(+ds.hx,1);setHome();drawH();return}
+    if(b&&b.id==="cfghome"){cloudSetup();return}
+    if(b&&b.id==="retry"){pull();return}
     if(b&&b.id==="newtrip"){$("nn").value="";$("nd").value=3;$("nnt").value=2;$("dlg").showModal();return}
     if(ds.share){shareTrip(ds.share);return}
     if(ds.del){const t=store.trips[ds.del];if(!confirm(cloud.key?"確定刪除「"+t.title+"」？雲端 Sheet 裡的這份行程也會一併刪除。":"確定從這台裝置移除「"+t.title+"」？雲端上的行程不會被刪除。"))return;
       delete store.trips[ds.del];delete store.dirty[ds.del];delete store.lists[ds.del];delete store.ldirty[ds.del];persist();renderHome();
       if(cloud.url&&cloud.key)call({action:"delete",id:ds.del},true).catch(()=>toast("雲端刪除失敗，請稍後再試"));return}
     const c=e.target.closest("[data-open]");if(c&&!b)location.hash="#e="+c.dataset.open;return}
+  const nvc=e.target.closest("[data-nv]");
+  if(nvc&&data){const it0=data.days[cur].items[+nvc.dataset.nv];if(it0){try{navigator.clipboard.writeText(kw(it0));toast("已複製名稱，搜不到時可直接貼上再搜")}catch(x){}}}
   const nr=e.target.closest("[data-nr]");
   if(nr&&data){const nx=data.days[cur].items[+nr.dataset.nr+1];if(nx){try{navigator.clipboard.writeText(kw(nx))}catch(x){}toast("已複製目的地「"+kw(nx)+"」，到 Naver 路線頁貼上即可")}return}
   const z=e.target.closest("[data-z]");
@@ -484,14 +500,17 @@ $("inv").onclick=()=>inviteTrip(tid);
 $("exp").onclick=()=>{const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([JSON.stringify({title:data.title,nights:data.nights,days:data.days},null,2)],{type:"application/json"}));
   a.download=(data.title||"itinerary")+".json";a.click();toast("已匯出")};
-$("cfg").onclick=()=>{const u=prompt("貼上 Apps Script 網頁應用程式網址（結尾為 /exec）",cloud.url||"");if(u===null)return;
+function cloudSetup(){const u=prompt("貼上 Apps Script 網頁應用程式網址（結尾為 /exec）",cloud.url||"");if(u===null)return;
   const k=prompt("輸入密碼（需與 Code.gs 裡的 KEY 相同）",cloud.key||"");if(k===null)return;
   cloud={url:u.trim(),key:k.trim()};try{localStorage.setItem(CK,JSON.stringify(cloud))}catch(e){}
   if(!/\/exec$/.test(cloud.url)){alert("網址結尾必須是 /exec，請回到 Apps Script 的「部署 → 管理部署作業」複製「網頁應用程式」網址。");return}
   toast("正在測試連線…");
   call({action:"view",id:"test"}).then(r=>{if(!Array.isArray(r.rows))throw new Error("後端沒有正確回應");return call({action:"all"})})
     .then(r=>{if(r.error)throw new Error(r.error);toast("連線成功");return Promise.all(Object.keys(store.dirty).map(saveCloud))}).then(pull)
-    .catch(async x=>toast("連線失敗："+await why(x)))};
+    .catch(async x=>toast("連線失敗："+await why(x)))}
+$("cfg").onclick=cloudSetup;
+$("cfglink").onclick=()=>{const m=(cloud.url||"").match(/\/s\/([^/]+)\/exec/);if(!m||!cloud.key){toast("請先完成雲端設定");return}
+  openShare(location.origin+location.pathname+"?s="+m[1]+"#o="+encodeURIComponent(cloud.key),"連接其他裝置","打開這個連結的裝置，可以管理你全部的行程與清單。請只傳給你自己（例如用 LINE 傳給自己），不要轉給別人。")};
 $("diag").onclick=async()=>{if(!cloud.url){alert("請先按「雲端設定」");return}
   const t=[];for(const [n,f] of [["讀取（GET）",()=>call({action:"view",id:"test"})],["寫入（POST）",()=>call({action:"ping"},true)]]){
     try{await f();t.push(n+"：成功")}catch(e){t.push(n+"：失敗（"+(e.message||e)+"）")}}
