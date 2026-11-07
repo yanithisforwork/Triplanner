@@ -142,12 +142,19 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .li.done .lf textarea{text-decoration:line-through;opacity:.5}
 .card .name{resize:none;overflow:hidden;line-height:1.35;font-family:inherit;color:inherit;display:block}
 .row textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 10px;resize:none;overflow:hidden;line-height:1.35;font-family:inherit;color:inherit;font-size:13px}
-.row textarea.stay{flex:1 1 9em;min-width:9em;width:auto}
+.row textarea.stay{flex:none;width:9em;min-width:0}
 .row textarea.kr{order:2;flex:1 1 100%;width:100%}
 .row textarea:focus-visible{outline:none;border-color:var(--rose);box-shadow:0 0 0 2px var(--soft)}
 .gap textarea{border:0;border-bottom:1px dashed var(--line);background:none;flex:1 1 11em;min-width:8em;padding:4px 8px;resize:none;overflow:hidden;line-height:1.35;font-family:inherit;color:var(--mute);font-size:13px}
 .gap textarea:focus-visible{outline:none;background:var(--soft);border-radius:6px}
 .dayhead{flex-wrap:wrap}.dayhead input[data-f=label]{flex:1 1 5em;min-width:5em}
+.row .lk{order:3;display:flex;gap:8px;flex-wrap:wrap}
+.dayhead input.date{font-size:16px;color:var(--ink);width:9em}
+.rodate{font:500 16px "Noto Serif TC",serif;color:var(--ink)}
+.ro .dayhead{margin-bottom:10px}
+.ro .row{align-items:center}.ro .row .lk{flex:1 1 100%}
+.ro .tv,.ro .stayv,.ro .nextv{color:var(--mute)}
+.ro .gap{align-items:center}
 /* 輸入框內距放寬 */
 .card .name{padding:4px 10px;margin:0 -10px;width:calc(100% + 20px)}
 .time input{padding:4px 8px}.dayhead input{padding:6px 10px}.gap input{padding:4px 8px}
@@ -324,11 +331,13 @@ function recalc(d){const a=d.items;let t=hm(a[0]&&a[0].time);if(t===null)return;
   for(let i=1;i<a.length;i++){const p=a[i-1],lv=hm(p.stay);t=(lv!==null?Math.max(lv,t):t+dur(p.stay))+dur(p.next);a[i].time=fm(t)}}
 function paint(){const d=data.days[cur];document.querySelectorAll(".time input").forEach((x,i)=>{if(d.items[i]&&document.activeElement!==x)x.value=d.items[i].time})}
 const normGift=x=>{if(!x.subs){x.subs=x.n?[{t:x.n,c:!!x.c}]:[];delete x.n}return x};
-const lists=()=>{const o=store.lists[tid]=store.lists[tid]||{gift:[],shop:[]};o.gift=(o.gift||[]).map(normGift);o.shop=o.shop||[];o.pack=o.pack||[];return o};
+const lists=()=>{const o=store.lists[tid]=store.lists[tid]||{gift:[],shop:[]};o.gift=(o.gift||[]).map(normGift);o.shop=o.shop||[];o.pack=o.pack||[];o.todo=o.todo||[];return o};
 const pDone=p=>p.subs.length?p.subs.every(s=>s.c):!!p.c;
 const units=(k,L)=>k==="gift"?L.flatMap(p=>p.subs.length?p.subs:[p]):L;
 const cnt=(k,L)=>{const u=units(k,L);return u.length?" "+u.filter(x=>x.c).length+"/"+u.length:""};
-const LT={pack:["行李清單","要帶的東西"],gift:["送禮名單","送給誰"],shop:["購物清單","想買的東西","品牌、店家、價格"]};
+const QUICK={pack:["護照","充電器、轉接頭","行動電源","藥、保健食品","換好的錢","隱形眼鏡、眼鏡","化妝品、保養品","粉撲、刷子","洗髮精、沐浴乳、洗面乳、私密洗、牙刷牙膏","電棒","牙套","筆電","雨傘"],
+  todo:["換錢","保旅平險","買＋裝 eSIM","換手機殼","修眉毛","洗衣服、晾衣服、收衣服","洗刷子","整理垃圾"]};
+const LT={pack:["備忘清單","要帶的東西"],todo:["待辦事項","要做的事"],gift:["送禮名單","送給誰"],shop:["購物清單","想買的東西","品牌、店家、價格"]};
 store.ldirty=store.ldirty||{};let lt;const lver={},lbusy={};
 function listSave(){persist();if(!cloud.key||!cloud.url||!tid)return;store.ldirty[tid]=1;lver[tid]=(lver[tid]||0)+1;const id=tid;clearTimeout(lt);lt=setTimeout(()=>saveLists(id),1500)}
 async function saveListsOnce(id){const v=lver[id]||0,L=store.lists[id];if(!L)return;
@@ -346,10 +355,14 @@ function renderList(){const L=lists()[view],T=LT[view],u=units(view,L);
   if(view==="gift")h+=L.map((p,i)=>`<div class="li ${pDone(p)?"done":""}"><input type="checkbox" data-gc="${i}" ${pDone(p)?"checked":""} aria-label="全部完成"><div class="lf"><textarea class="lt" rows="1" data-gt="${i}" placeholder="${T[1]}">${esc(p.t)}</textarea>`+
     p.subs.map((x,j)=>`<div class="sub ${x.c?"done":""}"><input type="checkbox" data-sc="${i}:${j}" ${x.c?"checked":""} aria-label="已買"><textarea class="st" rows="1" data-st="${i}:${j}" placeholder="要買的東西、預算">${esc(x.t)}</textarea><button class="sx" data-sd="${i}:${j}" aria-label="刪除品項">✕</button></div>`).join("")+
     `<button class="subadd" data-sa="${i}">＋ 新增品項</button></div><button data-ld="${i}" aria-label="刪除">✕</button></div>`).join("");
-  else if(view==="pack")h+=L.map((x,i)=>`<div class="li ${x.c?"done":""}"><input type="checkbox" data-pc="${i}" ${x.c?"checked":""} aria-label="已帶"><div class="lf"><textarea class="lt" rows="1" data-pt="${i}" placeholder="${T[1]}">${esc(x.t)}</textarea></div><button data-ld="${i}" aria-label="刪除">✕</button></div>`).join("");
+  else if(view==="pack"||view==="todo")h+=L.map((x,i)=>`<div class="li ${x.c?"done":""}"><input type="checkbox" data-pc="${i}" ${x.c?"checked":""} aria-label="完成"><div class="lf"><textarea class="lt" rows="1" data-pt="${i}" placeholder="${T[1]}">${esc(x.t)}</textarea></div><button data-ld="${i}" aria-label="刪除">✕</button></div>`).join("");
   else h+=L.map((x,i)=>`<div class="li ${x.c?"done":""}"><input type="checkbox" data-lc="${i}" ${x.c?"checked":""} aria-label="已買">${x.img?`<div class="thumb" data-zl="${i}"><img src="${imgUrl(x.img,200)}" alt=""><button class="x" data-lx="${i}" aria-label="移除圖片">✕</button></div>`:`<button class="thumbadd" data-limg="${i}">＋圖</button>`}<div class="lf"><textarea class="lt" rows="1" data-lt="${i}" placeholder="${T[1]}">${esc(x.t)}</textarea><textarea class="ln" rows="1" data-ln="${i}" placeholder="${T[2]}">${esc(x.n||"")}</textarea></div><button data-ld="${i}" aria-label="刪除">✕</button></div>`).join("");
-  $("main").innerHTML=h+`<button class="add" data-la>＋ 新增${view==="gift"?"對象":"項目"}</button>${view==="pack"?`<button class="add" data-lq>＋ 加入常用項目</button>`:""}<p class="hint">${hint}</p>`;document.querySelectorAll(".lf textarea,.sub textarea").forEach(fit)}
-const fit=el=>{el.style.height="auto";el.style.height=Math.max(34,el.scrollHeight+2)+"px"};
+  $("main").innerHTML=h+`<button class="add" data-la>＋ 新增${view==="gift"?"對象":"項目"}</button>${view==="pack"||view==="todo"?`<button class="add" data-lq>＋ 加入常用項目</button>`:""}<p class="hint">${hint}</p>`;document.querySelectorAll(".lf textarea,.sub textarea").forEach(fit)}
+const fit=el=>{el.style.height="auto";const h=el.scrollHeight;if(!h){el.style.height="";return}el.style.height=Math.max(el.classList.contains("note")?34:0,h+(el.offsetHeight-el.clientHeight))+"px"};
+const normTime=v=>{v=String(v||"").trim().replace(/[：.\s]/g,":");if(!v)return "";let h,m;
+  if(v.includes(":")){const a=v.split(":");h=a[0];m=a[1]||"0"}else{const d=v.replace(/\D/g,"");if(d.length<=2){h=d;m="0"}else{h=d.slice(0,d.length-2);m=d.slice(-2)}}
+  if(!/^\d{1,2}$/.test(h)||!/^\d{1,2}$/.test(m))return null;h=+h;m=+m;if(h>23||m>59)return null;return String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")};
+const fmtT=v=>{const n=normTime(v);return n===null?v:n};
 const kw=it=>/^https?:/i.test(it.kr||"")?it.name:(it.kr||it.name);
 const nvUrl=it=>/naver\.(com|me)/i.test(it.kr||"")?it.kr:"https://map.naver.com/p/search/"+encodeURIComponent(kw(it));
 const ggUrl=it=>/google\.[a-z.]+\/maps|goo\.gl|maps\.app/i.test(it.kr||"")?it.kr:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(kw(it));
@@ -363,25 +376,25 @@ function render(){
   $("cvr").hidden=RO;$("cvr").textContent=data.cover?"更換封面":"設定封面";$("cvx").hidden=RO||!data.cover;
   if(document.activeElement!==$("ndays"))$("ndays").value=data.days.length;
   if(RO)view="day";const LC=RO?null:lists();
-  $("tabs").innerHTML=data.days.map((d,i)=>`<button class="tab ${view==="day"&&i==cur?"on":""}" data-tab="${i}">${esc(d.label)}</button>`).join("")+`<button class="tab" data-adddays>＋ 新增一天</button>`+(RO?"":`<i class="tabsep"></i><button class="tab ${view==="gift"?"on":""}" data-view="gift">送禮名單${cnt("gift",LC.gift)}</button><button class="tab ${view==="shop"?"on":""}" data-view="shop">購物清單${cnt("shop",LC.shop)}</button><button class="tab ${view==="pack"?"on":""}" data-view="pack">行李清單${cnt("pack",LC.pack)}</button>`);
+  $("tabs").innerHTML=data.days.map((d,i)=>`<button class="tab ${view==="day"&&i==cur?"on":""}" data-tab="${i}">${esc(d.label)}</button>`).join("")+`<button class="tab" data-adddays>＋ 新增一天</button>`+(RO?"":`<i class="tabsep"></i><button class="tab ${view==="gift"?"on":""}" data-view="gift">送禮名單${cnt("gift",LC.gift)}</button><button class="tab ${view==="shop"?"on":""}" data-view="shop">購物清單${cnt("shop",LC.shop)}</button><button class="tab ${view==="pack"?"on":""}" data-view="pack">備忘清單${cnt("pack",LC.pack)}</button><button class="tab ${view==="todo"?"on":""}" data-view="todo">待辦事項${cnt("todo",LC.todo)}</button>`);
   {const on=document.querySelector(".tab.on"),T=$("tabs");if(on)T.scrollLeft=Math.max(0,on.offsetLeft-T.offsetLeft-(T.clientWidth-on.offsetWidth)/2)}
   if(view!=="day"){renderList();return}
   const d=data.days[cur];
-  let h=`<div class="dayhead"><input data-f="label" value="${esc(d.label)}" aria-label="天數名稱"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期" aria-label="日期"><span style="flex:1"></span><button data-delday>刪除此天</button></div>`;
+  let h=RO?(d.date?`<div class="dayhead"><span class="rodate">${esc(d.date)}</span></div>`:""):`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-delday>刪除此天</button></div>`;
   d.items.forEach((it,i)=>{
-    h+=`<div class="stop" data-idx="${i}"><div class="time"><input data-i="${i}" data-k="time" value="${esc(it.time)}" aria-label="時間"></div>
+    h+=`<div class="stop" data-idx="${i}"><div class="time"><input data-i="${i}" data-k="time" value="${esc(fmtT(it.time))}" inputmode="numeric" maxlength="5" placeholder="00:00" aria-label="時間"></div>
     <div class="card" data-t="${it.type}">
       <textarea class="name" rows="1" data-i="${i}" data-k="name" aria-label="地點" placeholder="地點名稱">${esc(it.name)}</textarea>
       <div class="row">
-        <select data-i="${i}" data-k="type" aria-label="類型">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${k==it.type?"selected":""}>${v}</option>`).join("")}</select>
-        <span>停留</span><textarea class="stay" rows="1" data-i="${i}" data-k="stay" aria-label="停留時間">${esc(it.stay)}</textarea>
-        <textarea class="kr" rows="1" data-i="${i}" data-k="kr" placeholder="韓文店名或地圖連結（選填，搜尋更準）" aria-label="韓文搜尋名稱">${esc(it.kr)}</textarea><a class="nv" target="_blank" rel="noopener" data-nv="${i}" href="${nvUrl(it)}">Naver 地圖</a><a class="nv" target="_blank" rel="noopener" data-gg="${i}" href="${ggUrl(it)}">Google 地圖</a>
+        ${RO?`<span class="tv">${TYPES[it.type]||""}</span>`:`<select data-i="${i}" data-k="type" aria-label="類型">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${k==it.type?"selected":""}>${v}</option>`).join("")}</select>`}
+        ${RO?(it.stay?`<span>停留</span><span class="stayv">${esc(it.stay)}</span>`:""):`<span>停留</span><textarea class="stay" rows="1" data-i="${i}" data-k="stay" aria-label="停留時間">${esc(it.stay)}</textarea>`}
+        <textarea class="kr" rows="1" data-i="${i}" data-k="kr" placeholder="韓文店名或地圖連結（選填，搜尋更準）" aria-label="韓文搜尋名稱">${esc(it.kr)}</textarea><span class="lk"><a class="nv" target="_blank" rel="noopener" data-nv="${i}" href="${nvUrl(it)}">Naver 地圖</a><a class="nv" target="_blank" rel="noopener" data-gg="${i}" href="${ggUrl(it)}">Google 地圖</a></span>
         <span class="acts"><span class="grip" data-grip title="按住拖曳排序">⠿</span><button data-up="${i}" title="上移">↑</button><button data-down="${i}" title="下移">↓</button><button data-del="${i}" title="刪除">✕</button></span>
       </div>
       <textarea class="note" data-i="${i}" data-k="note" placeholder="備註（訂位、票價、車次…）" rows="1">${esc(it.note)}</textarea>
       <div class="pics">${(it.imgs||[]).map((f,j)=>`<div class="pic" data-z="${i}:${j}"><img src="${imgUrl(f,300)}" alt="備註圖片" loading="lazy"><button class="cvb ${data.cover===f?"on":""}" data-cv="${i}:${j}" aria-label="設為封面" title="設為封面">★</button><button class="x" data-pd="${i}:${j}" aria-label="移除圖片">✕</button></div>`).join("")}<button class="addimg" data-addimg="${i}">＋ 圖片</button></div>
     </div></div>`;
-    if(i<d.items.length-1)h+=`<div class="gap">移動 <textarea rows="1" data-i="${i}" data-k="next" placeholder="交通方式與時間" aria-label="移動方式與時間">${esc(it.next)}</textarea> <a class="nv" target="_blank" rel="noopener" data-nr="${i}" href="https://map.naver.com/p/directions/-/-/-/transit">Naver 路線</a> <a class="nv" target="_blank" rel="noopener" data-rt="${i}" href="${rtUrl(it,d.items[i+1])}">Google 路線</a></div>`;
+    if(i<d.items.length-1)h+=`<div class="gap">移動 ${RO?`<span class="nextv">${esc(it.next)}</span>`:`<textarea rows="1" data-i="${i}" data-k="next" placeholder="交通方式與時間" aria-label="移動方式與時間">${esc(it.next)}</textarea>`} <a class="nv" target="_blank" rel="noopener" data-nr="${i}" href="https://map.naver.com/p/directions/-/-/-/transit">Naver 路線</a> <a class="nv" target="_blank" rel="noopener" data-rt="${i}" href="${rtUrl(it,d.items[i+1])}">Google 路線</a></div>`;
   });
   h+=`<button class="add" data-add>＋ 新增行程</button>`;
   $("main").innerHTML=h;
@@ -390,7 +403,7 @@ function render(){
 }
 document.addEventListener("input",e=>{
   const t=e.target;if(RO)return;
-  if(t.dataset.pt!==undefined){lists().pack[+t.dataset.pt].t=t.value;listSave();return}
+  if(t.dataset.pt!==undefined){lists()[view][+t.dataset.pt].t=t.value;listSave();return}
   if(t.dataset.gt!==undefined){lists().gift[+t.dataset.gt].t=t.value;listSave();return}
   if(t.dataset.st!==undefined){const [i,j]=t.dataset.st.split(":").map(Number);lists().gift[i].subs[j].t=t.value;listSave();return}
   if(t.dataset.lt!==undefined||t.dataset.ln!==undefined){const it=lists().shop[+(t.dataset.lt??t.dataset.ln)];if(t.dataset.lt!==undefined)it.t=t.value;else it.n=t.value;listSave();return}
@@ -398,21 +411,25 @@ document.addEventListener("input",e=>{
   if(t.id==="title"){fit(t);data.title=t.value;document.title=t.value||"旅遊行程規劃";save();return}
   if(t.id==="nights"){data.nights=+t.value||0;save();return}
   if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
+  if(t.dataset.k==="time")return;
   if(t.dataset.k){const it=data.days[cur].items[+t.dataset.i];it[t.dataset.k]=t.value;if(t.dataset.k==="name"||t.dataset.k==="kr")refreshLinks();
     if(t.dataset.k=="type")t.closest(".card").dataset.t=t.value;
     const k=t.dataset.k,i=+t.dataset.i;if(k==="stay"||k==="next"||(k==="time"&&i===0)){recalc(data.days[cur]);paint()}
     save()}
 });
 document.addEventListener("change",e=>{const t=e.target,d=t.dataset;if(!d||RO)return;
+  if(d.k==="time"){const it=data.days[cur].items[+d.i],n=normTime(t.value);
+    if(n===null){t.value=fmtT(it.time);toast("時間請輸入 00:00 的格式，例如 06:05 或 0605");return}
+    t.value=n;if(n!==it.time){it.time=n;if(+d.i===0)recalc(data.days[cur]);paint();save()}return}
   if(d.lc!==undefined){lists().shop[+d.lc].c=t.checked;listSave();render()}
-  else if(d.pc!==undefined){lists().pack[+d.pc].c=t.checked;listSave();render()}
+  else if(d.pc!==undefined){lists()[view][+d.pc].c=t.checked;listSave();render()}
   else if(d.gc!==undefined){const p=lists().gift[+d.gc];if(p.subs.length)p.subs.forEach(x=>x.c=t.checked);else p.c=t.checked;listSave();render()}
   else if(d.sc!==undefined){const [i,j]=d.sc.split(":").map(Number),p=lists().gift[i];p.subs[j].c=t.checked;p.c=p.subs.every(x=>x.c);listSave();render()}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id==="title"){e.preventDefault();e.target.blur();return}
   if(e.key==="Enter"&&e.target.tagName==="TEXTAREA"&&(["name","ln","stay","kr"].some(c=>e.target.classList.contains(c))||e.target.dataset.gt!==undefined||e.target.dataset.k==="next")){e.preventDefault();e.target.blur();return}
   const d=e.target.dataset;if(e.key!=="Enter"||!d||RO||!tid)return;
   if(d.st!==undefined){e.preventDefault();const [i,j]=d.st.split(":").map(Number),p=lists().gift[i];p.subs.splice(j+1,0,{t:"",c:false});p.c=false;listSave();render();const a=document.querySelector('[data-st="'+i+":"+(j+1)+'"]');if(a)a.focus()}
-  else if(d.pt!==undefined){e.preventDefault();const i=+d.pt;lists().pack.splice(i+1,0,{t:"",c:false});listSave();render();const a=document.querySelector('[data-pt="'+(i+1)+'"]');if(a)a.focus()}
+  else if(d.pt!==undefined){e.preventDefault();const i=+d.pt;lists()[view].splice(i+1,0,{t:"",c:false});listSave();render();const a=document.querySelector('[data-pt="'+(i+1)+'"]');if(a)a.focus()}
   else if(d.lt!==undefined){e.preventDefault();const n=document.querySelector('[data-ln="'+d.lt+'"]');if(n)n.focus()}});
 addEventListener("resize",()=>{document.querySelectorAll(".note,.name,.row textarea,.gap textarea,.lf textarea,.sub textarea").forEach(fit);fit($("title"))});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{document.querySelectorAll(".note,.name,.row textarea,.gap textarea,.lf textarea,.sub textarea").forEach(fit);fit($("title"))});
@@ -442,8 +459,8 @@ document.addEventListener("click",e=>{
   if(b&&data&&!RO&&["view","la","ld","sa","sd","limg","lx","lq"].some(k=>ds[k]!==undefined)){
     const L=lists();let focus=null;
     if(ds.view!==undefined)view=ds.view;
-    else if(ds.la!==undefined){if(view==="gift")L.gift.push({t:"",c:false,subs:[{t:"",c:false}]});else if(view==="pack")L.pack.push({t:"",c:false});else L.shop.push({t:"",n:"",c:false,img:""});listSave();focus=".lt"}
-    else if(ds.lq!==undefined){const have=new Set(L.pack.map(x=>x.t.trim()));["護照（效期 6 個月以上）","機票／電子登機證","旅館訂房資料","網卡／eSIM","行動電源","充電線與轉接頭","外幣、信用卡","常備藥品","盥洗用品","換洗衣物","雨具","旅平險資料"].forEach(t=>{if(!have.has(t))L.pack.push({t,c:false})});listSave()}
+    else if(ds.la!==undefined){if(view==="gift")L.gift.push({t:"",c:false,subs:[{t:"",c:false}]});else if(view==="pack"||view==="todo")L[view].push({t:"",c:false});else L.shop.push({t:"",n:"",c:false,img:""});listSave();focus=".lt"}
+    else if(ds.lq!==undefined){const have=new Set(L[view].map(x=>x.t.trim()));(QUICK[view]||[]).forEach(t=>{if(!have.has(t))L[view].push({t,c:false})});listSave()}
     else if(ds.ld!==undefined){L[view].splice(+ds.ld,1);listSave()}
     else if(ds.sa!==undefined){L.gift[+ds.sa].subs.push({t:"",c:false});L.gift[+ds.sa].c=false;listSave();focus='[data-st^="'+ds.sa+':"]'}
     else if(ds.sd!==undefined){const [i,j]=ds.sd.split(":").map(Number);L.gift[i].subs.splice(j,1);listSave()}
@@ -504,7 +521,7 @@ $("ndays").onchange=()=>{if(RO)return;const n=Math.min(30,Math.max(1,+$("ndays")
 $("back").onclick=()=>{location.hash=""};
 function listPrint(k){const L=(store.lists[tid]||{})[k]||[],T=LT[k];
   const rows=(k==="gift"?L.map(normGift).map(p=>`<div class="lp"><span>${pDone(p)?"☑":"☐"}</span><div><b>${esc(p.t)}</b><div class="subs">${p.subs.map(x=>`<div>${x.c?"☑":"☐"} ${esc(x.t)}</div>`).join("")}</div></div></div>`)
-    :k==="pack"?L.map(x=>`<div class="lp"><span>${x.c?"☑":"☐"}</span><div><b>${esc(x.t)}</b></div></div>`)
+    :(k==="pack"||k==="todo")?L.map(x=>`<div class="lp"><span>${x.c?"☑":"☐"}</span><div><b>${esc(x.t)}</b></div></div>`)
     :L.map(x=>`<div class="lp"><span>${x.c?"☑":"☐"}</span><div>${x.img?`<img src="${imgUrl(x.img,200)}" alt="">`:""}<b>${esc(x.t)}</b>${x.n?` <small>${esc(x.n)}</small>`:""}</div></div>`)).join("");
   const blank=Array.from({length:Math.max(0,14-L.length)},()=>`<div class="lp"><span>☐</span><div class="bl"></div></div>`).join("");
   return `<div class="pgb"><h2>${T[0]}</h2>${rows}${blank}</div>`}
@@ -512,7 +529,7 @@ function buildPrint(){if(!data)return;
   $("pv").innerHTML=(cover(data)?`<img class="pcv" src="${imgUrl(cover(data),700)}" alt="">`:"")+`<h1>${esc(data.title)}</h1><div class="sub">${data.days.length}天${+data.nights||0}夜</div>`+data.days.map(d=>
     `<h2>${esc(d.label)}${d.date?"　"+esc(d.date):""}</h2>`+d.items.map((it,i)=>
       `<div class="pi"><b>${esc(it.time)}</b><div>${esc(it.name)}<br><small>${TYPES[it.type]||""}${it.stay?"・停留 "+esc(it.stay):""}</small>${it.note?`<br><small>${esc(it.note)}</small>`:""}${(it.imgs||[]).length?"<br>"+it.imgs.map(f=>`<img src="${imgUrl(f,300)}" alt="">`).join(""):""}</div></div>`+
-      (it.next&&i<d.items.length-1?`<div class="mv">↓ ${esc(it.next)}</div>`:"")).join("")).join("")+(RO||!tid?"":listPrint("gift")+listPrint("shop")+listPrint("pack"))}
+      (it.next&&i<d.items.length-1?`<div class="mv">↓ ${esc(it.next)}</div>`:"")).join("")).join("")+(RO||!tid?"":listPrint("gift")+listPrint("shop")+listPrint("pack")+listPrint("todo"))}
 addEventListener("beforeprint",buildPrint);
 $("print").onclick=()=>print();
 $("save").onclick=()=>{if(!cloud.url){toast("請先到頁面最下方按「雲端設定」");return}clearTimeout(tm);saveCloud(tid)};
