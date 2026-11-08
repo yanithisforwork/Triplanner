@@ -169,6 +169,9 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .fd{flex:1;display:flex;align-items:center;gap:6px;color:var(--mute);font-size:12px;min-width:0}
 .fd i{flex:1;height:1px;background:var(--line)}.fd b{font-weight:500;white-space:nowrap}
 .ro .flbox{margin:4px 0 10px}
+.fz{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-bottom:2px}
+.fz select{border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:3px 8px;font-size:12px;margin-left:4px;max-width:11em}
+.fzn{color:var(--mute)}.ftzi[readonly]{background:none;border-style:dashed;color:var(--mute)}
 /* 輸入框內距放寬 */
 .card .name{padding:4px 10px;margin:0 -10px;width:calc(100% + 20px)}
 .time input{padding:4px 8px}.dayhead input{padding:6px 10px}.gap input{padding:4px 8px}
@@ -397,16 +400,25 @@ function refreshLinks(){const a=data.days[cur].items;
   document.querySelectorAll("[data-gg]").forEach(e=>e.href=ggUrl(a[+e.dataset.gg]));
   document.querySelectorAll("[data-rt]").forEach(e=>{const i=+e.dataset.rt;if(a[i+1])e.href=rtUrl(a[i],a[i+1])})}
 const FK=["去程","回程"];
-const FL=()=>{if(!Array.isArray(data.flights)||data.flights.length!==2)data.flights=[{no:"",dep:"",arr:"",tz:1},{no:"",dep:"",arr:"",tz:-1}];return data.flights};
-function fdur(f){const a=hm(f.dep),b=hm(f.arr);if(a===null||b===null)return "";let d=(((b-a-(+f.tz||0)*60)%1440)+1440)%1440;if(d===0)d=1440;const h=Math.floor(d/60),m=d%60;return h+"小時"+(m?m+"分":"")}
-function updFd(i){const e=document.querySelector('[data-fd="'+i+'"]');if(e)e.textContent=fdur(FL()[i])}
+const FL=()=>{if(!Array.isArray(data.flights)||data.flights.length!==2)data.flights=[{no:"",dep:"",arr:"",tz:1,z:""},{no:"",dep:"",arr:"",tz:-1,z:""}];return data.flights};
+const ZONES=[["日本","Asia/Tokyo"],["韓國","Asia/Seoul"],["中國","Asia/Shanghai"],["香港","Asia/Hong_Kong"],["澳門","Asia/Macau"],["新加坡","Asia/Singapore"],["馬來西亞","Asia/Kuala_Lumpur"],["泰國","Asia/Bangkok"],["越南","Asia/Ho_Chi_Minh"],["菲律賓","Asia/Manila"],["印尼（雅加達）","Asia/Jakarta"],["印尼（峇里島）","Asia/Makassar"],["柬埔寨","Asia/Phnom_Penh"],["印度","Asia/Kolkata"],["尼泊爾","Asia/Kathmandu"],["蒙古","Asia/Ulaanbaatar"],["阿聯（杜拜）","Asia/Dubai"],["土耳其","Europe/Istanbul"],["英國","Europe/London"],["法國","Europe/Paris"],["德國","Europe/Berlin"],["義大利","Europe/Rome"],["西班牙","Europe/Madrid"],["荷蘭","Europe/Amsterdam"],["瑞士","Europe/Zurich"],["捷克","Europe/Prague"],["冰島","Atlantic/Reykjavik"],["美國（紐約）","America/New_York"],["美國（洛杉磯）","America/Los_Angeles"],["美國（夏威夷）","Pacific/Honolulu"],["加拿大（溫哥華）","America/Vancouver"],["加拿大（多倫多）","America/Toronto"],["關島","Pacific/Guam"],["澳洲（雪梨）","Australia/Sydney"],["澳洲（伯斯）","Australia/Perth"],["紐西蘭","Pacific/Auckland"]];
+function zoneOffset(tz,dt){try{const p=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:tz,hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"}).formatToParts(dt).map(x=>[x.type,x.value]));
+  return (Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute,+p.second)-Math.floor(dt.getTime()/1000)*1000)/3600000}catch(e){return null}}
+const flAuto=()=>!!(FL()[0].z);
+function effTz(i){const f=FL()[i];if(!f.z)return +f.tz||0;
+  const ds=data.days,d=parseMD(i===0?ds[0]&&ds[0].date:ds[ds.length-1]&&ds[ds.length-1].date)||new Date();const at=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12);
+  const a=zoneOffset("Asia/Taipei",at),b=zoneOffset(f.z,at);if(a===null||b===null)return +f.tz||0;const diff=Math.round((b-a)*4)/4;return i===0?diff:-diff}
+const fmtTz=n=>(n>0?"+":n<0?"−":"")+Math.abs(n);
+function fdur(f,i){const a=hm(f.dep),b=hm(f.arr);if(a===null||b===null)return "";let d=Math.round((((b-a-effTz(i)*60)%1440)+1440)%1440);if(d===0)d=1440;const h=Math.floor(d/60),m=d%60;return h+"小時"+(m?m+"分":"")}
+function updFd(i){const e=document.querySelector('[data-fd="'+i+'"]');if(e)e.textContent=fdur(FL()[i],i)}
 function renderFlights(){const box=$("flbox"),L=FL();
   if(RO){const rows=L.map((f,i)=>({f,i})).filter(x=>x.f.no||x.f.dep||x.f.arr);box.hidden=!rows.length;
-    box.innerHTML=rows.map(({f,i})=>`<div class="fl"><div class="fl1"><span class="fk">✈ ${FK[i]}</span><span class="fnov">${esc(f.no)}</span></div>${f.dep||f.arr?`<div class="fl2"><b class="ftv">${esc(f.dep)||"--:--"}</b><span class="fd"><i></i><b>${fdur(f)}</b><i></i></span><b class="ftv">${esc(f.arr)||"--:--"}</b></div>`:""}</div>`).join("");return}
-  box.hidden=false;
-  box.innerHTML=L.map((f,i)=>`<div class="fl"><div class="fl1"><span class="fk">✈ ${FK[i]}</span><input class="fno" data-fl="${i}:no" value="${esc(f.no)}" placeholder="航空公司-班機編號" aria-label="${FK[i]}航班"><label class="ftz">時差<input class="ftzi" data-fl="${i}:tz" type="number" step="1" min="-12" max="12" value="${+f.tz||0}" aria-label="時差（小時）"></label></div><div class="fl2"><input class="ft" data-fl="${i}:dep" value="${esc(f.dep)}" inputmode="numeric" maxlength="5" placeholder="出發" aria-label="出發時間"><span class="fd"><i></i><b data-fd="${i}">${fdur(f)}</b><i></i></span><input class="ft" data-fl="${i}:arr" value="${esc(f.arr)}" inputmode="numeric" maxlength="5" placeholder="抵達" aria-label="抵達時間"></div></div>`).join("")}
+    box.innerHTML=rows.map(({f,i})=>`<div class="fl"><div class="fl1"><span class="fk">✈ ${FK[i]}</span><span class="fnov">${esc(f.no)}</span></div>${f.dep||f.arr?`<div class="fl2"><b class="ftv">${esc(f.dep)||"--:--"}</b><span class="fd"><i></i><b>${fdur(f,i)}</b><i></i></span><b class="ftv">${esc(f.arr)||"--:--"}</b></div>`:""}</div>`).join("");return}
+  box.hidden=false;const z=L[0].z||"";
+  const zsel=`<div class="fz"><label>目的地<select data-fl="0:z" aria-label="目的地（自動算時差）"><option value="">手動輸入時差</option>${ZONES.map(([n,id])=>`<option value="${id}" ${id===z?"selected":""}>${n}</option>`).join("")}</select></label><span class="fzn" id="fzn">${z?"去程 "+fmtTz(effTz(0))+"、回程 "+fmtTz(effTz(1))+" 小時（自動）":"沒選目的地時，請自己填下面的時差"}</span></div>`;
+  box.innerHTML=zsel+L.map((f,i)=>`<div class="fl"><div class="fl1"><span class="fk">✈ ${FK[i]}</span><input class="fno" data-fl="${i}:no" value="${esc(f.no)}" placeholder="航空公司-班機編號" aria-label="${FK[i]}航班"><label class="ftz">時差<input class="ftzi" data-fl="${i}:tz" type="number" step="0.5" min="-14" max="14" value="${effTz(i)}" ${f.z?"readonly":""} aria-label="時差（小時）"></label></div><div class="fl2"><input class="ft" data-fl="${i}:dep" value="${esc(f.dep)}" inputmode="numeric" maxlength="5" placeholder="出發" aria-label="出發時間"><span class="fd"><i></i><b data-fd="${i}">${fdur(f,i)}</b><i></i></span><input class="ft" data-fl="${i}:arr" value="${esc(f.arr)}" inputmode="numeric" maxlength="5" placeholder="抵達" aria-label="抵達時間"></div></div>`).join("")}
 function flPrint(){if(!data)return "";const L=FL().map((f,i)=>({f,i})).filter(x=>x.f.no||x.f.dep||x.f.arr);if(!L.length)return "";
-  return `<div class="fli">`+L.map(({f,i})=>`<div>✈ ${FK[i]}　${esc(f.no)}　${esc(f.dep)||"--:--"} → ${esc(f.arr)||"--:--"}${fdur(f)?"（"+fdur(f)+"）":""}</div>`).join("")+`</div>`}
+  return `<div class="fli">`+L.map(({f,i})=>`<div>✈ ${FK[i]}　${esc(f.no)}　${esc(f.dep)||"--:--"} → ${esc(f.arr)||"--:--"}${fdur(f,i)?"（"+fdur(f,i)+"）":""}</div>`).join("")+`</div>`}
 function render(){
   renderFlights();
   const cvSrc=cover(data);$("cvbar").hidden=!cvSrc;if(cvSrc)$("cvimg").src=imgUrl(cvSrc,900);
@@ -445,10 +457,10 @@ document.addEventListener("input",e=>{
   if(t.dataset.st!==undefined){const [i,j]=t.dataset.st.split(":").map(Number);lists().gift[i].subs[j].t=t.value;listSave();return}
   if(t.dataset.lt!==undefined||t.dataset.ln!==undefined){const it=lists().shop[+(t.dataset.lt??t.dataset.ln)];if(t.dataset.lt!==undefined)it.t=t.value;else it.n=t.value;listSave();return}
   if(t.tagName==="TEXTAREA")fit(t);
-  if(t.dataset.fl!==undefined){const [i,k]=t.dataset.fl.split(":"),f=FL()[+i];if(k==="no"){f.no=t.value;save()}else if(k==="tz"){f.tz=t.value===""||isNaN(+t.value)?0:+t.value;updFd(+i);save()}return}
+  if(t.dataset.fl!==undefined){const [i,k]=t.dataset.fl.split(":"),f=FL()[+i];if(k==="z"){FL()[0].z=FL()[1].z=t.value;save();renderFlights()}else if(k==="no"){f.no=t.value;save()}else if(k==="tz"){f.tz=t.value===""||isNaN(+t.value)?0:+t.value;updFd(+i);save()}return}
   if(t.id==="title"){fit(t);data.title=t.value;document.title=t.value||"旅遊行程規劃";save();return}
   if(t.id==="nights"){data.nights=+t.value||0;save();return}
-  if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
+  if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f==="date")renderFlights();if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
   if(t.dataset.k==="time")return;
   if(t.dataset.k){const it=data.days[cur].items[+t.dataset.i];it[t.dataset.k]=t.value;if(t.dataset.k==="name"||t.dataset.k==="kr")refreshLinks();
     if(t.dataset.k=="type")t.closest(".card").dataset.t=t.value;
