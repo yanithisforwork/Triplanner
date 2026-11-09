@@ -162,7 +162,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .fno{flex:1;min-width:0;border:0;background:none;font-size:12px;padding:3px 4px;color:var(--ink)}
 .fnov{font-size:12px;color:var(--ink)}
 .ftz{display:flex;align-items:center;gap:3px;white-space:nowrap}
-.ftzi{width:3.4em;border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:2px 4px;font-size:12px;text-align:center}
+.ftzi{width:3em;border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:2px 4px;font-size:12px;text-align:center}
 .fl2{display:flex;align-items:center;gap:8px;margin-top:3px}
 .ft{width:5.4em;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:4px 6px;text-align:center;font-weight:700;font-size:16px}
 .ftv{font-size:16px}
@@ -172,6 +172,14 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .fz{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-bottom:2px}
 .fz select{border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:3px 8px;font-size:12px;margin-left:4px;max-width:11em}
 .fzn{color:var(--mute)}.ftzi[readonly]{background:none;border-style:dashed;color:var(--mute)}
+.fl1{flex-wrap:wrap;gap:6px}.fl1 .fno{min-width:4.5em}
+.fplus{margin-left:auto;width:24px;height:24px;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--pri);font-size:15px;line-height:22px;flex:none}
+.fdel{border:0;background:none;color:var(--mute);padding:0 4px;font-size:12px;flex:none}
+.fstop{display:flex;align-items:center;gap:3px;white-space:nowrap}.fstop select{border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:2px 4px;font-size:12px;max-width:6.8em}
+.fhead{margin-bottom:2px}.ftot{color:var(--mute)}
+.leg+.leg,.lay+.leg{margin-top:2px}
+.lay{font-size:12px;color:var(--mute);text-align:center;padding:3px 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line);margin:6px 0}
+.ro .fl1 .fplus{display:none}
 /* 輸入框內距放寬 */
 .card .name{padding:4px 10px;margin:0 -10px;width:calc(100% + 20px)}
 .time input{padding:4px 8px}.dayhead input{padding:6px 10px}.gap input{padding:4px 8px}
@@ -399,26 +407,52 @@ function refreshLinks(){const a=data.days[cur].items;
   document.querySelectorAll("[data-nv]").forEach(e=>e.href=nvUrl(a[+e.dataset.nv]));
   document.querySelectorAll("[data-gg]").forEach(e=>e.href=ggUrl(a[+e.dataset.gg]));
   document.querySelectorAll("[data-rt]").forEach(e=>{const i=+e.dataset.rt;if(a[i+1])e.href=rtUrl(a[i],a[i+1])})}
-const FK=["去程","回程"];
-const FL=()=>{if(!Array.isArray(data.flights)||data.flights.length!==2)data.flights=[{no:"",dep:"",arr:"",tz:1,z:""},{no:"",dep:"",arr:"",tz:-1,z:""}];return data.flights};
 const ZONES=[["日本","Asia/Tokyo"],["韓國","Asia/Seoul"],["中國","Asia/Shanghai"],["香港","Asia/Hong_Kong"],["澳門","Asia/Macau"],["新加坡","Asia/Singapore"],["馬來西亞","Asia/Kuala_Lumpur"],["泰國","Asia/Bangkok"],["越南","Asia/Ho_Chi_Minh"],["菲律賓","Asia/Manila"],["印尼（雅加達）","Asia/Jakarta"],["印尼（峇里島）","Asia/Makassar"],["柬埔寨","Asia/Phnom_Penh"],["印度","Asia/Kolkata"],["尼泊爾","Asia/Kathmandu"],["蒙古","Asia/Ulaanbaatar"],["阿聯（杜拜）","Asia/Dubai"],["土耳其","Europe/Istanbul"],["英國","Europe/London"],["法國","Europe/Paris"],["德國","Europe/Berlin"],["義大利","Europe/Rome"],["西班牙","Europe/Madrid"],["荷蘭","Europe/Amsterdam"],["瑞士","Europe/Zurich"],["捷克","Europe/Prague"],["冰島","Atlantic/Reykjavik"],["美國（紐約）","America/New_York"],["美國（洛杉磯）","America/Los_Angeles"],["美國（夏威夷）","Pacific/Honolulu"],["加拿大（溫哥華）","America/Vancouver"],["加拿大（多倫多）","America/Toronto"],["關島","Pacific/Guam"],["澳洲（雪梨）","Australia/Sydney"],["澳洲（伯斯）","Australia/Perth"],["紐西蘭","Pacific/Auckland"]];
 function zoneOffset(tz,dt){try{const p=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:tz,hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"}).formatToParts(dt).map(x=>[x.type,x.value]));
   return (Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute,+p.second)-Math.floor(dt.getTime()/1000)*1000)/3600000}catch(e){return null}}
-const flAuto=()=>!!(FL()[0].z);
-function effTz(i){const f=FL()[i];if(!f.z)return +f.tz||0;
-  const ds=data.days,d=parseMD(i===0?ds[0]&&ds[0].date:ds[ds.length-1]&&ds[ds.length-1].date)||new Date();const at=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12);
-  const a=zoneOffset("Asia/Taipei",at),b=zoneOffset(f.z,at);if(a===null||b===null)return +f.tz||0;const diff=Math.round((b-a)*4)/4;return i===0?diff:-diff}
+const FK=["去程","回程"],CIR=["①","②","③","④"],TPE="Asia/Taipei",STOPS=[["台灣",TPE]].concat(ZONES);
+const FL=()=>{let f=data.flights;if(!Array.isArray(f)||f.length!==2)f=data.flights=[{},{}];
+  f.forEach((d,i)=>{if(!Array.isArray(d.legs)||!d.legs.length){d.legs=[{no:d.no||"",dep:d.dep||"",arr:d.arr||"",tz:d.tz!==undefined?+d.tz:(i?-1:1),z:""}];delete d.no;delete d.dep;delete d.arr;delete d.tz}
+    if(d.z===undefined)d.z=""});return f};
 const fmtTz=n=>(n>0?"+":n<0?"−":"")+Math.abs(n);
-function fdur(f,i){const a=hm(f.dep),b=hm(f.arr);if(a===null||b===null)return "";let d=Math.round((((b-a-effTz(i)*60)%1440)+1440)%1440);if(d===0)d=1440;const h=Math.floor(d/60),m=d%60;return h+"小時"+(m?m+"分":"")}
-function updFd(i){const e=document.querySelector('[data-fd="'+i+'"]');if(e)e.textContent=fdur(FL()[i],i)}
-function renderFlights(){const box=$("flbox"),L=FL();
-  if(RO){const rows=L.map((f,i)=>({f,i})).filter(x=>x.f.no||x.f.dep||x.f.arr);box.hidden=!rows.length;
-    box.innerHTML=rows.map(({f,i})=>`<div class="fl"><div class="fl1"><span class="fk">✈ ${FK[i]}</span><span class="fnov">${esc(f.no)}</span></div>${f.dep||f.arr?`<div class="fl2"><b class="ftv">${esc(f.dep)||"--:--"}</b><span class="fd"><i></i><b>${fdur(f,i)}</b><i></i></span><b class="ftv">${esc(f.arr)||"--:--"}</b></div>`:""}</div>`).join("");return}
-  box.hidden=false;const z=L[0].z||"";
-  const zsel=`<div class="fz"><label>目的地<select data-fl="0:z" aria-label="目的地（自動算時差）"><option value="">手動輸入時差</option>${ZONES.map(([n,id])=>`<option value="${id}" ${id===z?"selected":""}>${n}</option>`).join("")}</select></label><span class="fzn" id="fzn">${z?"去程 "+fmtTz(effTz(0))+"、回程 "+fmtTz(effTz(1))+" 小時（自動）":"沒選目的地時，請自己填下面的時差"}</span></div>`;
-  box.innerHTML=zsel+L.map((f,i)=>`<div class="fl"><div class="fl1"><span class="fk">✈ ${FK[i]}</span><input class="fno" data-fl="${i}:no" value="${esc(f.no)}" placeholder="航空公司-班機編號" aria-label="${FK[i]}航班"><label class="ftz">時差<input class="ftzi" data-fl="${i}:tz" type="number" step="0.5" min="-14" max="14" value="${effTz(i)}" ${f.z?"readonly":""} aria-label="時差（小時）"></label></div><div class="fl2"><input class="ft" data-fl="${i}:dep" value="${esc(f.dep)}" inputmode="numeric" maxlength="5" placeholder="出發" aria-label="出發時間"><span class="fd"><i></i><b data-fd="${i}">${fdur(f,i)}</b><i></i></span><input class="ft" data-fl="${i}:arr" value="${esc(f.arr)}" inputmode="numeric" maxlength="5" placeholder="抵達" aria-label="抵達時間"></div></div>`).join("")}
-function flPrint(){if(!data)return "";const L=FL().map((f,i)=>({f,i})).filter(x=>x.f.no||x.f.dep||x.f.arr);if(!L.length)return "";
-  return `<div class="fli">`+L.map(({f,i})=>`<div>✈ ${FK[i]}　${esc(f.no)}　${esc(f.dep)||"--:--"} → ${esc(f.arr)||"--:--"}${fdur(f,i)?"（"+fdur(f,i)+"）":""}</div>`).join("")+`</div>`}
+const fmtMin=d=>{const h=Math.floor(d/60),m=d%60;return h?h+"小時"+(m?m+"分":""):m+"分"};
+function legZones(di,li){const L=FL()[di].legs,dest=FL()[0].z||"";return [li===0?(di===0?TPE:dest):(L[li-1].z||""),li===L.length-1?(di===0?dest:TPE):(L[li].z||"")]}
+function flDate(di){const ds=data.days,d=parseMD(di===0?ds[0]&&ds[0].date:ds[ds.length-1]&&ds[ds.length-1].date)||new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate(),12)}
+function legAuto(di,li){const [a,b]=legZones(di,li);return !!(a&&b)}
+function legTz(di,li){const l=FL()[di].legs[li],[a,b]=legZones(di,li);
+  if(a&&b){if(a===b)return 0;const at=flDate(di),x=zoneOffset(a,at),y=zoneOffset(b,at);if(x!==null&&y!==null)return Math.round((y-x)*4)/4}
+  return +l.tz||0}
+function legMin(di,li){const l=FL()[di].legs[li],a=hm(l.dep),b=hm(l.arr);if(a===null||b===null)return null;let d=Math.round((((b-a-legTz(di,li)*60)%1440)+1440)%1440);if(d===0)d=1440;return d}
+const fdur=(di,li)=>{const d=legMin(di,li);return d===null?"":fmtMin(d)};
+function layMin(di,li){const L=FL()[di].legs,x=hm(L[li].arr),y=hm(L[li+1].dep);return x===null||y===null?null:(((y-x)%1440)+1440)%1440}
+const layText=(di,li)=>{const d=layMin(di,li);return d===null?"⏱ 轉機（填好時間會自動計算）":"⏱ 轉機等待 "+fmtMin(d)};
+function totMin(di){const L=FL()[di].legs;let t=0;for(let i=0;i<L.length;i++){const m=legMin(di,i);if(m===null)return null;t+=m;if(i<L.length-1){const w=layMin(di,i);if(w===null)return null;t+=w}}return t}
+const totText=di=>{const t=totMin(di);return t===null||FL()[di].legs.length<2?"":"全程 "+fmtMin(t)+"（含轉機）"};
+function destNote(){const z=FL()[0].z;if(!z)return "沒選目的地時，請自己填各段的時差";const at=flDate(0),x=zoneOffset(TPE,at),y=zoneOffset(z,at);if(x===null||y===null)return "";const d=Math.round((y-x)*4)/4;return d===0?"與台灣同時區（自動）":"比台灣"+(d>0?"快 ":"慢 ")+Math.abs(d)+" 小時（自動算時差）"}
+function updFd(){FL().forEach((D,di)=>{D.legs.forEach((l,li)=>{const e=document.querySelector('[data-fd="'+di+":"+li+'"]');if(e)e.textContent=fdur(di,li);
+    const y=document.querySelector('[data-lay="'+di+":"+li+'"]');if(y)y.textContent=layText(di,li);
+    const ti=document.querySelector('.ftzi[data-fl="'+di+":"+li+':tz"]');if(ti&&document.activeElement!==ti)ti.value=legTz(di,li)});
+  const t=document.querySelector('[data-tot="'+di+'"]');if(t)t.textContent=totText(di)})}
+function legHtml(di,li,lead,trail){const L=FL()[di].legs,l=L[li],n=L.length,last=li===n-1,auto=legAuto(di,li);
+  const stop=last?"":`<label class="fstop">到<select data-fl="${di}:${li}:z" aria-label="中途站"><option value="">選中途站</option>${STOPS.map(([nm,id])=>`<option value="${id}" ${id===l.z?"selected":""}>${nm}</option>`).join("")}</select></label>`;
+  return `<div class="leg"><div class="fl1">${lead}<input class="fno" data-fl="${di}:${li}:no" value="${esc(l.no)}" placeholder="航空公司-班機編號" aria-label="航班">${stop}<label class="ftz">時差<input class="ftzi" data-fl="${di}:${li}:tz" type="number" step="0.5" min="-14" max="14" value="${legTz(di,li)}" ${auto?"readonly":""} aria-label="時差（小時）"></label>${n>1?`<button class="fdel" data-fldel="${di}:${li}" aria-label="刪除這一段">✕</button>`:""}${trail}</div>
+  <div class="fl2"><input class="ft" data-fl="${di}:${li}:dep" value="${esc(l.dep)}" inputmode="numeric" maxlength="5" placeholder="出發" aria-label="出發時間"><span class="fd"><i></i><b data-fd="${di}:${li}">${fdur(di,li)}</b><i></i></span><input class="ft" data-fl="${di}:${li}:arr" value="${esc(l.arr)}" inputmode="numeric" maxlength="5" placeholder="抵達" aria-label="抵達時間"></div></div>`}
+function dirHtml(di){const L=FL()[di].legs,n=L.length,plus=n<4?`<button class="fplus" data-fladd="${di}" title="加中途站／轉機" aria-label="加中途站或轉機">＋</button>`:"";
+  const head=n>1?`<div class="fl1 fhead"><span class="fk">✈ ${FK[di]}</span><span class="ftot" data-tot="${di}">${totText(di)}</span>${plus}</div>`:"";
+  return `<div class="fl">${head}${L.map((l,li)=>legHtml(di,li,n===1?`<span class="fk">✈ ${FK[di]}</span>`:`<span class="fk">${CIR[li]}</span>`,n===1?plus:"")+(li<n-1?`<div class="lay" data-lay="${di}:${li}">${layText(di,li)}</div>`:"")).join("")}</div>`}
+function renderFlights(){const box=$("flbox"),F=FL();
+  if(RO){let h="";F.forEach((D,di)=>{const ix=D.legs.map((l,li)=>li).filter(li=>{const l=D.legs[li];return l.no||l.dep||l.arr});if(!ix.length)return;
+    const multi=ix.length>1;
+    h+=`<div class="fl">${multi?`<div class="fl1 fhead"><span class="fk">✈ ${FK[di]}</span><span class="ftot">${totText(di)}</span></div>`:""}`+ix.map((li,k)=>{const l=D.legs[li];
+      const lay=k>0&&ix[k-1]===li-1?`<div class="lay">${layText(di,li-1)}</div>`:"";
+      return lay+`<div class="leg"><div class="fl1">${multi?`<span class="fk">${CIR[li]}</span>`:`<span class="fk">✈ ${FK[di]}</span>`}<span class="fnov">${esc(l.no)}</span></div>${l.dep||l.arr?`<div class="fl2"><b class="ftv">${esc(l.dep)||"--:--"}</b><span class="fd"><i></i><b>${fdur(di,li)}</b><i></i></span><b class="ftv">${esc(l.arr)||"--:--"}</b></div>`:""}</div>`}).join("")+`</div>`});
+    box.innerHTML=h;box.hidden=!h;return}
+  box.hidden=false;const z=F[0].z||"";
+  box.innerHTML=`<div class="fz"><label>目的地<select data-fl="dest" aria-label="目的地（自動算時差）"><option value="">手動輸入時差</option>${ZONES.map(([n,id])=>`<option value="${id}" ${id===z?"selected":""}>${n}</option>`).join("")}</select></label><span class="fzn" id="fzn">${destNote()}</span></div>`+dirHtml(0)+dirHtml(1)}
+function flPrint(){if(!data)return "";let h="";FL().forEach((D,di)=>{const ix=D.legs.map((l,li)=>li).filter(li=>{const l=D.legs[li];return l.no||l.dep||l.arr});
+  ix.forEach((li,k)=>{const l=D.legs[li];if(k>0&&ix[k-1]===li-1)h+=`<div>　　${esc(layText(di,li-1))}</div>`;
+    h+=`<div>✈ ${FK[di]}${ix.length>1?" "+CIR[li]:""}　${esc(l.no)}　${esc(l.dep)||"--:--"} → ${esc(l.arr)||"--:--"}${fdur(di,li)?"（"+fdur(di,li)+"）":""}</div>`})});
+  return h?`<div class="fli">${h}</div>`:""}
 function render(){
   renderFlights();
   const cvSrc=cover(data);$("cvbar").hidden=!cvSrc;if(cvSrc)$("cvimg").src=imgUrl(cvSrc,900);
@@ -457,7 +491,13 @@ document.addEventListener("input",e=>{
   if(t.dataset.st!==undefined){const [i,j]=t.dataset.st.split(":").map(Number);lists().gift[i].subs[j].t=t.value;listSave();return}
   if(t.dataset.lt!==undefined||t.dataset.ln!==undefined){const it=lists().shop[+(t.dataset.lt??t.dataset.ln)];if(t.dataset.lt!==undefined)it.t=t.value;else it.n=t.value;listSave();return}
   if(t.tagName==="TEXTAREA")fit(t);
-  if(t.dataset.fl!==undefined){const [i,k]=t.dataset.fl.split(":"),f=FL()[+i];if(k==="z"){FL()[0].z=FL()[1].z=t.value;save();renderFlights()}else if(k==="no"){f.no=t.value;save()}else if(k==="tz"){f.tz=t.value===""||isNaN(+t.value)?0:+t.value;updFd(+i);save()}return}
+  if(t.dataset.fl!==undefined){
+    if(t.dataset.fl==="dest"){FL()[0].z=FL()[1].z=t.value;save();renderFlights();return}
+    const [di,li,k]=t.dataset.fl.split(":"),l=FL()[+di].legs[+li];
+    if(k==="no"){l.no=t.value;save()}
+    else if(k==="z"){l.z=t.value;save();renderFlights()}
+    else if(k==="tz"){l.tz=t.value===""||isNaN(+t.value)?0:+t.value;updFd();save()}
+    return}
   if(t.id==="title"){fit(t);data.title=t.value;document.title=t.value||"旅遊行程規劃";save();return}
   if(t.id==="nights"){data.nights=+t.value||0;save();return}
   if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f==="date")renderFlights();if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
@@ -468,9 +508,10 @@ document.addEventListener("input",e=>{
     save()}
 });
 document.addEventListener("change",e=>{const t=e.target,d=t.dataset;if(!d||RO)return;
-  if(d.fl!==undefined){const [i,k]=d.fl.split(":");if(k==="dep"||k==="arr"){const f=FL()[+i],n=normTime(t.value);
-      if(n===null){t.value=fmtT(f[k]);toast("時間請輸入 00:00 的格式，例如 08:30 或 0830");return}
-      t.value=n;if(n!==f[k]){f[k]=n;save();updFd(+i)}}return}
+  if(d.fl!==undefined){const [di,li,k]=d.fl.split(":");
+    if(k==="dep"||k==="arr"){const l=FL()[+di].legs[+li],n=normTime(t.value);
+      if(n===null){t.value=fmtT(l[k]);toast("時間請輸入 00:00 的格式，例如 08:30 或 0830");return}
+      t.value=n;if(n!==l[k]){l[k]=n;save();updFd()}}return}
   if(d.k==="time"){const it=data.days[cur].items[+d.i],n=normTime(t.value);
     if(n===null){t.value=fmtT(it.time);toast("時間請輸入 00:00 的格式，例如 06:05 或 0605");return}
     t.value=n;if(n!==it.time){it.time=n;if(+d.i===0)recalc(data.days[cur]);paint();save()}return}
@@ -507,6 +548,10 @@ document.addEventListener("click",e=>{
   const z=e.target.closest("[data-z]");
   if(z&&data&&!(b&&(b.dataset.pd!==undefined||b.dataset.cv!==undefined))){const [zi,zj]=z.dataset.z.split(":").map(Number);$("big").src=imgUrl(data.days[cur].items[zi].imgs[zj],1200);$("lb").classList.add("on");return}
   if(e.target.closest("#lb")){$("lb").classList.remove("on");return}
+  if(b&&data&&!RO&&(b.dataset.fladd!==undefined||b.dataset.fldel!==undefined)){
+    if(b.dataset.fladd!==undefined){const D=FL()[+b.dataset.fladd];if(D.legs.length<4)D.legs.push({no:"",dep:"",arr:"",tz:0,z:""})}
+    else{const [di,li]=b.dataset.fldel.split(":").map(Number),D=FL()[di];if(D.legs.length>1&&confirm("要刪除這一段航班嗎？"))D.legs.splice(li,1);else return}
+    save();renderFlights();return}
   const zl=e.target.closest("[data-zl]");
   if(zl&&data&&!(b&&b.dataset.lx!==undefined)){const it=lists().shop[+zl.dataset.zl];if(it&&it.img){$("big").src=imgUrl(it.img,1200);$("lb").classList.add("on")}return}
   if(b&&data&&!RO&&["view","la","ld","sa","sd","limg","lx","lq"].some(k=>ds[k]!==undefined)){
