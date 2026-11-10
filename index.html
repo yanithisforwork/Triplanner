@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>旅遊行程規劃</title>
@@ -125,17 +126,6 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 #pv .pi{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:3px 0;break-inside:avoid}
 #pv .pi b{text-align:right}#pv .pi small{color:#666}#pv .mv{margin-left:64px;color:#777;font-size:12px;break-inside:avoid}#pv .pi img{width:110px;margin:6px 6px 0 0;border-radius:6px}
 #pv .pgb{break-before:page}#pv .lp{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #ddd;break-inside:avoid;font-size:15px}#pv .lp .bl{height:20px}#pv .lp small{color:#666}#pv .pcv{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px}#pv .lp img{width:46px;height:46px;object-fit:cover;border-radius:5px;margin-right:8px;vertical-align:middle}#pv .subs div{padding:1px 0}#pv .fli{margin:0 0 8px;font-size:14px}}
-@media print{
-  html,body{width:100%;min-height:0;background:#fff!important}
-  body{font-size:12pt;line-height:1.45}
-  #pv{display:block!important;width:100%;max-width:none}
-  #pv .pcv{display:block;width:100%;height:110px;object-fit:cover}
-  #pv h1,#pv h2{color:#222}
-  #pv h2{margin-top:16px;break-after:avoid-page;page-break-after:avoid}
-  #pv .pi,#pv .mv,#pv .lp,.fl,.leg{break-inside:avoid;page-break-inside:avoid}
-  #pv img{max-width:100%;height:auto}
-  a{color:inherit;text-decoration:none}
-}
 .dayhead button{white-space:nowrap}
 @media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
 .titlebox{display:block}
@@ -220,7 +210,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 </div></section>
 <section id="editor" hidden><div class="wrap">
   <div class="bar"><button id="back">← 首頁</button><span id="sync" class="sync"></span><button id="save" class="primary">存檔</button></div>
-  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">存成 PDF</button><button id="print">列印</button></div>
+  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button></div>
   <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span></div>
   <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
@@ -462,8 +452,8 @@ function renderFlights(){const box=$("flbox"),F=FL();
   box.hidden=false;const z=F[0].z||"";
   box.innerHTML=`<div class="fz"><label>目的地<select data-fl="dest" aria-label="目的地（自動算時差）"><option value="">手動輸入時差</option>${ZONES.map(([n,id])=>`<option value="${id}" ${id===z?"selected":""}>${n}</option>`).join("")}</select></label><span class="fzn" id="fzn">${destNote()}</span></div>`+dirHtml(0)+dirHtml(1)}
 function flPrint(){if(!data)return "";let h="";FL().forEach((D,di)=>{const ix=D.legs.map((l,li)=>li).filter(li=>{const l=D.legs[li];return l.no||l.dep||l.arr});
-  ix.forEach((li,k)=>{const l=D.legs[li];if(k>0&&ix[k-1]===li-1)h+=`<div>　　${esc(layText(di,li-1))}</div>`;
-    h+=`<div>✈ ${FK[di]}${ix.length>1?" "+CIR[li]:""}　${esc(l.no)}　${esc(l.dep)||"--:--"} → ${esc(l.arr)||"--:--"}${fdur(di,li)?"（"+fdur(di,li)+"）":""}</div>`})});
+  ix.forEach((li,k)=>{const l=D.legs[li];if(k>0&&ix[k-1]===li-1)h+=`<div>  ${esc(layText(di,li-1))}</div>`;
+    h+=`<div>✈ ${FK[di]}${ix.length>1?" "+CIR[li]:""} ${esc(l.no)} ${esc(l.dep)||"--:--"} → ${esc(l.arr)||"--:--"}${fdur(di,li)?"（"+fdur(di,li)+"）":""}</div>`})});
   return h?`<div class="fli">${h}</div>`:""}
 function render(){
   renderFlights();
@@ -549,9 +539,14 @@ document.addEventListener("click",e=>{
     if(b&&b.id==="retry"){pull();return}
     if(b&&b.id==="newtrip"){$("nn").value="";$("nd").value=3;$("nnt").value=2;$("nstart").value="";$("dlg").showModal();return}
     if(ds.share){shareTrip(ds.share);return}
-    if(ds.del){const t=store.trips[ds.del];if(!confirm(cloud.key?"確定刪除「"+t.title+"」？雲端 Sheet 裡的這份行程也會一併刪除。":"確定從這台裝置移除「"+t.title+"」？雲端上的行程不會被刪除。"))return;
-      delete store.trips[ds.del];delete store.dirty[ds.del];delete store.lists[ds.del];delete store.ldirty[ds.del];persist();renderHome();
-      if(cloud.url&&cloud.key)call({action:"delete",id:ds.del},true).catch(()=>toast("雲端刪除失敗，請稍後再試"));return}
+    if(ds.del){const delId=ds.del,t=store.trips[delId];
+      if(!confirm(cloud.key?"確定刪除「"+(t?t.title:"")+"」？雲端 Sheet 裡的這份行程也會一併刪除。":"確定從這台裝置移除「"+(t?t.title:"")+"」？雲端上的行程不會被刪除。"))return;
+      delete store.trips[delId];delete store.dirty[delId];delete store.lists[delId];delete store.ldirty[delId];persist();renderHome();
+      if(cloud.url&&cloud.key){toast("正在從雲端刪除…");
+        call({action:"delete",id:delId},true).then(r=>{if(r&&r.error)toast("刪除失敗："+r.error);else toast("已成功刪除行程")})
+        .catch(async()=>{let confirmed=false;
+          for(let k=0;k<2;k++){await new Promise(z=>setTimeout(z,1000));try{const v=await call({action:"view",id:delId});if(!v.rows||v.rows.length===0){confirmed=true;break}}catch(e2){}}
+          if(confirmed)toast("已成功刪除行程");else toast("雲端刪除失敗，請稍後再試")});}return}
     const c=e.target.closest("[data-open]");if(c&&!b)location.hash="#e="+c.dataset.open;return}
   const nvc=e.target.closest("[data-nv]");
   if(nvc&&data){const it0=data.days[cur].items[+nvc.dataset.nv];if(it0){try{navigator.clipboard.writeText(kw(it0));toast("已複製名稱，搜不到時可直接貼上再搜")}catch(x){}}}
@@ -637,37 +632,28 @@ function listPrint(k){const L=(store.lists[tid]||{})[k]||[],T=LT[k];
   return `<div class="pgb"><h2>${T[0]}</h2>${rows}${blank}</div>`}
 let printMode="all";
 function buildPrint(){if(!data)return;
-  $("pv").innerHTML=(cover(data)?`<img class="pcv" src="${imgUrl(cover(data),900)}" alt="">`:"")+`<h1>${esc(data.title)}</h1><div class="sub">${data.days.length}天${+data.nights||0}夜</div>`+flPrint()+data.days.map(d=>
-    `<h2>${esc(d.label)}${d.date?"　"+esc(d.date):""}</h2>`+d.items.map((it,i)=>
-      `<div class="pi"><b>${esc(it.time)}</b><div>${esc(it.name)}<br><small>${TYPES[it.type]||""}${it.stay?"・停留 "+esc(it.stay):""}</small>${it.note?`<br><small>${esc(it.note)}</small>`:""}${(it.imgs||[]).length?"<br>"+it.imgs.map(f=>`<img src="${imgUrl(f,500)}" alt="">`).join(""):""}</div></div>`+
+  $("pv").innerHTML=(cover(data)?`<img class="pcv" src="${imgUrl(cover(data),700)}" alt="">`:"")+`<h1>${esc(data.title)}</h1><div class="sub">${data.days.length}天${+data.nights||0}夜</div>`+flPrint()+data.days.map(d=>
+    `<h2>${esc(d.label)}${d.date?" "+esc(d.date):""}</h2>`+d.items.map((it,i)=>
+      `<div class="pi"><b>${esc(it.time)}</b><div>${esc(it.name)}<br><small>${TYPES[it.type]||""}${it.stay?"・停留 "+esc(it.stay):""}</small>${it.note?`<br><small>${esc(it.note)}</small>`:""}${(it.imgs||[]).length?"<br>"+it.imgs.map(f=>`<img src="${imgUrl(f,300)}" alt="">`).join(""):""}</div></div>`+
       (it.next&&i<d.items.length-1?`<div class="mv">↓ ${esc(it.next)}</div>`:"")).join("")).join("")+(RO||!tid||printMode==="trip"?"":listPrint("gift")+listPrint("shop")+listPrint("pack")+listPrint("todo"))}
-async function waitForPrintAssets(){
-  try{if(document.fonts&&document.fonts.ready)await document.fonts.ready}catch(e){}
-  const imgs=Array.from($("pv").querySelectorAll("img"));
-  await Promise.all(imgs.map(img=>{
-    if(img.complete)return Promise.resolve();
-    return new Promise(resolve=>{
-      img.onload=resolve;img.onerror=resolve;
-      setTimeout(resolve,8000);
-    });
-  }));
-}
-async function startPrint(mode){
-  if(!data)return;
-  printMode=mode;
-  buildPrint();
-  toast("正在整理 PDF，請稍候…",3000);
-  await waitForPrintAssets();
-  // 等待瀏覽器完成版面重排，再開啟系統列印／儲存 PDF 介面
-  requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
-}
 addEventListener("beforeprint",buildPrint);
 addEventListener("afterprint",()=>{printMode="all"});
-$("print").onclick=()=>startPrint("all");
+addEventListener("focus",()=>{printMode="all"});
+$("print").onclick=()=>{printMode="all";print()};
 $("save").onclick=()=>{if(!cloud.url){toast("請先到頁面最下方按「雲端設定」");return}clearTimeout(tm);saveCloud(tid)};
 $("share").onclick=()=>shareTrip(tid);
 $("inv").onclick=()=>inviteTrip(tid);
-$("exp").onclick=()=>startPrint("trip");
+$("exp").onclick=async()=>{if(!data)return;printMode="trip";buildPrint();
+  const el=$("pv"),wrap=document.createElement("div");
+  wrap.id="pv";wrap.style.position="absolute";wrap.style.top="-99999px";wrap.style.left="0";wrap.style.width="780px";
+  wrap.style.backgroundColor="#ffffff";wrap.style.color="#000000";wrap.style.padding="20px";wrap.style.display="block";
+  wrap.innerHTML=el.innerHTML;document.body.appendChild(wrap);
+  toast("正在匯出 PDF，請稍候…",3000);
+  const title=(data.title||"旅遊行程").replace(/[/\\?%*:|"<>]/g,"_");
+  const opt={margin:[12,10,12,10],filename:title+".pdf",image:{type:"jpeg",quality:0.98},html2canvas:{scale:2,useCORS:true,logging:false},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"}};
+  try{await html2pdf().set(opt).from(wrap).save();toast("匯出完成！")}
+  catch(err){console.error(err);toast("PDF 匯出失敗，改為開啟列印畫面");print()}
+  finally{document.body.removeChild(wrap)}};
 function cloudSetup(){const u=prompt("貼上 Apps Script 網頁應用程式網址（結尾為 /exec）",cloud.url||"");if(u===null)return;
   const k=prompt("輸入密碼（需與 Code.gs 裡的 KEY 相同）",cloud.key||"");if(k===null)return;
   cloud={url:u.trim(),key:k.trim()};try{localStorage.setItem(CK,JSON.stringify(cloud))}catch(e){}
@@ -688,7 +674,7 @@ $("dok").onclick=()=>{const n=$("nn").value.trim();if(!n){$("nn").focus();return
   store.trips[id]={id,title:n,nights:Math.max(0,+$("nnt").value||0),days:Array.from({length:N},(_,i)=>({label:"第"+(i+1)+"天",date:startDate(i),items:[]}))};
   store.dirty[id]=1;persist();$("dlg").close();schedule(id);location.hash="#e="+id};
 $("sclose").onclick=()=>$("shr").close();
-$("cp").onclick=async()=>{try{await navigator.clipboard.writeText(shareUrl);toast("已複製連結")}catch(e){$("lnk").select();toast("請手動複製連結")}};
+$("cp").onclick=async()=>{try{navigator.clipboard.writeText(shareUrl);toast("已複製連結")}catch(e){$("lnk").select();toast("請手動複製連結")}};
 $("line").onclick=()=>window.open("https://social-plugins.line.me/lineit/share?url="+encodeURIComponent(shareUrl),"_blank");
 $("sys").onclick=()=>navigator.share({title:store.trips[tid]?store.trips[tid].title:"旅遊行程",url:shareUrl}).catch(()=>{});
 /* routing */
