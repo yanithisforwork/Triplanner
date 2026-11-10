@@ -118,12 +118,24 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .ro input,.ro textarea,.ro select{border-color:transparent!important;background:none!important;appearance:none;-webkit-appearance:none;pointer-events:none}
 .ro .row select{padding:0}
 #pv{display:none}
-@media print{body>section,dialog,.toast{display:none!important}#pv{display:block}body{background:#fff;color:#000}
+@page{size:A4;margin:14mm}
+@media print{*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body>section,dialog,.toast{display:none!important}#pv{display:block}body{background:#fff;color:#000}
 #pv h1{font-size:24px;margin:0 0 2px}#pv .sub{color:#666;margin-bottom:14px}
 #pv h2{font:700 18px "Noto Serif TC",serif;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #999;break-after:avoid}
 #pv .pi{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:3px 0;break-inside:avoid}
 #pv .pi b{text-align:right}#pv .pi small{color:#666}#pv .mv{margin-left:64px;color:#777;font-size:12px;break-inside:avoid}#pv .pi img{width:110px;margin:6px 6px 0 0;border-radius:6px}
 #pv .pgb{break-before:page}#pv .lp{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #ddd;break-inside:avoid;font-size:15px}#pv .lp .bl{height:20px}#pv .lp small{color:#666}#pv .pcv{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px}#pv .lp img{width:46px;height:46px;object-fit:cover;border-radius:5px;margin-right:8px;vertical-align:middle}#pv .subs div{padding:1px 0}#pv .fli{margin:0 0 8px;font-size:14px}}
+@media print{
+  html,body{width:100%;min-height:0;background:#fff!important}
+  body{font-size:12pt;line-height:1.45}
+  #pv{display:block!important;width:100%;max-width:none}
+  #pv .pcv{display:block;width:100%;height:110px;object-fit:cover}
+  #pv h1,#pv h2{color:#222}
+  #pv h2{margin-top:16px;break-after:avoid-page;page-break-after:avoid}
+  #pv .pi,#pv .mv,#pv .lp,.fl,.leg{break-inside:avoid;page-break-inside:avoid}
+  #pv img{max-width:100%;height:auto}
+  a{color:inherit;text-decoration:none}
+}
 .dayhead button{white-space:nowrap}
 @media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
 .titlebox{display:block}
@@ -208,7 +220,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 </div></section>
 <section id="editor" hidden><div class="wrap">
   <div class="bar"><button id="back">← 首頁</button><span id="sync" class="sync"></span><button id="save" class="primary">存檔</button></div>
-  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button></div>
+  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">存成 PDF</button><button id="print">列印</button></div>
   <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span></div>
   <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
@@ -253,7 +265,7 @@ const imgUrl=(f,w)=>"https://drive.google.com/thumbnail?id="+encodeURIComponent(
 const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
 const persist=()=>{try{localStorage.setItem(SK,JSON.stringify(store))}catch(e){}};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),m.length>20?6000:1800)}
+function toast(m,ms){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),ms||(m.length>20?6000:1800))}
 const sync=t=>$("sync").textContent=t;
 async function why(x){const m=errMsg(x);if(!/連不到後端/.test(m))return m;
   try{await fetch(cloud.url+"?action=view&id=test",{mode:"no-cors"});
@@ -623,19 +635,39 @@ function listPrint(k){const L=(store.lists[tid]||{})[k]||[],T=LT[k];
     :L.map(x=>`<div class="lp"><span>${x.c?"☑":"☐"}</span><div>${x.img?`<img src="${imgUrl(x.img,200)}" alt="">`:""}<b>${esc(x.t)}</b>${x.n?` <small>${esc(x.n)}</small>`:""}</div></div>`)).join("");
   const blank=Array.from({length:Math.max(0,14-L.length)},()=>`<div class="lp"><span>☐</span><div class="bl"></div></div>`).join("");
   return `<div class="pgb"><h2>${T[0]}</h2>${rows}${blank}</div>`}
+let printMode="all";
 function buildPrint(){if(!data)return;
-  $("pv").innerHTML=(cover(data)?`<img class="pcv" src="${imgUrl(cover(data),700)}" alt="">`:"")+`<h1>${esc(data.title)}</h1><div class="sub">${data.days.length}天${+data.nights||0}夜</div>`+flPrint()+data.days.map(d=>
+  $("pv").innerHTML=(cover(data)?`<img class="pcv" src="${imgUrl(cover(data),900)}" alt="">`:"")+`<h1>${esc(data.title)}</h1><div class="sub">${data.days.length}天${+data.nights||0}夜</div>`+flPrint()+data.days.map(d=>
     `<h2>${esc(d.label)}${d.date?"　"+esc(d.date):""}</h2>`+d.items.map((it,i)=>
-      `<div class="pi"><b>${esc(it.time)}</b><div>${esc(it.name)}<br><small>${TYPES[it.type]||""}${it.stay?"・停留 "+esc(it.stay):""}</small>${it.note?`<br><small>${esc(it.note)}</small>`:""}${(it.imgs||[]).length?"<br>"+it.imgs.map(f=>`<img src="${imgUrl(f,300)}" alt="">`).join(""):""}</div></div>`+
-      (it.next&&i<d.items.length-1?`<div class="mv">↓ ${esc(it.next)}</div>`:"")).join("")).join("")+(RO||!tid?"":listPrint("gift")+listPrint("shop")+listPrint("pack")+listPrint("todo"))}
+      `<div class="pi"><b>${esc(it.time)}</b><div>${esc(it.name)}<br><small>${TYPES[it.type]||""}${it.stay?"・停留 "+esc(it.stay):""}</small>${it.note?`<br><small>${esc(it.note)}</small>`:""}${(it.imgs||[]).length?"<br>"+it.imgs.map(f=>`<img src="${imgUrl(f,500)}" alt="">`).join(""):""}</div></div>`+
+      (it.next&&i<d.items.length-1?`<div class="mv">↓ ${esc(it.next)}</div>`:"")).join("")).join("")+(RO||!tid||printMode==="trip"?"":listPrint("gift")+listPrint("shop")+listPrint("pack")+listPrint("todo"))}
+async function waitForPrintAssets(){
+  try{if(document.fonts&&document.fonts.ready)await document.fonts.ready}catch(e){}
+  const imgs=Array.from($("pv").querySelectorAll("img"));
+  await Promise.all(imgs.map(img=>{
+    if(img.complete)return Promise.resolve();
+    return new Promise(resolve=>{
+      img.onload=resolve;img.onerror=resolve;
+      setTimeout(resolve,8000);
+    });
+  }));
+}
+async function startPrint(mode){
+  if(!data)return;
+  printMode=mode;
+  buildPrint();
+  toast("正在整理 PDF，請稍候…",3000);
+  await waitForPrintAssets();
+  // 等待瀏覽器完成版面重排，再開啟系統列印／儲存 PDF 介面
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
+}
 addEventListener("beforeprint",buildPrint);
-$("print").onclick=()=>print();
+addEventListener("afterprint",()=>{printMode="all"});
+$("print").onclick=()=>startPrint("all");
 $("save").onclick=()=>{if(!cloud.url){toast("請先到頁面最下方按「雲端設定」");return}clearTimeout(tm);saveCloud(tid)};
 $("share").onclick=()=>shareTrip(tid);
 $("inv").onclick=()=>inviteTrip(tid);
-$("exp").onclick=()=>{const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([JSON.stringify({title:data.title,nights:data.nights,days:data.days},null,2)],{type:"application/json"}));
-  a.download=(data.title||"itinerary")+".json";a.click();toast("已匯出")};
+$("exp").onclick=()=>startPrint("trip");
 function cloudSetup(){const u=prompt("貼上 Apps Script 網頁應用程式網址（結尾為 /exec）",cloud.url||"");if(u===null)return;
   const k=prompt("輸入密碼（需與 Code.gs 裡的 KEY 相同）",cloud.key||"");if(k===null)return;
   cloud={url:u.trim(),key:k.trim()};try{localStorage.setItem(CK,JSON.stringify(cloud))}catch(e){}
