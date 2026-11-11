@@ -114,7 +114,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .hint{color:var(--mute);font-size:13px;margin:12px 0 0}
 .toast{max-width:90vw;text-align:center;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 .toast.show{opacity:1}
-.ro #back,.ro #save,.ro #share,.ro #inv,.ro #exp,.ro .acts,.ro .add,.ro [data-adddays],.ro [data-delday],.ro .kr,.ro .note:placeholder-shown{display:none}
+.ro #back,.ro #save,.ro #share,.ro #inv,.ro #exp,.ro #undo,.ro .acts,.ro .add,.ro [data-adddays],.ro [data-delday],.ro .kr,.ro .note:placeholder-shown{display:none}
 .ro input,.ro textarea,.ro select{border-color:transparent!important;background:none!important;appearance:none;-webkit-appearance:none;pointer-events:none}
 .ro .row select{padding:0}
 #pv{display:none}
@@ -134,7 +134,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .dayhead button{white-space:nowrap}
 @media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
 .titlebox{display:block}
-.bar2{display:flex;gap:8px;flex-wrap:wrap;padding:0 0 8px}
+.bar2{display:flex;gap:8px;flex-wrap:wrap;padding:0 0 8px}.bar2 .undo{margin-left:auto;min-width:48px}.bar2 .undo:disabled{opacity:.4}
 .bar .sp{display:none}.sync{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
 .cvtools{display:flex;justify-content:flex-end;gap:8px;margin:6px 0 4px}.ro .cvtools{display:none}
 .title{display:block;width:calc(100% + 10px);resize:none;overflow:hidden;line-height:1.35;min-height:0;font-size:26px}
@@ -215,7 +215,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 </div></section>
 <section id="editor" hidden><div class="wrap">
   <div class="bar"><button id="back">← 首頁</button><span id="sync" class="sync"></span><button id="save" class="primary">存檔</button></div>
-  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button></div>
+  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">存成 PDF</button><button id="print">列印</button><button id="undo" class="undo" disabled title="上一步" aria-label="上一步">↶</button></div>
   <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span></div>
   <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
@@ -346,7 +346,7 @@ function renderNote(){const el=$("homenote");let h="";const none=!Object.keys(st
   else if(pullState==="empty"&&none)h=`<div class="nc"><b>雲端上目前沒有行程</b><p>如果你以為這裡應該有行程，請確認密碼和網址是不是連到正確的 Google Sheet。</p><button id="cfghome">雲端設定</button></div>`;
   el.innerHTML=h}
 function showHome(){tid=null;data=null;$("editor").hidden=true;$("home").hidden=false;document.title="旅遊行程規劃";renderHome()}
-function showEditor(){$("home").hidden=true;$("editor").hidden=false;$("title").value=data.title;fit($("title"));$("nights").value=data.nights||0;document.title=data.title;sync("");$("inv").hidden=RO||!cloud.key;$("foot").hidden=RO||(!cloud.key&&!!cloud.url);render()}
+function showEditor(){$("home").hidden=true;$("editor").hidden=false;$("title").value=data.title;fit($("title"));$("nights").value=data.nights||0;document.title=data.title;sync("");$("inv").hidden=RO||!cloud.key;updUndo();$("foot").hidden=RO||(!cloud.key&&!!cloud.url);render()}
 function lockShare(on,msg){["cp","line","sys"].forEach(i=>$(i).disabled=on);if(msg)$("shint").textContent=msg}
 async function syncThen(id,okMsg){if(!store.dirty[id]&&!inflight[id])return;
   lockShare(true,"正在同步最新內容…");await saveCloud(id);
@@ -511,7 +511,7 @@ document.addEventListener("input",e=>{
   if(t.dataset.k==="time")return;
   if(t.dataset.k){const it=data.days[cur].items[+t.dataset.i];it[t.dataset.k]=t.value;if(t.dataset.k==="name"||t.dataset.k==="kr")refreshLinks();
     if(t.dataset.k=="type")t.closest(".card").dataset.t=t.value;
-    const k=t.dataset.k,i=+t.dataset.i;if(k==="stay"||k==="next"||(k==="time"&&i===0)){recalc(data.days[cur]);paint()}
+    const k=t.dataset.k,i=+t.dataset.i;if(k==="stay"||k==="next"||(k==="time"&&i===0)){takeCand();recalc(data.days[cur]);paint()}
     save()}
 });
 document.addEventListener("change",e=>{const t=e.target,d=t.dataset;if(!d||RO)return;
@@ -521,7 +521,7 @@ document.addEventListener("change",e=>{const t=e.target,d=t.dataset;if(!d||RO)re
       t.value=n;if(n!==l[k]){l[k]=n;save();updFd()}}return}
   if(d.k==="time"){const it=data.days[cur].items[+d.i],n=normTime(t.value);
     if(n===null){t.value=fmtT(it.time);toast("時間請輸入 00:00 的格式，例如 06:05 或 0605");return}
-    t.value=n;if(n!==it.time){it.time=n;if(+d.i===0)recalc(data.days[cur]);paint();save()}return}
+    t.value=n;if(n!==it.time){if(+d.i===0)takeCand();it.time=n;if(+d.i===0)recalc(data.days[cur]);paint();save()}return}
   if(d.lc!==undefined){lists().shop[+d.lc].c=t.checked;listSave();render()}
   else if(d.pc!==undefined){lists()[view][+d.pc].c=t.checked;listSave();render()}
   else if(d.gc!==undefined){const p=lists().gift[+d.gc];if(p.subs.length)p.subs.forEach(x=>x.c=t.checked);else p.c=t.checked;listSave();render()}
@@ -578,16 +578,17 @@ document.addEventListener("click",e=>{
     render();if(focus){const a=document.querySelectorAll(focus);if(a.length)a[a.length-1].focus()}return}
   if(!b||!data)return;const d=data.days[cur];
   if(RO&&ds.tab===undefined)return;
+  if(ds.del!==undefined||ds.up!==undefined||ds.down!==undefined||ds.add!==undefined||ds.adddays!==undefined)snap();
   if(ds.tab!==undefined){cur=+ds.tab;view="day"}
   else if(ds.adddays!==undefined){data.days.push({label:"第"+(data.days.length+1)+"天",date:nextDate(data.days[data.days.length-1].date),items:[]});cur=data.days.length-1}
-  else if(ds.delday!==undefined){if(!confirm("確定刪除「"+d.label+"」？"))return;data.days.splice(cur,1);if(!data.days.length)data.days.push({label:"第1天",date:"",items:[]});cur=0}
+  else if(ds.delday!==undefined){if(!confirm("確定刪除「"+d.label+"」？"))return;snap();data.days.splice(cur,1);if(!data.days.length)data.days.push({label:"第1天",date:"",items:[]});cur=0}
   else if(ds.add!==undefined){d.items.push({time:"",name:"",type:"spot",stay:"",next:"",note:"",kr:""})}
   else if(ds.del!==undefined){d.items.splice(+ds.del,1)}
   else if(ds.up!==undefined){const i=+ds.up;if(i>0)[d.items[i-1],d.items[i]]=[d.items[i],d.items[i-1]]}
   else if(ds.down!==undefined){const i=+ds.down;if(i<d.items.length-1)[d.items[i+1],d.items[i]]=[d.items[i],d.items[i+1]]}
   else if(ds.addimg!==undefined){pickIdx=+ds.addimg;pickMode="item";$("pf").click();return}
   else if(ds.cv!==undefined){const [ci,cj]=ds.cv.split(":").map(Number),cf=d.items[ci].imgs[cj];data.cover=data.cover===cf?"":cf;toast(data.cover?"已設為封面":"已取消封面")}
-  else if(ds.pd!==undefined){const [pi,pj]=ds.pd.split(":").map(Number);if(!confirm("要移除這張圖片嗎？"))return;d.items[pi].imgs.splice(pj,1)}
+  else if(ds.pd!==undefined){const [pi,pj]=ds.pd.split(":").map(Number);if(!confirm("要移除這張圖片嗎？"))return;snap();d.items[pi].imgs.splice(pj,1)}
   else return;
   if(ds.tab===undefined){if(ds.up!==undefined||ds.down!==undefined||ds.del!==undefined)recalc(d);save()}
   render();
@@ -600,7 +601,7 @@ document.addEventListener("pointermove",e=>{if(!drag)return;
   const t=document.elementsFromPoint(e.clientX,e.clientY).find(x=>x.classList&&x.classList.contains("stop"));
   if(t){drag.to=+t.dataset.idx;t.classList.add("over")}});
 function endDrag(){if(!drag)return;const d=drag;drag=null;
-  if(d.from!==d.to){const a=data.days[cur].items;a.splice(d.to,0,a.splice(d.from,1)[0]);recalc(data.days[cur]);save()}render()}
+  if(d.from!==d.to){snap();const a=data.days[cur].items;a.splice(d.to,0,a.splice(d.from,1)[0]);recalc(data.days[cur]);save()}render()}
 document.addEventListener("pointerup",endDrag);document.addEventListener("pointercancel",endDrag);
 /* buttons */
 let pickIdx=0,pickMode="item";
@@ -647,6 +648,13 @@ $("print").onclick=()=>{printMode="all";print()};
 $("save").onclick=()=>{if(!cloud.url){toast("請先到頁面最下方按「雲端設定」");return}clearTimeout(tm);saveCloud(tid)};
 $("share").onclick=()=>shareTrip(tid);
 $("inv").onclick=()=>inviteTrip(tid);
+const undoS={};let cand=null;
+function pushSnap(s){const a=undoS[tid]=undoS[tid]||[];a.push(s);if(a.length>30)a.shift();updUndo()}
+function snap(){if(data)pushSnap(JSON.stringify(data.days))}
+function updUndo(){const b=$("undo"),n=(undoS[tid]||[]).length;if(b){b.disabled=!n;b.textContent="↶";b.title=n?"上一步（可退回 "+n+" 步）":"上一步"}}
+$("undo").onclick=()=>{const a=undoS[tid]||[];if(!a.length||!data)return;data.days=JSON.parse(a.pop());if(cur>=data.days.length)cur=0;cand=null;updUndo();save();render();toast("已回到上一步")};
+document.addEventListener("focusin",e=>{const k=e.target.dataset&&e.target.dataset.k;if(!RO&&data&&(k==="stay"||k==="next"||k==="time"))cand=JSON.stringify(data.days)});
+const takeCand=()=>{if(cand){pushSnap(cand);cand=null}};
 const loadJs=src=>new Promise((ok,no)=>{if(document.querySelector('script[data-lib="'+src+'"]'))return ok();const s=document.createElement("script");s.src=src;s.dataset.lib=src;s.onload=ok;s.onerror=()=>no(new Error("載入失敗"));document.head.appendChild(s)});
 async function libs(){if(!window.html2canvas)await loadJs("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");if(!(window.jspdf&&window.jspdf.jsPDF))await loadJs("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js")}
 const b64=blob=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(blob)});
