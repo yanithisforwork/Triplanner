@@ -151,7 +151,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .rt-sheet{display:flex;flex-direction:column;height:100%}
 .rt-top{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
 .rt-top h2{font-size:17px;margin:0;flex:1}
-.rt-x{border:0;background:var(--soft);color:var(--pri);width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer}
+.rt-x{flex:none;box-sizing:border-box;border:0;background:var(--soft);color:var(--pri);width:36px;height:36px;min-width:36px;min-height:0;padding:0;margin:0;border-radius:50%;font-size:20px;line-height:1;display:grid;place-items:center;cursor:pointer}
 .rt-dtabs{display:flex;gap:6px;padding:8px 14px 0;overflow-x:auto}
 .rt-dtabs button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;cursor:pointer}
 .rt-dtabs button.on{background:var(--pri);color:var(--on);border-color:var(--pri)}
@@ -284,7 +284,6 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 <div class="toast" id="toast"></div>
 <dialog id="rdlg"><div class="rt-sheet">
 <div class="rt-top"><h2 id="rt-title"></h2><button class="rt-x" id="rt-close" type="button" aria-label="關閉">×</button></div>
-<div class="rt-dtabs" id="rt-dtabs"></div>
 <div id="rmapwrap"><div id="rmap"></div><div id="rhint" hidden></div></div>
 <div class="rt-chips" id="rt-chips"></div>
 <div class="rt-cand" id="rt-cand" hidden></div>
@@ -715,7 +714,8 @@ function updUndo(){const b=$("undo"),n=(undoS[tid]||[]).length;if(b){b.disabled=
 $("undo").onclick=()=>{const a=undoS[tid]||[];if(!a.length||!data)return;data.days=JSON.parse(a.pop());if(cur>=data.days.length)cur=0;cand=null;updUndo();save();render();toast("已回到上一步")};
 document.addEventListener("focusin",e=>{const k=e.target.dataset&&e.target.dataset.k;if(!RO&&data&&(k==="stay"||k==="next"||k==="time"))cand=JSON.stringify(data.days)});
 const takeCand=()=>{if(cand){pushSnap(cand);cand=null}};
-const loadJs=src=>new Promise((ok,no)=>{if(document.querySelector('script[data-lib="'+src+'"]'))return ok();const s=document.createElement("script");s.src=src;s.dataset.lib=src;s.onload=ok;s.onerror=()=>no(new Error("載入失敗"));document.head.appendChild(s)});
+const jsP={};
+const loadJs=src=>jsP[src]||(jsP[src]=new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.dataset.lib=src;s.onload=ok;s.onerror=()=>{delete jsP[src];s.remove();no(new Error("載入失敗"))};document.head.appendChild(s)}));
 async function libs(){if(!window.html2canvas)await loadJs("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");if(!(window.jspdf&&window.jspdf.jsPDF))await loadJs("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js")}
 const b64=blob=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(blob)});
 const pdfImg={};
@@ -725,7 +725,7 @@ async function imgData(fid){if(pdfImg[fid]!==undefined)return pdfImg[fid];let d=
   return pdfImg[fid]=d}
 const hasLL=it=>it&&typeof it.lat==="number"&&typeof it.lng==="number"&&isFinite(it.lat)&&isFinite(it.lng);
 const leafUrl="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.";
-async function leaflet(){if(!document.querySelector("link[data-leaf]")){const l=document.createElement("link");l.rel="stylesheet";l.href=leafUrl+"min.css";l.dataset.leaf="1";document.head.appendChild(l)}if(!window.L)await loadJs(leafUrl+"min.js")}
+async function leaflet(){if(!document.querySelector("link[data-leaf]")){const l=document.createElement("link");l.rel="stylesheet";l.href=leafUrl+"min.css";l.dataset.leaf="1";document.head.appendChild(l)}if(!window.L)await loadJs(leafUrl+"min.js");if(!window.L)throw new Error("Leaflet")}
 const rtPin=(n,cls)=>L.divIcon({className:"",html:`<div class="rt-pin ${cls||""}"><span>${n}</span></div>`,iconSize:[30,30],iconAnchor:[15,30]});
 const normN=s=>String(s||"").toLowerCase().replace(/[\s\-·・()（）]/g,"");
 const kmBetween=(a,b)=>{const dy=(a.lat-b.lat)*111,dx=(a.lng-b.lng)*111*Math.cos(a.lat*Math.PI/180);return Math.sqrt(dx*dx+dy*dy)};
@@ -752,15 +752,15 @@ function rtPaint(){
   got.forEach(o=>{const s=rtState(o.x),m=L.marker([o.x.it.lat,o.x.it.lng],{icon:rtPin(o.k+1,s==="warn"?"warn":(o.k===rSel?"on":""))}).bindTooltip((o.x.it.time?o.x.it.time+" ":"")+o.x.it.name,{direction:"top",offset:[0,-28]}).addTo(rlayer);m.on("click",()=>rtFocus(o.k));rmk[o.k]=m})}
 function rtFit(){if(!rmap)return;const p=rList.filter(x=>hasLL(x.it)).map(x=>[x.it.lat,x.it.lng]);if(p.length)rmap.fitBounds(p,{padding:[40,40],maxZoom:15});else rmap.setView([36.5,127.8],6)}
 function rtStatus(t){const h=$("rhint");h.hidden=!t;h.textContent=t||""}
-async function drawRoute(){
+async function drawRoute(){try{await drawRoute0()}catch(e){console.error(e);rtStatus("發生錯誤："+(e&&e.message||e))}}
+async function drawRoute0(){
   const my=++rRun,d=data.days[rDay];rSel=-1;rCand={};$("rt-cand").hidden=true;
   rList=d.items.map((it,i)=>({it,i})).filter(x=>x.it.type!=="move"&&x.it.name);
   $("rt-title").textContent=(d.label||"")+(d.date?" "+d.date:"")+" 路線";
-  $("rt-dtabs").innerHTML=data.days.map((x,k)=>`<button type="button" class="${k===rDay?"on":""}" data-rm="${k}">${esc(x.label)}</button>`).join("");
   rtStatus("");
   try{await leaflet()}catch(e){rtPaint();rtStatus("地圖元件載入失敗，請確認網路連線");return}
   if(!rmap){rmap=L.map("rmap");L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(rmap);rlayer=L.layerGroup().addTo(rmap)}
-  rtPaint();setTimeout(()=>{rmap.invalidateSize();rtFit()},80);
+  rtStatus("");rtPaint();setTimeout(()=>{rmap.invalidateSize();rtFit()},80);
   const todo=rList.filter(x=>!hasLL(x.it));if(!todo.length)return;
   if(RO){rtStatus("有 "+todo.length+" 個地點尚未定位，不會標在地圖上");return}
   if(!cloud.url){rtStatus("需要連上雲端才能自動定位");return}
@@ -786,7 +786,6 @@ $("rt-cand").onclick=e=>{const x=rList[rSel];if(!x)return;
   if(e.target.closest("[data-man]")){cur=rDay;$("rdlg").close();openLoc(x.i,true);return}
   const b=e.target.closest("[data-rc]");if(!b)return;const c=rCand[x.i].c[+b.dataset.rc];
   x.it.lat=c.lat;x.it.lng=c.lng;rCand[x.i].warn=false;save();$("rt-cand").hidden=true;rtPaint();rtFit();rtStatus("已改為：「"+c.name+"」")};
-$("rt-dtabs").onclick=e=>{const b=e.target.closest("[data-rm]");if(b){rDay=+b.dataset.rm;cur=rDay;drawRoute()}};
 $("rt-chips").onclick=e=>{const b=e.target.closest("[data-ci]");if(b)rtFocus(+b.dataset.ci)};
 $("rt-fit").onclick=()=>{rSel=-1;$("rt-cand").hidden=true;rtPaint();rtFit()};
 $("rt-close").onclick=()=>{$("rdlg").close()};
