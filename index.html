@@ -675,8 +675,11 @@ $("exp").onclick=async()=>{if(pdfBusy||!data)return;pdfBusy=true;const btn=$("ex
     starts.forEach((y0,pi)=>{const y1=Math.min(pi+1<starts.length?starts[pi+1]:total,y0+pageH),hpx=Math.max(1,Math.round((y1-y0)*S)),c=document.createElement("canvas");
       c.width=cv.width;c.height=hpx;const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(cv,0,Math.round(y0*S),cv.width,hpx,0,0,cv.width,hpx);
       if(pi)pdf.addPage();pdf.addImage(c.toDataURL("image/jpeg",0.92),"JPEG",M,M,CW,(y1-y0)/pxPerMm)});
-    const nm=String((data.days[0]||{}).date||"").match(/\d+/g)||[];let mo,dy;if(nm[0]&&nm[0].length===4){mo=nm[1];dy=nm[2]}else{mo=nm[0];dy=nm[1]}
-    const fname=mo&&dy?String(mo).padStart(2,"0")+String(dy).padStart(2,"0"):(data.title||"旅遊行程").replace(/[\\\/:*?"<>|]/g,"_");
+    const md=d=>{const n=String(d||"").match(/\d+/g)||[];let m,x;if(n[0]&&n[0].length===4){m=n[1];x=n[2]}else{m=n[0];x=n[1]}return m&&x?String(m).padStart(2,"0")+String(x).padStart(2,"0"):""};
+    const d1=md((data.days[0]||{}).date),d2=md((data.days[data.days.length-1]||{}).date);
+    let tt=String(data.title||"").trim();if(/\d/.test(tt))tt=(tt.match(/[\u4e00-\u9fff]+/g)||[]).join("");
+    tt=tt.replace(/[\\\/:*?"<>|]/g,"_").trim();
+    const fname=[d1&&d2&&d1!==d2?d1+"-"+d2:(d1||d2),tt].filter(Boolean).join(" ")||"旅遊行程";
     pdf.save(fname+".pdf");
     toast(miss?"PDF 已下載，但有 "+miss+" 張圖片讀取失敗而未放入":"PDF 已下載",4000)
   }catch(e){toast("PDF 製作失敗："+(e&&e.message||e),6000)}
