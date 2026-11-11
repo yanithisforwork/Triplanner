@@ -8,6 +8,12 @@
 <link rel="icon" type="image/png" href="icon-512.png">
 <meta name="apple-mobile-web-app-title" content="旅遊行程">
 <meta name="theme-color" content="#dc9aa6">
+<meta name="description" content="旅遊行程規劃">
+<meta property="og:type" content="website">
+<meta property="og:title" content="旅遊行程規劃">
+<meta property="og:description" content="旅遊行程規劃">
+<meta property="og:image" content="https://trippplannner.vercel.app/icon-512.png">
+<meta property="og:locale" content="zh_TW">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -138,7 +144,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .dayhead button{white-space:nowrap}
 @media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
 .titlebox{display:block}
-.bar2{display:flex;gap:8px;flex-wrap:wrap;padding:0 0 8px}.bar2 .undo{margin-left:auto;min-width:48px}.bar2 .undo:disabled{opacity:.4}
+.bar2{display:flex;gap:8px;flex-wrap:wrap;padding:0 0 8px}.bar2 .undo{margin-left:auto;min-width:52px;display:inline-flex;align-items:center;justify-content:center;color:var(--pri)}.bar2 .undo svg{display:block}.bar2 .undo:disabled{opacity:.5}
 .bar .sp{display:none}.sync{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
 .cvtools{display:flex;justify-content:flex-end;gap:8px;margin:6px 0 4px}.ro .cvtools{display:none}
 .title{display:block;width:calc(100% + 10px);resize:none;overflow:hidden;line-height:1.35;min-height:0;font-size:26px}
@@ -219,7 +225,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 </div></section>
 <section id="editor" hidden><div class="wrap">
   <div class="bar"><button id="back">← 首頁</button><span id="sync" class="sync"></span><button id="save" class="primary">存檔</button></div>
-  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button><button id="undo" class="undo" disabled title="上一步" aria-label="上一步">↶</button></div>
+  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button><button id="undo" class="undo" disabled title="上一步" aria-label="上一步"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button></div>
   <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span></div>
   <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
@@ -655,7 +661,7 @@ $("inv").onclick=()=>inviteTrip(tid);
 const undoS={};let cand=null;
 function pushSnap(s){const a=undoS[tid]=undoS[tid]||[];a.push(s);if(a.length>30)a.shift();updUndo()}
 function snap(){if(data)pushSnap(JSON.stringify(data.days))}
-function updUndo(){const b=$("undo"),n=(undoS[tid]||[]).length;if(b){b.disabled=!n;b.textContent="↶";b.title=n?"上一步（可退回 "+n+" 步）":"上一步"}}
+function updUndo(){const b=$("undo"),n=(undoS[tid]||[]).length;if(b){b.disabled=!n;b.title=n?"上一步（可退回 "+n+" 步）":"上一步"}}
 $("undo").onclick=()=>{const a=undoS[tid]||[];if(!a.length||!data)return;data.days=JSON.parse(a.pop());if(cur>=data.days.length)cur=0;cand=null;updUndo();save();render();toast("已回到上一步")};
 document.addEventListener("focusin",e=>{const k=e.target.dataset&&e.target.dataset.k;if(!RO&&data&&(k==="stay"||k==="next"||k==="time"))cand=JSON.stringify(data.days)});
 const takeCand=()=>{if(cand){pushSnap(cand);cand=null}};
