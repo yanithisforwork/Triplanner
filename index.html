@@ -670,12 +670,14 @@ $("exp").onclick=async()=>{if(pdfBusy||!data)return;pdfBusy=true;const btn=$("ex
     const PW=210,PH=297,M=14,CW=PW-2*M,CH=PH-2*M,pxPerMm=box.offsetWidth/CW,pageH=CH*pxPerMm,top0=box.getBoundingClientRect().top;
     const kids=[...box.children].map(k=>{const r=k.getBoundingClientRect();return{t:r.top-top0,b:r.bottom-top0,h2:k.tagName==="H2"}});
     const starts=[0];let ps=0;
-    kids.forEach((k,i)=>{if(k.b-ps>pageH+0.5){let at=i;if(i>0&&kids[i-1].h2&&kids[i-1].t>ps)at=i-1;if(kids[at].t>ps+1){ps=kids[at].t;starts.push(ps)}else{ps=ps+pageH;starts.push(ps)}}});
+    let seenH2=false;kids.forEach((k,i)=>{if(k.h2){if(seenH2&&k.t>ps+1){ps=k.t;starts.push(ps)}seenH2=true}if(k.b-ps>pageH+0.5){let at=i;if(i>0&&kids[i-1].h2&&kids[i-1].t>ps)at=i-1;if(kids[at].t>ps+1){ps=kids[at].t;starts.push(ps)}else{ps=ps+pageH;starts.push(ps)}}});
     const total=box.offsetHeight,{jsPDF}=window.jspdf,pdf=new jsPDF({unit:"mm",format:"a4",compress:true});
     starts.forEach((y0,pi)=>{const y1=Math.min(pi+1<starts.length?starts[pi+1]:total,y0+pageH),hpx=Math.max(1,Math.round((y1-y0)*S)),c=document.createElement("canvas");
       c.width=cv.width;c.height=hpx;const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(cv,0,Math.round(y0*S),cv.width,hpx,0,0,cv.width,hpx);
       if(pi)pdf.addPage();pdf.addImage(c.toDataURL("image/jpeg",0.92),"JPEG",M,M,CW,(y1-y0)/pxPerMm)});
-    pdf.save((data.title||"旅遊行程").replace(/[\\\/:*?"<>|]/g,"_")+".pdf");
+    const nm=String((data.days[0]||{}).date||"").match(/\d+/g)||[];let mo,dy;if(nm[0]&&nm[0].length===4){mo=nm[1];dy=nm[2]}else{mo=nm[0];dy=nm[1]}
+    const fname=mo&&dy?String(mo).padStart(2,"0")+String(dy).padStart(2,"0"):(data.title||"旅遊行程").replace(/[\\\/:*?"<>|]/g,"_");
+    pdf.save(fname+".pdf");
     toast(miss?"PDF 已下載，但有 "+miss+" 張圖片讀取失敗而未放入":"PDF 已下載",4000)
   }catch(e){toast("PDF 製作失敗："+(e&&e.message||e),6000)}
   finally{if(box)box.remove();pdfBusy=false;btn.disabled=false;btn.textContent=txt}};
