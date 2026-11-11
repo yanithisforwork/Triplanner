@@ -142,6 +142,39 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 #pdfbox .pi b{text-align:right}#pdfbox .pi small{color:#666}#pdfbox .mv{margin-left:64px;color:#777;font-size:12px;break-inside:avoid}#pdfbox .pi img{width:110px;margin:6px 6px 0 0;border-radius:6px}
 #pdfbox .pgb{break-before:page}#pdfbox .lp{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #ddd;break-inside:avoid;font-size:15px}#pdfbox .lp .bl{height:20px}#pdfbox .lp small{color:#666}#pdfbox .pcv{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px}#pdfbox .lp img{width:46px;height:46px;object-fit:cover;border-radius:5px;margin-right:8px;vertical-align:middle}#pdfbox .subs div{padding:1px 0}#pdfbox .fli{margin:0 0 8px;font-size:14px}
 .dayhead button{white-space:nowrap}
+.rtbtn{color:var(--pri);font-weight:700}
+.locb{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;background:var(--bg);color:var(--pri);cursor:pointer;font-family:inherit}.locb.on{background:var(--soft)}
+#rdlg,#ldlg{border:0;padding:0;border-radius:18px;background:var(--card);color:var(--ink)}
+#rdlg{width:min(920px,94vw);height:min(720px,90vh);overflow:hidden}
+#ldlg{width:min(520px,94vw);max-height:86vh;overflow:auto}
+#rdlg::backdrop,#ldlg::backdrop{background:rgba(60,40,35,.45)}
+.rt-sheet{display:flex;flex-direction:column;height:100%}
+.rt-top{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.rt-top h2{font-size:17px;margin:0;flex:1}
+.rt-x{border:0;background:var(--soft);color:var(--pri);width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer}
+.rt-dtabs{display:flex;gap:6px;padding:8px 14px 0;overflow-x:auto}
+.rt-dtabs button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;cursor:pointer}
+.rt-dtabs button.on{background:var(--pri);color:var(--on);border-color:var(--pri)}
+#rmapwrap{position:relative;flex:1;min-height:200px;margin-top:8px;background:#e7dcd8}
+#rmap{position:absolute;inset:0}
+#rhint{position:absolute;left:12px;right:12px;top:12px;z-index:500;background:var(--card);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.rt-chips{display:flex;gap:8px;overflow-x:auto;padding:10px 14px}
+.rt-chip{flex:none;display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:8px 12px;font:inherit;cursor:pointer;white-space:nowrap}
+.rt-chip i{font-style:normal;background:var(--pri);color:var(--on);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700}
+.rt-chip.warn{border-color:#e0a030}.rt-chip.warn i{background:#e0a030}.rt-pin.warn{background:#e0a030}.rt-cand{padding:0 14px 8px;max-height:34%;overflow:auto}.rt-cand b{display:block;font-size:13px;margin-bottom:6px}.rt-cand button{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:9px 12px;margin-bottom:6px;font:inherit;cursor:pointer}.rt-cand small{color:var(--mute);display:block}.rt-cand .rt-man{text-align:center;color:var(--pri);font-weight:700}.rt-chip.no{border-style:dashed;color:var(--mute)}.rt-chip.no i{background:var(--mute)}.rt-chip.on{border-color:var(--pri)}
+.rt-foot{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 14px;padding-bottom:max(14px,env(safe-area-inset-bottom))}
+.rt-foot a,.rt-foot button{flex:1 1 140px;text-align:center;text-decoration:none;border:0;border-radius:12px;padding:12px;font:inherit;font-weight:700;cursor:pointer}
+.rt-go{background:var(--pri);color:var(--on)}.rt-all{background:var(--soft);color:var(--pri)}
+.rt-pin{background:var(--pri);color:var(--on);border:2px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);width:30px;height:30px;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.rt-pin span{transform:rotate(45deg);font-weight:700;font-size:13px}.rt-pin.on{background:#c4636f}
+.lc-body{padding:14px;display:flex;flex-direction:column;gap:10px}
+.lc-body input{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.lc-btns{display:flex;gap:8px;flex-wrap:wrap}.lc-btns button{flex:1 1 90px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit;cursor:pointer}
+.lc-btns button.pri{background:var(--pri);color:var(--on);border-color:var(--pri)}
+.lc-res{display:flex;flex-direction:column;gap:6px}.lc-res button{text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit;cursor:pointer}.lc-res small{display:block;color:var(--mute)}
+.lc-msg{color:var(--mute);font-size:13px}
+@media (max-width:600px){#rdlg{width:100vw;height:100dvh;max-width:none;max-height:none;border-radius:0}}
+
 @media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
 .titlebox{display:block}
 .bar2{display:flex;gap:8px;flex-wrap:wrap;padding:0 0 8px}.bar2 .undo{margin-left:auto;min-width:52px;display:inline-flex;align-items:center;justify-content:center;color:var(--pri)}.bar2 .undo svg{display:block}.bar2 .undo:disabled{opacity:.5}
@@ -249,6 +282,21 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 <input type="file" accept="image/*" id="pf" hidden>
 <div id="pv"></div>
 <div class="toast" id="toast"></div>
+<dialog id="rdlg"><div class="rt-sheet">
+<div class="rt-top"><h2 id="rt-title"></h2><button class="rt-x" id="rt-close" type="button" aria-label="關閉">×</button></div>
+<div class="rt-dtabs" id="rt-dtabs"></div>
+<div id="rmapwrap"><div id="rmap"></div><div id="rhint" hidden></div></div>
+<div class="rt-chips" id="rt-chips"></div>
+<div class="rt-cand" id="rt-cand" hidden></div>
+<div class="rt-foot"><button class="rt-all" id="rt-fit" type="button">看全部</button></div>
+</div></dialog>
+<dialog id="ldlg"><div class="rt-top"><h2 id="lc-title">定位</h2><button class="rt-x" id="lc-close" type="button" aria-label="關閉">×</button></div>
+<div class="lc-body">
+<input id="lc-q" placeholder="搜尋地點，或貼上 Google 地圖連結／座標">
+<div class="lc-btns"><button id="lc-n" type="button">Naver 搜尋</button><button id="lc-g" type="button">Google 搜尋</button><button id="lc-use" type="button">使用貼上的連結／座標</button></div>
+<div class="lc-msg" id="lc-msg"></div><div class="lc-res" id="lc-res"></div>
+<div class="lc-btns"><button id="lc-clear" type="button">清除定位</button></div>
+</div></dialog>
 <script>
 const TYPES={move:"交通",food:"餐飲",hotel:"住宿",spot:"景點",shop:"購物"};
 const $=id=>document.getElementById(id);
@@ -295,11 +343,11 @@ async function call(o,post){const u=cloud.url;if(!u)throw new Error("nourl");
 const fls=t=>t.flights?JSON.stringify(t.flights):"";
 const parseFl=v=>{try{const a=JSON.parse(v||"null");return Array.isArray(a)?a:undefined}catch(e){return undefined}};
 const toRows=t=>t.days.flatMap((d,di)=>{const h=[t.id,t.title,t.nights||0,di+1,d.label,d.date];
-  return d.items.length?d.items.map((it,i)=>[...h,i+1,it.time,it.name,it.type,it.stay,it.next,it.note,it.kr||"",t.token||"",(it.imgs||[]).join(","),t.cover||"",fls(t)]):[[...h,0,"","","","","","","",t.token||"","",t.cover||"",fls(t)]]});
+  return d.items.length?d.items.map((it,i)=>[...h,i+1,it.time,it.name,it.type,it.stay,it.next,it.note,it.kr||"",t.token||"",(it.imgs||[]).join(","),t.cover||"",fls(t),it.lat??"",it.lng??""]):[[...h,0,"","","","","","","",t.token||"","",t.cover||"",fls(t),"",""]]});
 function group(rows){const T={};rows.sort((a,b)=>a[3]-b[3]||a[6]-b[6]).forEach(r=>{
   const t=T[r[0]]=T[r[0]]||{id:String(r[0]),title:String(r[1]),nights:+r[2]||0,days:[],token:String(r[14]||""),cover:String(r[16]||""),flights:parseFl(r[17])},k=+r[3]-1;
   const d=t.days[k]=t.days[k]||{label:String(r[4]),date:String(r[5]),items:[]};
-  if(+r[6]>0)d.items.push({time:String(r[7]),name:String(r[8]),type:r[9]||"spot",stay:String(r[10]),next:String(r[11]),note:String(r[12]),kr:String(r[13]||""),imgs:String(r[15]||"").split(",").filter(Boolean)})});
+  if(+r[6]>0)d.items.push({time:String(r[7]),name:String(r[8]),type:r[9]||"spot",stay:String(r[10]),next:String(r[11]),note:String(r[12]),kr:String(r[13]||""),imgs:String(r[15]||"").split(",").filter(Boolean),lat:(r[18]!==""&&r[18]!=null&&isFinite(+r[18]))?+r[18]:undefined,lng:(r[19]!==""&&r[19]!=null&&isFinite(+r[19]))?+r[19]:undefined})});
   Object.values(T).forEach(t=>t.days=t.days.filter(Boolean));return T}
 let pullState="";let flushing=false;const inflight={},again={},sv={};
 async function saveOnce(id){const t=store.trips[id];if(!t)return;store.ver=store.ver||{};const ver=store.ver[id]||0;sv[id]=ver;
@@ -480,7 +528,7 @@ function render(){
   {const on=document.querySelector(".tab.on"),T=$("tabs");if(on)T.scrollLeft=Math.max(0,on.offsetLeft-T.offsetLeft-(T.clientWidth-on.offsetWidth)/2)}
   if(view!=="day"){renderList();return}
   const d=data.days[cur];
-  let h=RO?(d.date?`<div class="dayhead"><span class="rodate">${esc(d.date)}</span></div>`:""):`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-delday>刪除此天</button></div>`;
+  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}</span><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button><button data-delday>刪除此天</button></div>`;
   d.items.forEach((it,i)=>{
     h+=`<div class="stop" data-idx="${i}"><div class="time"><input data-i="${i}" data-k="time" value="${esc(fmtT(it.time))}" inputmode="numeric" maxlength="5" placeholder="00:00" aria-label="時間"></div>
     <div class="card" data-t="${it.type}">
@@ -587,6 +635,8 @@ document.addEventListener("click",e=>{
     else if(ds.lx!==undefined){L.shop[+ds.lx].img="";listSave()}
     render();if(focus){const a=document.querySelectorAll(focus);if(a.length)a[a.length-1].focus()}return}
   if(!b||!data)return;const d=data.days[cur];
+  if(ds.route!==undefined){openRoute();return}
+  if(ds.loc!==undefined&&!RO){openLoc(+ds.loc);return}
   if(RO&&ds.tab===undefined)return;
   if(ds.del!==undefined||ds.up!==undefined||ds.down!==undefined||ds.add!==undefined||ds.adddays!==undefined)snap();
   if(ds.tab!==undefined){cur=+ds.tab;view="day"}
@@ -673,6 +723,108 @@ async function imgData(fid){if(pdfImg[fid]!==undefined)return pdfImg[fid];let d=
   if(cloud.url){try{const r=await call({action:"img",id:fid});if(r&&r.data)d=r.data}catch(e){}}
   if(!d){try{const res=await fetch(imgUrl(fid,800));if(res.ok)d=await b64(await res.blob())}catch(e){}}
   return pdfImg[fid]=d}
+const hasLL=it=>it&&typeof it.lat==="number"&&typeof it.lng==="number"&&isFinite(it.lat)&&isFinite(it.lng);
+const leafUrl="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.";
+async function leaflet(){if(!document.querySelector("link[data-leaf]")){const l=document.createElement("link");l.rel="stylesheet";l.href=leafUrl+"min.css";l.dataset.leaf="1";document.head.appendChild(l)}if(!window.L)await loadJs(leafUrl+"min.js")}
+const rtPin=(n,cls)=>L.divIcon({className:"",html:`<div class="rt-pin ${cls||""}"><span>${n}</span></div>`,iconSize:[30,30],iconAnchor:[15,30]});
+const normN=s=>String(s||"").toLowerCase().replace(/[\s\-·・()（）]/g,"");
+const kmBetween=(a,b)=>{const dy=(a.lat-b.lat)*111,dx=(a.lng-b.lng)*111*Math.cos(a.lat*Math.PI/180);return Math.sqrt(dx*dx+dy*dy)};
+async function autoFind(it){
+  const v=(it.kr||"").trim(),isUrl=/^https?:\/\//i.test(v);
+  if(isUrl){const p=await linkLL(v);if(p)return{c:[{name:it.name,addr:"",lat:p.lat,lng:p.lng}],warn:false}}
+  const q=(isUrl||!v)?(it.name||""):v,kor=/[\u3131-\u318e\uac00-\ud7a3]/.test(q);
+  let src=kor?"naver":"google",r=await call({action:"geo",src,q,id:tid,token:data.token||""});
+  if(kor&&(r.error||!(r.results||[]).length)){const r2=await call({action:"geo",src:"google",q,id:tid,token:data.token||""});if(!r2.error&&(r2.results||[]).length){r=r2;src="google"}}
+  let c=r.results||[],warn=false;
+  if(src==="google")warn=c.length>1;
+  else{const qn=normN(q),same=c.filter(x=>{const n=normN(x.name);return n.includes(qn)||qn.includes(n)});
+    if(!same.length)warn=c.length>0;else{c=same.concat(c.filter(x=>!same.includes(x)));warn=same.some(x=>kmBetween(x,same[0])>0.5)}}
+  return{c,warn,err:r.error}}
+let rmap=null,rlayer=null,rmk=[],rDay=0,rList=[],rSel=-1,rRun=0,rCand={};
+async function openRoute(){rDay=cur;$("rdlg").showModal();await drawRoute()}
+function rtState(x){return hasLL(x.it)?(rCand[x.i]&&rCand[x.i].warn?"warn":"ok"):(x.fail?"fail":"wait")}
+function rtPaint(){
+  $("rt-chips").innerHTML=rList.map((x,k)=>{const s=rtState(x),tag=s==="warn"?" ⚠ 請確認":s==="fail"?"（找不到）":s==="wait"?(RO?"（尚未定位）":"（搜尋中…）"):"";
+    return `<button type="button" class="rt-chip ${s==="warn"?"warn":(s==="ok"?"":"no")} ${k===rSel?"on":""}" data-ci="${k}"><i>${k+1}</i>${esc(x.it.name)}${tag}</button>`}).join("")||'<span class="lc-msg">這一天還沒有行程</span>';
+  if(!rmap)return;rlayer.clearLayers();rmk=[];
+  const got=rList.map((x,k)=>({x,k})).filter(o=>hasLL(o.x.it));
+  if(got.length>1)L.polyline(got.map(o=>[o.x.it.lat,o.x.it.lng]),{color:"#c4636f",weight:4,opacity:.85,dashArray:"8 8"}).addTo(rlayer);
+  got.forEach(o=>{const s=rtState(o.x),m=L.marker([o.x.it.lat,o.x.it.lng],{icon:rtPin(o.k+1,s==="warn"?"warn":(o.k===rSel?"on":""))}).bindTooltip((o.x.it.time?o.x.it.time+" ":"")+o.x.it.name,{direction:"top",offset:[0,-28]}).addTo(rlayer);m.on("click",()=>rtFocus(o.k));rmk[o.k]=m})}
+function rtFit(){if(!rmap)return;const p=rList.filter(x=>hasLL(x.it)).map(x=>[x.it.lat,x.it.lng]);if(p.length)rmap.fitBounds(p,{padding:[40,40],maxZoom:15});else rmap.setView([36.5,127.8],6)}
+function rtStatus(t){const h=$("rhint");h.hidden=!t;h.textContent=t||""}
+async function drawRoute(){
+  const my=++rRun,d=data.days[rDay];rSel=-1;rCand={};$("rt-cand").hidden=true;
+  rList=d.items.map((it,i)=>({it,i})).filter(x=>x.it.type!=="move"&&x.it.name);
+  $("rt-title").textContent=(d.label||"")+(d.date?" "+d.date:"")+" 路線";
+  $("rt-dtabs").innerHTML=data.days.map((x,k)=>`<button type="button" class="${k===rDay?"on":""}" data-rm="${k}">${esc(x.label)}</button>`).join("");
+  rtStatus("");
+  try{await leaflet()}catch(e){rtPaint();rtStatus("地圖元件載入失敗，請確認網路連線");return}
+  if(!rmap){rmap=L.map("rmap");L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(rmap);rlayer=L.layerGroup().addTo(rmap)}
+  rtPaint();setTimeout(()=>{rmap.invalidateSize();rtFit()},80);
+  const todo=rList.filter(x=>!hasLL(x.it));if(!todo.length)return;
+  if(RO){rtStatus("有 "+todo.length+" 個地點尚未定位，不會標在地圖上");return}
+  if(!cloud.url){rtStatus("需要連上雲端才能自動定位");return}
+  let found=0;
+  for(let n=0;n<todo.length;n++){
+    if(my!==rRun){if(found)save();return}
+    rtStatus("正在定位地點… "+(n+1)+"/"+todo.length);
+    const x=todo[n];
+    try{const r=await autoFind(x.it);if(r.c.length){x.it.lat=r.c[0].lat;x.it.lng=r.c[0].lng;rCand[x.i]={c:r.c,warn:r.warn};found++}else{x.fail=true;x.err=r.err}}catch(e){x.fail=true}
+    if(my!==rRun){if(found)save();return}
+    rtPaint();rtFit()}
+  if(found)save();
+  const w=rList.filter(x=>rtState(x)==="warn").length,f=rList.filter(x=>rtState(x)==="fail").length;
+  rtStatus(w||f?[w?w+" 個地點有多個同名結果，已先選第一個，請確認（橘色）":"",f?f+" 個地點找不到，請點虛線項目手動搜尋":""].filter(Boolean).join("；"):"已完成定位")}
+function rtFocus(k){const x=rList[k];if(!x)return;rSel=k;const box=$("rt-cand"),cd=rCand[x.i];
+  if(RO){if(!hasLL(x.it))toast("這個地點尚未定位");else rmap.setView([x.it.lat,x.it.lng],16);rtPaint();return}
+  let html="";
+  if(cd&&cd.warn&&cd.c.length>1)html+="<b>「"+esc(x.it.name)+"」有多個結果，請選擇正確的地點：</b>"+cd.c.slice(0,5).map((c,j)=>`<button type="button" data-rc="${j}">${esc(c.name)}${c.addr?"<small>"+esc(c.addr)+"</small>":""}</button>`).join("");
+  html+=`<button type="button" class="rt-man" data-man>${hasLL(x.it)?"位置不對？手動搜尋或貼連結":"手動搜尋或貼上地圖連結"}</button>`;
+  box.innerHTML=html;box.hidden=false;
+  if(hasLL(x.it))rmap.setView([x.it.lat,x.it.lng],16);rtPaint()}
+$("rt-cand").onclick=e=>{const x=rList[rSel];if(!x)return;
+  if(e.target.closest("[data-man]")){cur=rDay;$("rdlg").close();openLoc(x.i,true);return}
+  const b=e.target.closest("[data-rc]");if(!b)return;const c=rCand[x.i].c[+b.dataset.rc];
+  x.it.lat=c.lat;x.it.lng=c.lng;rCand[x.i].warn=false;save();$("rt-cand").hidden=true;rtPaint();rtFit();rtStatus("已改為：「"+c.name+"」")};
+$("rt-dtabs").onclick=e=>{const b=e.target.closest("[data-rm]");if(b){rDay=+b.dataset.rm;cur=rDay;drawRoute()}};
+$("rt-chips").onclick=e=>{const b=e.target.closest("[data-ci]");if(b)rtFocus(+b.dataset.ci)};
+$("rt-fit").onclick=()=>{rSel=-1;$("rt-cand").hidden=true;rtPaint();rtFit()};
+$("rt-close").onclick=()=>{$("rdlg").close()};
+$("rdlg").addEventListener("click",e=>{if(e.target===$("rdlg"))$("rdlg").close()});
+$("rdlg").addEventListener("close",()=>{rRun++;if(typeof render==="function"&&data)render()});
+/* 定位 */
+let locI=-1,locBack=false;
+function parseLL(s){s=String(s||"");const m=s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||s.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)||s.match(/[?&](?:q|ll|query|destination)=(-?\d+\.\d+)(?:,|%2C)(-?\d+\.\d+)/i)||s.match(/^\s*(-?\d{1,2}\.\d+)\s*[,，\s]\s*(-?\d{1,3}\.\d+)\s*$/);
+  if(!m)return null;const a=+m[1],b=+m[2];return Math.abs(a)<=90&&Math.abs(b)<=180?{lat:a,lng:b}:null}
+function openLoc(i,back){const it=data.days[cur].items[i];if(!it)return;locI=i;locBack=!!back;
+  $("lc-title").textContent="定位："+(it.name||"");const kr=it.kr||"";
+  $("lc-q").value=/^https?:/i.test(kr)?(parseLL(kr)?kr:(it.name||"")):(kr||it.name||"");
+  $("lc-msg").textContent=hasLL(it)?"目前座標："+it.lat.toFixed(5)+", "+it.lng.toFixed(5):"";$("lc-res").innerHTML="";$("lc-clear").hidden=!hasLL(it);
+  const kor=/[\u3131-\u318e\uac00-\ud7a3]/.test($("lc-q").value);
+  $("lc-n").className=kor?"pri":"";$("lc-g").className=kor?"":"pri";
+  $("ldlg").showModal();if(isGgLink($("lc-q").value)&&!parseLL($("lc-q").value))$("lc-use").click();else if(!parseLL($("lc-q").value)&&$("lc-q").value)locSearch(kor?"naver":"google")}
+function locSet(lat,lng){const it=data.days[cur].items[locI];if(!it)return;snap();it.lat=lat;it.lng=lng;save();$("ldlg").close();render();toast("已定位")}
+async function locSearch(src){const q=$("lc-q").value.trim(),msg=$("lc-msg"),box=$("lc-res");box.innerHTML="";
+  if(!q){msg.textContent="請輸入搜尋內容";return}
+  if(!cloud.url){msg.textContent="需要先連上雲端才能搜尋，也可以直接貼上 Google 地圖連結或座標";return}
+  msg.textContent="搜尋中…";
+  try{const r=await call({action:"geo",src,q,id:tid,token:data.token||""});
+    if(r.error){msg.textContent=r.error;return}
+    const L2=r.results||[];msg.textContent=L2.length?"請選擇正確的地點：":"找不到結果，可換個關鍵字，或貼上 Google 地圖連結／座標";
+    L2.forEach(x=>{const b=document.createElement("button");b.type="button";b.innerHTML=esc(x.name)+(x.addr?"<small>"+esc(x.addr)+"</small>":"");b.onclick=()=>locSet(x.lat,x.lng);box.appendChild(b)})
+  }catch(e){msg.textContent="搜尋失敗："+(e.message||e)}}
+$("lc-n").onclick=()=>locSearch("naver");$("lc-g").onclick=()=>locSearch("google");
+const isGgLink=v=>/^https?:\/\/(maps\.app\.goo\.gl|goo\.gl|(www\.)?google\.[a-z.]+)\//i.test(String(v||"").trim());
+async function linkLL(v){const p=parseLL(v);if(p)return p;if(!isGgLink(v)||!cloud.url)return null;try{const r=await call({action:"geo",src:"link",q:String(v).trim(),id:tid,token:data.token||""});const x=(r.results||[])[0];return x?{lat:x.lat,lng:x.lng}:null}catch(e){return null}}
+$("lc-use").onclick=async()=>{const v=$("lc-q").value;$("lc-msg").textContent="讀取中…";const p=await linkLL(v);if(!p){$("lc-msg").textContent="讀不到座標。請貼上 Google 地圖的分享連結，或輸入「緯度,經度」（Naver 連結目前無法讀取座標）";return}locSet(p.lat,p.lng)};
+async function autoLoc(i){const it=data.days[cur].items[i];if(!it)return;const v=(it.kr||"").trim();if(!/^https?:\/\//i.test(v))return;
+  const p=await linkLL(v);if(!p)return;if(hasLL(it)&&Math.abs(it.lat-p.lat)<1e-6&&Math.abs(it.lng-p.lng)<1e-6)return;
+  snap();it.lat=p.lat;it.lng=p.lng;save();const b=document.querySelector('[data-loc="'+i+'"]');if(b){b.classList.add("on");b.textContent="📍 已定位"}toast("已從連結定位")}
+document.addEventListener("change",e=>{const t=e.target;if(RO||!data||!t.dataset||t.dataset.k!=="kr")return;autoLoc(+t.dataset.i)});
+$("lc-clear").onclick=()=>{const it=data.days[cur].items[locI];if(!it)return;snap();delete it.lat;delete it.lng;save();$("ldlg").close();render();toast("已清除定位")};
+$("lc-q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();const p=parseLL($("lc-q").value);if(p)locSet(p.lat,p.lng);else if(isGgLink($("lc-q").value))$("lc-use").click();else locSearch(/[\u3131-\u318e\uac00-\ud7a3]/.test($("lc-q").value)?"naver":"google")}});
+$("lc-close").onclick=()=>$("ldlg").close();
+$("ldlg").addEventListener("close",()=>{if(locBack){locBack=false;openRoute()}});
 let pdfBusy=false;
 $("exp").onclick=async()=>{if(pdfBusy||!data)return;pdfBusy=true;const btn=$("exp"),txt=btn.textContent;btn.disabled=true;let box;
   try{
