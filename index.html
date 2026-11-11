@@ -125,6 +125,12 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 #pv .pi{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:3px 0;break-inside:avoid}
 #pv .pi b{text-align:right}#pv .pi small{color:#666}#pv .mv{margin-left:64px;color:#777;font-size:12px;break-inside:avoid}#pv .pi img{width:110px;margin:6px 6px 0 0;border-radius:6px}
 #pv .pgb{break-before:page}#pv .lp{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #ddd;break-inside:avoid;font-size:15px}#pv .lp .bl{height:20px}#pv .lp small{color:#666}#pv .pcv{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px}#pv .lp img{width:46px;height:46px;object-fit:cover;border-radius:5px;margin-right:8px;vertical-align:middle}#pv .subs div{padding:1px 0}#pv .fli{margin:0 0 8px;font-size:14px}}
+#pdfbox{position:fixed;left:-10000px;top:0;width:688px;background:#fff;color:#000;font-family:"Noto Sans TC",sans-serif;font-size:15px;line-height:1.5}
+#pdfbox h1{font-size:24px;margin:0 0 2px}#pdfbox .sub{color:#666;margin-bottom:14px}
+#pdfbox h2{font:700 18px "Noto Serif TC",serif;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #999;break-after:avoid}
+#pdfbox .pi{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:3px 0;break-inside:avoid}
+#pdfbox .pi b{text-align:right}#pdfbox .pi small{color:#666}#pdfbox .mv{margin-left:64px;color:#777;font-size:12px;break-inside:avoid}#pdfbox .pi img{width:110px;margin:6px 6px 0 0;border-radius:6px}
+#pdfbox .pgb{break-before:page}#pdfbox .lp{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #ddd;break-inside:avoid;font-size:15px}#pdfbox .lp .bl{height:20px}#pdfbox .lp small{color:#666}#pdfbox .pcv{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px}#pdfbox .lp img{width:46px;height:46px;object-fit:cover;border-radius:5px;margin-right:8px;vertical-align:middle}#pdfbox .subs div{padding:1px 0}#pdfbox .fli{margin:0 0 8px;font-size:14px}
 .dayhead button{white-space:nowrap}
 @media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
 .titlebox{display:block}
@@ -209,7 +215,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 </div></section>
 <section id="editor" hidden><div class="wrap">
   <div class="bar"><button id="back">← 首頁</button><span id="sync" class="sync"></span><button id="save" class="primary">存檔</button></div>
-  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button></div>
+  <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">存成 PDF</button><button id="print">列印</button></div>
   <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span></div>
   <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
@@ -298,10 +304,6 @@ function saveCloud(id){if(inflight[id]){if(((store.ver||{})[id]||0)>(sv[id]||0))
   return inflight[id]=(async()=>{try{do{again[id]=0;await saveOnce(id)}while(again[id])}finally{delete inflight[id]}})()}
 function schedule(id){if(!cloud.url)return;sync("尚未存檔…");clearTimeout(tm);tm=setTimeout(()=>saveCloud(id),1500)}
 function save(){store.ver=store.ver||{};store.ver[tid]=(store.ver[tid]||0)+1;store.dirty[tid]=1;persist();schedule(tid)}
-async function cloudDelete(id){
-  try{const r=await call({action:"delete",id},true);if(r.ok)return true;toast("雲端刪除失敗："+errMsg(r.error||"未知錯誤"));return false}
-  catch(e){for(let k=0;k<4;k++){await new Promise(z=>setTimeout(z,1500));try{const v=await call({action:"view",id});if(Array.isArray(v.rows)&&v.rows.length===0)return true}catch(e2){}}
-    toast("雲端刪除失敗："+await why(e));return false}}
 async function pull(){if(!cloud.url||!cloud.key)return;pullState="loading";
   try{const r=await call({action:"all"});if(r.error||!r.rows)throw 0;const T=group(r.rows);if(Array.isArray(r.home))store.home=r.home;
     for(const id in T)if(!store.dirty[id]){const old=store.trips[id];if(old&&old.flights&&T[id].flights===undefined)T[id].flights=old.flights;store.trips[id]=T[id]}
@@ -544,7 +546,11 @@ document.addEventListener("click",e=>{
     if(ds.share){shareTrip(ds.share);return}
     if(ds.del){const t=store.trips[ds.del];if(!confirm(cloud.key?"確定刪除「"+t.title+"」？雲端 Sheet 裡的這份行程也會一併刪除。":"確定從這台裝置移除「"+t.title+"」？雲端上的行程不會被刪除。"))return;
       delete store.trips[ds.del];delete store.dirty[ds.del];delete store.lists[ds.del];delete store.ldirty[ds.del];persist();renderHome();
-      if(cloud.url&&cloud.key)cloudDelete(ds.del).then(ok=>{if(ok)toast("已刪除")});else toast("已刪除");return}
+      if(cloud.url&&cloud.key){const did=ds.del;(async()=>{
+        try{const r=await call({action:"delete",id:did},true);if(r&&r.ok)return;throw new Error(r&&r.error||"未知錯誤")}
+        catch(e){let gone=false;for(let k=0;k<4&&!gone;k++){if(k)await new Promise(z=>setTimeout(z,1500));
+          try{const v=await call({action:"view",id:did});gone=Array.isArray(v.rows)&&v.rows.length===0}catch(e2){}}
+          if(!gone)toast("雲端刪除失敗，請稍後再試")}})()}return}
     const c=e.target.closest("[data-open]");if(c&&!b)location.hash="#e="+c.dataset.open;return}
   const nvc=e.target.closest("[data-nv]");
   if(nvc&&data){const it0=data.days[cur].items[+nvc.dataset.nv];if(it0){try{navigator.clipboard.writeText(kw(it0));toast("已複製名稱，搜不到時可直接貼上再搜")}catch(x){}}}
@@ -629,80 +635,6 @@ function listPrint(k){const L=(store.lists[tid]||{})[k]||[],T=LT[k];
   const blank=Array.from({length:Math.max(0,14-L.length)},()=>`<div class="lp"><span>☐</span><div class="bl"></div></div>`).join("");
   return `<div class="pgb"><h2>${T[0]}</h2>${rows}${blank}</div>`}
 let printMode="all";
-/* ---------- 匯出 PDF（直接產生檔案並下載，不經過列印畫面） ---------- */
-async function fetchImg(f){try{const r=await call({action:"img",id:f});if(!r||!r.data)return null;
-  return await new Promise(ok=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ok(null);im.src="data:"+(r.mime||"image/jpeg")+";base64,"+r.data})}catch(e){return null}}
-function makePDF(pages){const enc=new TextEncoder(),chunks=[],offs=[];let len=0;
-  const push=b=>{if(typeof b==="string")b=enc.encode(b);chunks.push(b);len+=b.length};
-  const obj=(id,head,stream)=>{offs[id]=len;push(id+" 0 obj\n"+head+(stream?"\nstream\n":"\n"));if(stream){push(stream);push("\nendstream\n")}push("endobj\n")};
-  const n=pages.length;push("%PDF-1.4\n");
-  obj(1,"<< /Type /Catalog /Pages 2 0 R >>");
-  obj(2,"<< /Type /Pages /Kids ["+pages.map((_,i)=>(3+i*3)+" 0 R").join(" ")+"] /Count "+n+" >>");
-  pages.forEach((c,i)=>{const pid=3+i*3,cid=pid+1,iid=pid+2;
-    const b64=c.toDataURL("image/jpeg",0.88).split(",")[1],bin=atob(b64),jpg=new Uint8Array(bin.length);for(let k=0;k<bin.length;k++)jpg[k]=bin.charCodeAt(k);
-    const cs="q 595.28 0 0 841.89 0 0 cm /Im0 Do Q";
-    obj(pid,"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 "+iid+" 0 R >> >> /Contents "+cid+" 0 R >>");
-    obj(cid,"<< /Length "+cs.length+" >>",cs);
-    obj(iid,"<< /Type /XObject /Subtype /Image /Width "+c.width+" /Height "+c.height+" /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+jpg.length+" >>",jpg)});
-  const total=3+n*3,xr=len;let x="xref\n0 "+total+"\n0000000000 65535 f \n";for(let i=1;i<total;i++)x+=String(offs[i]).padStart(10,"0")+" 00000 n \n";
-  push(x+"trailer\n<< /Size "+total+" /Root 1 0 R >>\nstartxref\n"+xr+"\n%%EOF");
-  const out=new Uint8Array(len);let o=0;chunks.forEach(b=>{out.set(b,o);o+=b.length});return out}
-async function exportPDF(){if(!data)return;
-  toast("正在產生 PDF，請稍候…",60000);
-  try{
-    const W=1240,H=1754,M=100,CWd=W-2*M,SANS='"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif',SERIF='"Noto Serif TC","Songti TC","PMingLiU",serif';
-    const ink="#3d2b26",mute="#8c7770",rule="#e7d6d0",acc="#6a4639";
-    try{await document.fonts.ready}catch(e){}
-    const ids=new Set(),cv0=cover(data);if(cv0)ids.add(cv0);data.days.forEach(d=>d.items.forEach(it=>(it.imgs||[]).forEach(f=>ids.add(f))));
-    const imgs={},q=[...ids];let miss=0;
-    await Promise.all(Array.from({length:4},async()=>{while(q.length){const f=q.shift(),im=cloud.url?await fetchImg(f):null;if(im)imgs[f]=im;else miss++}}));
-    const pages=[];let c,x,y;
-    const newPage=()=>{c=document.createElement("canvas");c.width=W;c.height=H;x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);x.textBaseline="top";pages.push(c);y=M};
-    const font=(px,w,fam)=>{x.font=(w||400)+" "+px+"px "+(fam||SANS)};
-    const room=h=>y+h<=H-M-40;
-    const wrap=(t,px,w,fam,maxW)=>{font(px,w,fam);const out=[];String(t||"").split("\n").forEach(par=>{let ln="";
-      (par.match(/[\u2E80-\u9FFF\uFF00-\uFFEF]|[^\s\u2E80-\u9FFF\uFF00-\uFFEF]+|\s+/g)||[""]).forEach(tk=>{
-        const parts=x.measureText(tk).width>maxW?tk.split(""):[tk];
-        parts.forEach(p=>{if(ln&&x.measureText(ln+p).width>maxW){out.push(ln.trimEnd());ln=p.trimStart()}else ln+=p})});out.push(ln.trimEnd())});return out};
-    const draw=(arr,px,lh,col,xx,w,fam)=>{font(px,w,fam);x.fillStyle=col;arr.forEach(l=>{x.fillText(l,xx,y);y+=lh})};
-    const rrect=(rx,ry,rw,rh,r)=>{x.beginPath();x.moveTo(rx+r,ry);x.arcTo(rx+rw,ry,rx+rw,ry+rh,r);x.arcTo(rx+rw,ry+rh,rx,ry+rh,r);x.arcTo(rx,ry+rh,rx,ry,r);x.arcTo(rx,ry,rx+rw,ry,r);x.closePath()};
-    const cover_=(im,dx,dy,dw,dh,r)=>{x.save();rrect(dx,dy,dw,dh,r);x.clip();const sc=Math.max(dw/im.width,dh/im.height),sw=dw/sc,sh=dh/sc;x.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,dx,dy,dw,dh);x.restore()};
-    const fit_=(im,dx,dy,dw,dh,r)=>{x.save();rrect(dx,dy,dw,dh,r);x.clip();x.fillStyle="#f6f0ee";x.fillRect(dx,dy,dw,dh);const sc=Math.min(dw/im.width,dh/im.height),w2=im.width*sc,h2=im.height*sc;x.drawImage(im,dx+(dw-w2)/2,dy+(dh-h2)/2,w2,h2);x.restore();x.strokeStyle=rule;x.lineWidth=2;rrect(dx,dy,dw,dh,r);x.stroke()};
-    newPage();
-    if(cv0&&imgs[cv0]){cover_(imgs[cv0],M,y,CWd,300,22);y+=300+36}
-    draw(wrap(data.title||"旅遊行程",64,700,SERIF,CWd),64,84,ink,M,700,SERIF);
-    draw([data.days.length+"天"+(+data.nights||0)+"夜"],30,44,mute,M);y+=6;
-    x.fillStyle="#dc9aa6";x.fillRect(M,y,70,5);y+=34;
-    const fl=[];FL().forEach((D,di)=>{const ix=D.legs.map((l,li)=>li).filter(li=>{const l=D.legs[li];return l.no||l.dep||l.arr});
-      ix.forEach((li,k)=>{const l=D.legs[li];if(k>0&&ix[k-1]===li-1)fl.push("　　轉機等待 "+(layMin(di,li-1)===null?"":fmtMin(layMin(di,li-1))));
-        fl.push(FK[di]+(ix.length>1?" "+CIR[li]:"")+"　"+(l.no||"")+"　"+(l.dep||"--:--")+" → "+(l.arr||"--:--")+(fdur(di,li)?"（"+fdur(di,li)+"）":""))})});
-    if(fl.length){draw(["航班"],30,44,acc,M,700);fl.forEach(t=>{wrap(t,28,400,SANS,CWd).forEach(l=>draw([l],28,42,ink,M))});y+=22}
-    const TX=M+150,TW=W-M-TX;
-    data.days.forEach((d,di)=>{
-      if(!room(260)){newPage()}
-      y+=14;draw([d.label+(d.date?"　"+d.date:"")],40,56,ink,M,700,SERIF);
-      x.fillStyle=rule;x.fillRect(M,y,CWd,3);y+=26;
-      if(!d.items.length){draw(["（尚無行程）"],26,40,mute,TX);y+=10}
-      d.items.forEach(it=>{
-        const nl=wrap(it.name||"（未命名地點）",34,700,SANS,TW),meta=[TYPES[it.type]||"",it.stay?"停留 "+it.stay:""].filter(Boolean).join("・"),
-          ml=meta?wrap(meta,26,400,SANS,TW):[],nt=it.note?wrap(it.note,26,400,SANS,TW):[],
-          ims=(it.imgs||[]).map(f=>imgs[f]).filter(Boolean),cw=Math.floor((TW-2*20)/3),rows=[];
-        for(let i=0;i<ims.length;i+=3){const r=ims.slice(i,i+3);rows.push({r,h:Math.min(Math.max(...r.map(im=>cw*im.height/im.width)),cw*1.25)})}
-        const nx=it.next&&it.next.trim()?wrap("↓ "+it.next,24,400,SANS,TW):[];
-        const total=nl.length*48+ml.length*38+nt.length*40+rows.reduce((a,r)=>a+r.h+18,0)+nx.length*36+34;
-        if(!room(total)){newPage();draw([d.label+"（續）"],26,40,mute,M)}
-        const y0=y;font(32,700);x.fillStyle=ink;x.fillText(fmtT(it.time)||"",M,y0+4);
-        draw(nl,34,48,ink,TX,700);if(ml.length)draw(ml,26,38,mute,TX);if(nt.length)draw(nt,26,40,"#6b5a54",TX);
-        rows.forEach(r=>{y+=6;r.r.forEach((im,i)=>fit_(im,TX+i*(cw+20),y,cw,r.h,12));y+=r.h+12});
-        if(nx.length)draw(nx,24,36,mute,TX);
-        y+=34})
-    });
-    pages.forEach((pg,i)=>{const g=pg.getContext("2d");g.textBaseline="top";g.font="400 22px "+SANS;g.fillStyle=mute;g.textAlign="center";g.fillText((i+1)+" / "+pages.length,W/2,H-M+20)});
-    const bytes=makePDF(pages),blob=new Blob([bytes],{type:"application/pdf"}),a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);a.download=(data.title||"itinerary").replace(/[\\/:*?"<>|]/g,"_")+".pdf";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000);
-    toast(miss?"PDF 已下載（有 "+miss+" 張圖片未能放入，請確認 Code.gs 已更新為最新版）":"PDF 已下載",miss?8000:3000)
-  }catch(e){console.error(e);toast("PDF 產生失敗："+(e&&e.message||"未知錯誤"),6000)}}
-
 function buildPrint(){if(!data)return;
   $("pv").innerHTML=(cover(data)?`<img class="pcv" src="${imgUrl(cover(data),700)}" alt="">`:"")+`<h1>${esc(data.title)}</h1><div class="sub">${data.days.length}天${+data.nights||0}夜</div>`+flPrint()+data.days.map(d=>
     `<h2>${esc(d.label)}${d.date?"　"+esc(d.date):""}</h2>`+d.items.map((it,i)=>
@@ -715,7 +647,38 @@ $("print").onclick=()=>{printMode="all";print()};
 $("save").onclick=()=>{if(!cloud.url){toast("請先到頁面最下方按「雲端設定」");return}clearTimeout(tm);saveCloud(tid)};
 $("share").onclick=()=>shareTrip(tid);
 $("inv").onclick=()=>inviteTrip(tid);
-$("exp").onclick=exportPDF;
+const loadJs=src=>new Promise((ok,no)=>{if(document.querySelector('script[data-lib="'+src+'"]'))return ok();const s=document.createElement("script");s.src=src;s.dataset.lib=src;s.onload=ok;s.onerror=()=>no(new Error("載入失敗"));document.head.appendChild(s)});
+async function libs(){if(!window.html2canvas)await loadJs("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");if(!(window.jspdf&&window.jspdf.jsPDF))await loadJs("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js")}
+const b64=blob=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(blob)});
+const pdfImg={};
+async function imgData(fid){if(pdfImg[fid]!==undefined)return pdfImg[fid];let d="";
+  if(cloud.url){try{const r=await call({action:"img",id:fid});if(r&&r.data)d=r.data}catch(e){}}
+  if(!d){try{const res=await fetch(imgUrl(fid,800));if(res.ok)d=await b64(await res.blob())}catch(e){}}
+  return pdfImg[fid]=d}
+let pdfBusy=false;
+$("exp").onclick=async()=>{if(pdfBusy||!data)return;pdfBusy=true;const btn=$("exp"),txt=btn.textContent;btn.disabled=true;let box;
+  try{
+    btn.textContent="製作中…";toast("正在製作 PDF，圖片較多時需要一點時間",4000);
+    await libs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    printMode="trip";buildPrint();printMode="all";
+    box=document.createElement("div");box.id="pdfbox";box.innerHTML=$("pv").innerHTML;document.body.appendChild(box);
+    const imgs=[...box.querySelectorAll("img")],ids=[...new Set(imgs.map(i=>{try{return new URL(i.src).searchParams.get("id")}catch(e){return null}}).filter(Boolean))];
+    let miss=0,q=ids.slice();await Promise.all(Array.from({length:4},async()=>{while(q.length){const f=q.shift();if(!(await imgData(f)))miss++}}));
+    imgs.forEach(i=>{let f=null;try{f=new URL(i.src).searchParams.get("id")}catch(e){}const d=f&&pdfImg[f];if(d)i.src=d;else i.remove()});
+    await Promise.all([...box.querySelectorAll("img")].map(i=>i.complete?1:new Promise(z=>{i.onload=i.onerror=z})));
+    const S=2,cv=await html2canvas(box,{scale:S,backgroundColor:"#fff",useCORS:true,logging:false});
+    const PW=210,PH=297,M=14,CW=PW-2*M,CH=PH-2*M,pxPerMm=box.offsetWidth/CW,pageH=CH*pxPerMm,top0=box.getBoundingClientRect().top;
+    const kids=[...box.children].map(k=>{const r=k.getBoundingClientRect();return{t:r.top-top0,b:r.bottom-top0,h2:k.tagName==="H2"}});
+    const starts=[0];let ps=0;
+    kids.forEach((k,i)=>{if(k.b-ps>pageH+0.5){let at=i;if(i>0&&kids[i-1].h2&&kids[i-1].t>ps)at=i-1;if(kids[at].t>ps+1){ps=kids[at].t;starts.push(ps)}else{ps=ps+pageH;starts.push(ps)}}});
+    const total=box.offsetHeight,{jsPDF}=window.jspdf,pdf=new jsPDF({unit:"mm",format:"a4",compress:true});
+    starts.forEach((y0,pi)=>{const y1=Math.min(pi+1<starts.length?starts[pi+1]:total,y0+pageH),hpx=Math.max(1,Math.round((y1-y0)*S)),c=document.createElement("canvas");
+      c.width=cv.width;c.height=hpx;const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(cv,0,Math.round(y0*S),cv.width,hpx,0,0,cv.width,hpx);
+      if(pi)pdf.addPage();pdf.addImage(c.toDataURL("image/jpeg",0.92),"JPEG",M,M,CW,(y1-y0)/pxPerMm)});
+    pdf.save((data.title||"旅遊行程").replace(/[\\\/:*?"<>|]/g,"_")+".pdf");
+    toast(miss?"PDF 已下載，但有 "+miss+" 張圖片讀取失敗而未放入":"PDF 已下載",4000)
+  }catch(e){toast("PDF 製作失敗："+(e&&e.message||e),6000)}
+  finally{if(box)box.remove();pdfBusy=false;btn.disabled=false;btn.textContent=txt}};
 function cloudSetup(){const u=prompt("貼上 Apps Script 網頁應用程式網址（結尾為 /exec）",cloud.url||"");if(u===null)return;
   const k=prompt("輸入密碼（需與 Code.gs 裡的 KEY 相同）",cloud.key||"");if(k===null)return;
   cloud={url:u.trim(),key:k.trim()};try{localStorage.setItem(CK,JSON.stringify(cloud))}catch(e){}
