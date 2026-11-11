@@ -804,6 +804,7 @@ function openLoc(i,back){const it=data.days[cur].items[i];if(!it)return;locI=i;l
   $("ldlg").showModal();if(isGgLink($("lc-q").value)&&!parseLL($("lc-q").value))$("lc-use").click();else if(!parseLL($("lc-q").value)&&$("lc-q").value)locSearch(kor?"naver":"google")}
 function locSet(lat,lng){const it=data.days[cur].items[locI];if(!it)return;snap();it.lat=lat;it.lng=lng;save();$("ldlg").close();render();toast("已定位")}
 async function locSearch(src){const q=$("lc-q").value.trim(),msg=$("lc-msg"),box=$("lc-res");box.innerHTML="";
+  if(q&&(parseLL(q)||isGgLink(q))){$("lc-use").click();return}
   if(!q){msg.textContent="請輸入搜尋內容";return}
   if(!cloud.url){msg.textContent="需要先連上雲端才能搜尋，也可以直接貼上 Google 地圖連結或座標";return}
   msg.textContent="搜尋中…";
@@ -814,8 +815,9 @@ async function locSearch(src){const q=$("lc-q").value.trim(),msg=$("lc-msg"),box
   }catch(e){msg.textContent="搜尋失敗："+(e.message||e)}}
 $("lc-n").onclick=()=>locSearch("naver");$("lc-g").onclick=()=>locSearch("google");
 const isGgLink=v=>/^https?:\/\/(maps\.app\.goo\.gl|goo\.gl|(www\.)?google\.[a-z.]+)\//i.test(String(v||"").trim());
-async function linkLL(v){const p=parseLL(v);if(p)return p;if(!isGgLink(v)||!cloud.url)return null;try{const r=await call({action:"geo",src:"link",q:String(v).trim(),id:tid,token:data.token||""});const x=(r.results||[])[0];return x?{lat:x.lat,lng:x.lng}:null}catch(e){return null}}
-$("lc-use").onclick=async()=>{const v=$("lc-q").value;$("lc-msg").textContent="讀取中…";const p=await linkLL(v);if(!p){$("lc-msg").textContent="讀不到座標。請貼上 Google 地圖的分享連結，或輸入「緯度,經度」（Naver 連結目前無法讀取座標）";return}locSet(p.lat,p.lng)};
+let linkInfo="";
+async function linkLL(v){linkInfo="";const p=parseLL(v);if(p)return p;if(!isGgLink(v)||!cloud.url)return null;try{const r=await call({action:"geo",src:"link",q:String(v).trim(),id:tid,token:data.token||""});linkInfo=r.error||r.info||"";const x=(r.results||[])[0];return x?{lat:x.lat,lng:x.lng}:null}catch(e){linkInfo=String(e&&e.message||e);return null}}
+$("lc-use").onclick=async()=>{const v=$("lc-q").value;$("lc-msg").textContent="讀取中…";const p=await linkLL(v);if(!p){$("lc-msg").textContent="讀不到座標。請貼上 Google 地圖的分享連結，或輸入「緯度,經度」（Naver 連結目前無法讀取座標）"+(linkInfo?"。最後讀取到：「"+linkInfo.slice(0,120)+"」":"");return}locSet(p.lat,p.lng)};
 async function autoLoc(i){const it=data.days[cur].items[i];if(!it)return;const v=(it.kr||"").trim();if(!/^https?:\/\//i.test(v))return;
   const p=await linkLL(v);if(!p)return;if(hasLL(it)&&Math.abs(it.lat-p.lat)<1e-6&&Math.abs(it.lng-p.lng)<1e-6)return;
   snap();it.lat=p.lat;it.lng=p.lng;save();const b=document.querySelector('[data-loc="'+i+'"]');if(b){b.classList.add("on");b.textContent="📍 已定位"}toast("已從連結定位")}
