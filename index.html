@@ -8,8 +8,6 @@
 <link rel="icon" type="image/png" href="icon-512.png">
 <meta name="apple-mobile-web-app-title" content="旅遊行程">
 <meta name="theme-color" content="#dc9aa6">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" data-leaf="1" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
 <meta name="description" content="旅遊行程規劃">
 <meta property="og:type" content="website">
 <meta property="og:title" content="旅遊行程規劃">
@@ -253,10 +251,25 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .thumb .x{position:absolute;top:-7px;right:-7px;width:18px;height:18px;padding:0;border-radius:50%;background:rgba(60,40,35,.72);color:#fff;border:0;font-size:10px;line-height:18px}
 .thumbadd{width:56px;height:56px;flex:none;border:1px dashed var(--rose);border-radius:10px;background:none;color:var(--pri);font-size:12px;padding:0}
 
-#rmap{touch-action:none}
 .rt-x{width:48px;height:48px;min-width:48px}
 .rt-top{padding-top:max(12px,env(safe-area-inset-top))}
 @media (max-width:600px){#rdlg{transform-origin:0 0}}
+
+#rmap{overflow:hidden;background:#e7dcd8;touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab}
+.mm-tiles,.mm-pins{position:absolute;inset:0;pointer-events:none}
+.mm-t{position:absolute;left:0;top:0;opacity:0;transition:opacity .2s;pointer-events:none;max-width:none;-webkit-user-drag:none}
+.mm-t.ok{opacity:1}
+.mm-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.mm-pin{position:absolute;width:0;height:0;pointer-events:auto;z-index:1;--c:var(--pri)}
+.mm-pin.on{z-index:3}
+.mm-pin.t-food{--c:var(--t-food)}.mm-pin.t-hotel{--c:var(--t-hotel)}.mm-pin.t-spot{--c:var(--t-spot)}.mm-pin.t-shop{--c:var(--t-shop)}.mm-pin.t-move{--c:var(--t-move)}.mm-pin.warn{--c:#e0a030}
+.mm-pin .pb{position:absolute;left:-16px;top:-46px;width:32px;height:32px;border-radius:50%;background:var(--c);color:#fff;border:3px solid #fff;box-sizing:border-box;display:grid;place-items:center;font-weight:700;font-size:13px;line-height:1;box-shadow:0 3px 8px rgba(60,30,30,.35);transform-origin:50% 150%;transition:transform .15s}
+.mm-pin .pb::after{content:"";position:absolute;left:50%;top:100%;margin-left:-6px;border:6px solid transparent;border-top:9px solid var(--c);border-bottom:0;margin-top:1px}
+.mm-pin.on .pb{transform:scale(1.2)}
+.mm-pin .lb{position:absolute;left:0;bottom:50px;transform:translateX(-50%);white-space:nowrap;max-width:60vw;overflow:hidden;text-overflow:ellipsis;background:var(--card);color:var(--ink);padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.mm-zoom{position:absolute;right:10px;bottom:30px;z-index:5;display:flex;flex-direction:column;gap:6px}
+.mm-zoom button{width:42px;height:42px;padding:0;border-radius:12px;font-size:22px;line-height:1;background:var(--card);color:var(--pri);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.mm-attr{position:absolute;right:0;bottom:0;z-index:4;font-size:10px;padding:1px 6px;background:rgba(255,255,255,.75);color:#333;border-radius:6px 0 0 0;pointer-events:none}
 </style>
 </head>
 <body>
@@ -537,7 +550,7 @@ function render(){
   {const on=document.querySelector(".tab.on"),T=$("tabs");if(on)T.scrollLeft=Math.max(0,on.offsetLeft-T.offsetLeft-(T.clientWidth-on.offsetWidth)/2)}
   if(view!=="day"){renderList();return}
   const d=data.days[cur];
-  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}</span><span style="flex:1"></span><button data-route class="rtbtn">📍路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button><button data-delday>刪除此天</button></div>`;
+  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}</span><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button><button data-delday>刪除此天</button></div>`;
   d.items.forEach((it,i)=>{
     h+=`<div class="stop" data-idx="${i}"><div class="time"><input data-i="${i}" data-k="time" value="${esc(fmtT(it.time))}" inputmode="numeric" maxlength="5" placeholder="00:00" aria-label="時間"></div>
     <div class="card" data-t="${it.type}">
@@ -734,13 +747,70 @@ async function imgData(fid){if(pdfImg[fid]!==undefined)return pdfImg[fid];let d=
   if(!d){try{const res=await fetch(imgUrl(fid,800));if(res.ok)d=await b64(await res.blob())}catch(e){}}
   return pdfImg[fid]=d}
 const hasLL=it=>it&&typeof it.lat==="number"&&typeof it.lng==="number"&&isFinite(it.lat)&&isFinite(it.lng);
-const leafSrcs=["https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js","https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js","https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"];
-const loadJs1=(src,ms)=>new Promise((ok,no)=>{const e=document.createElement("script"),t=setTimeout(()=>{e.remove();no(new Error("逾時"))},ms);e.src=src;e.onload=()=>{clearTimeout(t);ok()};e.onerror=()=>{clearTimeout(t);e.remove();no(new Error("載入失敗"))};document.head.appendChild(e)});
-async function leaflet(){if(window.L)return;
-  for(let i=0;i<12&&!window.L;i++)await new Promise(z=>setTimeout(z,250));
-  for(const u of leafSrcs){if(window.L)return;try{await loadJs1(u,8000)}catch(e){}if(window.L)return}
-  if(!window.L)throw new Error("Leaflet 未載入")}
-const rtPin=(n,cls)=>L.divIcon({className:"",html:`<div class="rt-pin ${cls||""}"><span>${n}</span></div>`,iconSize:[30,30],iconAnchor:[15,30]});
+/* 自製地圖：不依賴任何外部套件，只讀取 OpenStreetMap 圖磚 */
+function mkMap(el){
+  el.innerHTML='<div class="mm-tiles"></div><svg class="mm-svg"></svg><div class="mm-pins"></div><div class="mm-zoom"><button type="button" data-z="1" aria-label="放大">+</button><button type="button" data-z="-1" aria-label="縮小">−</button></div><div class="mm-attr">© OpenStreetMap</div>';
+  const tl=el.querySelector(".mm-tiles"),svg=el.querySelector(".mm-svg"),pl=el.querySelector(".mm-pins");
+  const m={z:6,lat:36.5,lng:127.8,W:0,H:0,line:[],pins:[],cache:new Map(),ok:0,bad:0,onbad:null,onpin:null};
+  const wx=(g,z)=>(g+180)/360*256*2**z;
+  const wy=(t,z)=>{const q=Math.sin(Math.max(-85,Math.min(85,t))*Math.PI/180);return(0.5-Math.log((1+q)/(1-q))/(4*Math.PI))*256*2**z};
+  const ix=(x,z)=>x/(256*2**z)*360-180;
+  const iy=(y,z)=>{const n=Math.PI-2*Math.PI*y/(256*2**z);return 180/Math.PI*Math.atan(Math.sinh(n))};
+  const pt=(t,g)=>({x:m.W/2+wx(g,m.z)-wx(m.lng,m.z),y:m.H/2+wy(t,m.z)-wy(m.lat,m.z)});
+  function over(){
+    svg.setAttribute("viewBox","0 0 "+m.W+" "+m.H);
+    const d=m.line.map((q,i)=>{const o=pt(q[0],q[1]);return(i?"L":"M")+o.x.toFixed(1)+","+o.y.toFixed(1)}).join("");
+    svg.innerHTML=d?'<path d="'+d+'" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/><path d="'+d+'" fill="none" stroke="#c4636f" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1 9"/>':"";
+    [...pl.children].forEach((e,i)=>{const q=m.pins[i],o=pt(q.lat,q.lng);e.style.left=o.x.toFixed(1)+"px";e.style.top=o.y.toFixed(1)+"px"})}
+  m.draw=()=>{m.W=el.clientWidth;m.H=el.clientHeight;if(!m.W||!m.H)return;
+    const zi=Math.max(1,Math.min(19,Math.floor(m.z))),sc=2**(m.z-zi),cx=wx(m.lng,zi),cy=wy(m.lat,zi),n=2**zi;
+    const x0=Math.floor((cx-m.W/2/sc)/256),x1=Math.floor((cx+m.W/2/sc)/256),y0=Math.max(0,Math.floor((cy-m.H/2/sc)/256)),y1=Math.min(n-1,Math.floor((cy+m.H/2/sc)/256));
+    const need=new Set();
+    for(let ty=y0;ty<=y1;ty++)for(let tx=x0;tx<=x1;tx++){
+      const w=((tx%n)+n)%n,key=zi+"/"+tx+"/"+ty;need.add(key);let im=m.cache.get(key);
+      if(!im){im=new Image();im.className="mm-t";im.alt="";im.draggable=false;
+        im.onload=()=>{m.ok++;im.classList.add("ok")};im.onerror=()=>{m.bad++;if(m.onbad)m.onbad()};
+        im.src="https://tile.openstreetmap.org/"+zi+"/"+w+"/"+ty+".png";tl.appendChild(im);m.cache.set(key,im)}
+      im.style.display="";im.style.width=im.style.height=(256*sc+.6)+"px";
+      im.style.transform="translate("+(m.W/2+(tx*256-cx)*sc).toFixed(1)+"px,"+(m.H/2+(ty*256-cy)*sc).toFixed(1)+"px)"}
+    m.cache.forEach((im,k)=>{if(!need.has(k))im.style.display="none"});
+    if(m.cache.size>160){let c=0;m.cache.forEach((im,k)=>{if(!need.has(k)&&c++<60){im.remove();m.cache.delete(k)}})}
+    over()};
+  m.set=(line,pins)=>{m.line=line;m.pins=pins;
+    pl.innerHTML=pins.map(q=>'<div class="mm-pin '+q.cls+'" data-k="'+q.k+'">'+(q.label?'<span class="lb">'+esc(q.label)+'</span>':"")+'<span class="pb">'+q.n+'</span></div>').join("");
+    if(m.W)over()};
+  m.setView=(t,g,z)=>{m.lat=t;m.lng=g;m.z=Math.max(1,Math.min(19,z));m.draw()};
+  m.fit=(pts,pad,maxZ)=>{m.W=el.clientWidth;m.H=el.clientHeight;
+    const la=pts.map(q=>q[0]),lo=pts.map(q=>q[1]),a=Math.min(...lo),b=Math.max(...lo),c=Math.min(...la),d=Math.max(...la);
+    const dx=wx(b,0)-wx(a,0),dy=wy(c,0)-wy(d,0);let z=maxZ;
+    if(m.W&&m.H){if(dx>1e-9)z=Math.min(z,Math.log2((m.W-2*pad)/dx));if(dy>1e-9)z=Math.min(z,Math.log2((m.H-2*pad)/dy))}
+    z=Math.max(2,Math.min(maxZ,z));if(!isFinite(z))z=maxZ;
+    const mx=(wx(a,0)+wx(b,0))/2,my=(wy(c,0)+wy(d,0))/2;m.setView(iy(my,0),ix(mx,0),z)};
+  function zoomAt(px,py,nz){nz=Math.max(2,Math.min(19,nz));
+    const ax=wx(m.lng,m.z)+px-m.W/2,ay=wy(m.lat,m.z)+py-m.H/2,g=ix(ax,m.z),t=iy(ay,m.z);
+    m.z=nz;m.lng=ix(wx(g,nz)-(px-m.W/2),nz);m.lat=iy(wy(t,nz)-(py-m.H/2),nz)}
+  function pan(dx,dy){const nx=wx(m.lng,m.z)-dx,ny=wy(m.lat,m.z)-dy;m.lng=ix(nx,m.z);m.lat=Math.max(-84,Math.min(84,iy(ny,m.z)))}
+  const P=new Map();let g0=null,last=null;
+  const rel=e=>{const r=el.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  el.addEventListener("pointerdown",e=>{if(e.target.closest(".mm-zoom"))return;
+    if(e.pointerType==="mouse"&&e.button!==0)return;
+    try{if(e.pointerType==="mouse")el.setPointerCapture(e.pointerId)}catch(_){}
+    P.set(e.pointerId,rel(e));
+    if(P.size===1)g0={mv:0,pin:e.target.closest(".mm-pin"),t:Date.now(),multi:false};else if(g0)g0.multi=true;
+    last=null});
+  el.addEventListener("pointermove",e=>{if(!P.has(e.pointerId))return;const o=rel(e),b=P.get(e.pointerId);
+    if(P.size===1){const dx=o.x-b.x,dy=o.y-b.y;if(g0)g0.mv+=Math.abs(dx)+Math.abs(dy);if(g0&&g0.mv>8){pan(dx,dy);m.draw()}P.set(e.pointerId,o)}
+    else if(P.size===2){P.set(e.pointerId,o);const [p,q]=[...P.values()],d=Math.hypot(p.x-q.x,p.y-q.y),mid={x:(p.x+q.x)/2,y:(p.y+q.y)/2};
+      if(last&&last.d>10){zoomAt(mid.x,mid.y,m.z+Math.log2(d/last.d));pan(mid.x-last.x,mid.y-last.y);m.draw()}
+      last={d,x:mid.x,y:mid.y};if(g0)g0.mv+=99}});
+  const up=e=>{if(!P.has(e.pointerId))return;P.delete(e.pointerId);last=null;
+    if(P.size===0&&g0){const tap=g0.mv<=8&&!g0.multi&&Date.now()-g0.t<800;if(tap&&g0.pin&&m.onpin)m.onpin(+g0.pin.dataset.k);g0=null}};
+  el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up);
+  el.addEventListener("wheel",e=>{e.preventDefault();const o=rel(e);zoomAt(o.x,o.y,m.z-e.deltaY*.0025);m.draw()},{passive:false});
+  el.addEventListener("dblclick",e=>{if(e.target.closest(".mm-zoom")||e.target.closest(".mm-pin"))return;const o=rel(e);zoomAt(o.x,o.y,m.z+1);m.draw()});
+  el.querySelector(".mm-zoom").addEventListener("click",e=>{const b=e.target.closest("[data-z]");if(!b)return;zoomAt(m.W/2,m.H/2,Math.round(m.z)+ +b.dataset.z);m.draw()});
+  if(window.ResizeObserver)new ResizeObserver(()=>m.draw()).observe(el);
+  return m}
 const normN=s=>String(s||"").toLowerCase().replace(/[\s\-·・()（）]/g,"");
 const kmBetween=(a,b)=>{const dy=(a.lat-b.lat)*111,dx=(a.lng-b.lng)*111*Math.cos(a.lat*Math.PI/180);return Math.sqrt(dx*dx+dy*dy)};
 async function autoFind(it){
@@ -760,11 +830,11 @@ function rtState(x){return hasLL(x.it)?(rCand[x.i]&&rCand[x.i].warn?"warn":"ok")
 function rtPaint(){
   $("rt-chips").innerHTML=rList.map((x,k)=>{const s=rtState(x),tag=s==="warn"?" ⚠ 請確認":s==="fail"?"（找不到）":s==="wait"?(RO?"（尚未定位）":"（搜尋中…）"):"";
     return `<button type="button" class="rt-chip ${s==="warn"?"warn":(s==="ok"?"":"no")} ${k===rSel?"on":""}" data-ci="${k}"><i>${k+1}</i>${esc(x.it.name)}${tag}</button>`}).join("")||'<span class="lc-msg">這一天還沒有行程</span>';
-  if(!rmap)return;rlayer.clearLayers();rmk=[];
+  if(!rmap)return;
   const got=rList.map((x,k)=>({x,k})).filter(o=>hasLL(o.x.it));
-  if(got.length>1)L.polyline(got.map(o=>[o.x.it.lat,o.x.it.lng]),{color:"#c4636f",weight:4,opacity:.85,dashArray:"8 8"}).addTo(rlayer);
-  got.forEach(o=>{const s=rtState(o.x),m=L.marker([o.x.it.lat,o.x.it.lng],{icon:rtPin(o.k+1,s==="warn"?"warn":(o.k===rSel?"on":""))}).bindTooltip((o.x.it.time?o.x.it.time+" ":"")+o.x.it.name,{direction:"top",offset:[0,-28]}).addTo(rlayer);m.on("click",()=>rtFocus(o.k));rmk[o.k]=m})}
-function rtFit(){if(!rmap)return;const p=rList.filter(x=>hasLL(x.it)).map(x=>[x.it.lat,x.it.lng]);if(p.length)rmap.fitBounds(p,{padding:[40,40],maxZoom:15});else rmap.setView([36.5,127.8],6)}
+  rmap.set(got.length>1?got.map(o=>[o.x.it.lat,o.x.it.lng]):[],got.map(o=>{const s=rtState(o.x),on=o.k===rSel;
+    return{k:o.k,lat:o.x.it.lat,lng:o.x.it.lng,n:o.k+1,cls:(s==="warn"?"warn":"t-"+(o.x.it.type||"spot"))+(on?" on":""),label:on?((o.x.it.time?o.x.it.time+" ":"")+o.x.it.name):""}}))}
+function rtFit(){if(!rmap)return;const p=rList.filter(x=>hasLL(x.it)).map(x=>[x.it.lat,x.it.lng]);if(p.length)rmap.fit(p,50,15);else rmap.setView(36.5,127.8,6)}
 function rtStatus(t){const h=$("rhint");h.hidden=!t;h.textContent=t||""}
 async function drawRoute(){try{await drawRoute0()}catch(e){console.error(e);rtStatus("發生錯誤："+(e&&e.message||e))}}
 async function drawRoute0(){
@@ -772,12 +842,9 @@ async function drawRoute0(){
   rList=d.items.map((it,i)=>({it,i})).filter(x=>x.it.type!=="move"&&x.it.name);
   $("rt-title").textContent=(d.label||"")+(d.date?" "+d.date:"")+" 路線";
   rtStatus("");
-  let mapOk=true;
-  try{await leaflet()}catch(e){mapOk=false}
-  if(my!==rRun)return;
-  if(mapOk&&!rmap){rmap=L.map("rmap",{tap:false});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(rmap);rlayer=L.layerGroup().addTo(rmap)}
-  const note=mapOk?"":"（地圖底圖暫時載入失敗，定位結果仍會儲存，請稍後重新開啟路線圖）";
-  rtStatus(mapOk?"":note);rtPaint();if(rmap)setTimeout(()=>{rmap.invalidateSize();rtFit()},80);
+  if(!rmap){rmap=mkMap($("rmap"));rmap.onpin=k=>rtFocus(k);let warned=false;rmap.onbad=()=>{if(!warned&&rmap.ok===0&&rmap.bad>=6){warned=true;rtStatus("底圖載入失敗，請確認網路連線（定位結果仍會儲存）")}}}
+  const note="";
+  rtStatus("");rtPaint();setTimeout(()=>{rmap.draw();rtFit()},80);
   const todo=rList.filter(x=>!hasLL(x.it));
   if(!todo.length)return;
   if(RO){rtStatus("有 "+todo.length+" 個地點尚未定位，不會標在地圖上"+note);return}
@@ -795,12 +862,12 @@ async function drawRoute0(){
   const msg=(w||f)?[w?w+" 個地點有多個同名結果，已先選第一個，請確認（橘色）":"",f?f+" 個地點找不到，請點虛線項目手動搜尋"+((rList.find(x=>x.err)||{}).err?"（原因："+rList.find(x=>x.err).err.slice(0,90)+"）":""):""].filter(Boolean).join("；"):"已完成定位";
   rtStatus(msg+note)}
 function rtFocus(k){const x=rList[k];if(!x)return;rSel=k;const box=$("rt-cand"),cd=rCand[x.i];
-  if(RO){if(!hasLL(x.it))toast("這個地點尚未定位");else if(rmap)rmap.setView([x.it.lat,x.it.lng],16);rtPaint();return}
+  if(RO){if(!hasLL(x.it))toast("這個地點尚未定位");else if(rmap)rmap.setView(x.it.lat,x.it.lng,16);rtPaint();return}
   let html="";
   if(cd&&cd.warn&&cd.c.length>1)html+="<b>「"+esc(x.it.name)+"」有多個結果，請選擇正確的地點：</b>"+cd.c.slice(0,5).map((c,j)=>`<button type="button" data-rc="${j}">${esc(c.name)}${c.addr?"<small>"+esc(c.addr)+"</small>":""}</button>`).join("");
   html+=`<button type="button" class="rt-man" data-man>${hasLL(x.it)?"位置不對？手動搜尋或貼連結":"手動搜尋或貼上地圖連結"}</button>`;
   box.innerHTML=html;box.hidden=false;
-  if(hasLL(x.it)&&rmap)rmap.setView([x.it.lat,x.it.lng],16);rtPaint()}
+  if(hasLL(x.it)&&rmap)rmap.setView(x.it.lat,x.it.lng,16);rtPaint()}
 $("rt-cand").onclick=e=>{const x=rList[rSel];if(!x)return;
   if(e.target.closest("[data-man]")){cur=rDay;$("rdlg").close();openLoc(x.i,true);return}
   const b=e.target.closest("[data-rc]");if(!b)return;const c=rCand[x.i].c[+b.dataset.rc];
@@ -866,7 +933,7 @@ $("ldlg").addEventListener("close",()=>{if(locBack){locBack=false;openRoute()}})
 let pdfBusy=false;
 $("exp").onclick=async()=>{if(pdfBusy||!data)return;pdfBusy=true;const btn=$("exp"),txt=btn.textContent;btn.disabled=true;let box;
   try{
-    btn.textContent="製作中…";toast("正在製作 PDF，圖片較多時需要一點時間",4000);
+    btn.textContent="製作中…";toast("正在匯出 PDF，圖片較多時需要一點時間",4000);
     await libs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
     printMode="trip";buildPrint();printMode="all";
     box=document.createElement("div");box.id="pdfbox";box.innerHTML=$("pv").innerHTML;document.body.appendChild(box);
