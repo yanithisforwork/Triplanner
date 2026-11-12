@@ -142,7 +142,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 #pdfbox .pi b{text-align:right}#pdfbox .pi small{color:#666}#pdfbox .mv{margin-left:64px;color:#777;font-size:12px;break-inside:avoid}#pdfbox .pi img{width:110px;margin:6px 6px 0 0;border-radius:6px}
 #pdfbox .pgb{break-before:page}#pdfbox .lp{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #ddd;break-inside:avoid;font-size:15px}#pdfbox .lp .bl{height:20px}#pdfbox .lp small{color:#666}#pdfbox .pcv{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px}#pdfbox .lp img{width:46px;height:46px;object-fit:cover;border-radius:5px;margin-right:8px;vertical-align:middle}#pdfbox .subs div{padding:1px 0}#pdfbox .fli{margin:0 0 8px;font-size:14px}
 .dayhead button{white-space:nowrap}
-.rtbtn{color:var(--pri);font-weight:700}
+.rtbtn{color:var(--pri);font-weight:700;display:inline-flex;align-items:center;gap:6px}.rtbtn .rti{flex:none}
 .locb{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;background:var(--bg);color:var(--pri);cursor:pointer;font-family:inherit}.locb.on{background:var(--soft)}
 #rdlg,#ldlg{border:0;padding:0;border-radius:18px;background:var(--card);color:var(--ink)}
 #rdlg{width:min(920px,94vw);height:min(720px,90vh);overflow:hidden}
@@ -550,7 +550,7 @@ function render(){
   {const on=document.querySelector(".tab.on"),T=$("tabs");if(on)T.scrollLeft=Math.max(0,on.offsetLeft-T.offsetLeft-(T.clientWidth-on.offsetWidth)/2)}
   if(view!=="day"){renderList();return}
   const d=data.days[cur];
-  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}</span><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button><button data-delday>刪除此天</button></div>`;
+  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}</span><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button><button data-delday>刪除此天</button></div>`;
   d.items.forEach((it,i)=>{
     h+=`<div class="stop" data-idx="${i}"><div class="time"><input data-i="${i}" data-k="time" value="${esc(fmtT(it.time))}" inputmode="numeric" maxlength="5" placeholder="00:00" aria-label="時間"></div>
     <div class="card" data-t="${it.type}">
