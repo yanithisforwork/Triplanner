@@ -886,8 +886,11 @@ function openLoc(i,back){const it=data.days[cur].items[i];if(!it)return;locI=i;l
   $("lc-q").value=/^https?:/i.test(kr)?(parseLL(kr)?kr:(it.name||"")):(kr||it.name||"");
   $("lc-msg").textContent=hasLL(it)?"目前座標："+it.lat.toFixed(5)+", "+it.lng.toFixed(5):"";$("lc-res").innerHTML="";$("lc-clear").hidden=!hasLL(it);
   const kor=/[\u3131-\u318e\uac00-\ud7a3]/.test($("lc-q").value);
-  $("lc-n").className=kor?"pri":"";$("lc-g").className=kor?"":"pri";
+  lcHi();
   $("ldlg").showModal();if(isGgLink($("lc-q").value)&&!parseLL($("lc-q").value))$("lc-use").click();else if(!parseLL($("lc-q").value)&&$("lc-q").value)locSearch(kor?"naver":"google")}
+function lcHi(){const v=$("lc-q").value,link=!!(parseLL(v)||isGgLink(urlIn(v))),kor=/[\u3131-\u318e\uac00-\ud7a3]/.test(v);
+  $("lc-n").className=!link&&kor?"pri":"";$("lc-g").className=!link&&!kor?"pri":"";$("lc-use").className=link?"pri":""}
+$("lc-q").addEventListener("input",lcHi);
 function locSet(lat,lng){const it=data.days[cur].items[locI];if(!it)return;snap();it.lat=lat;it.lng=lng;save();$("ldlg").close();render();toast("已定位")}
 async function locSearch(src){const q=$("lc-q").value.trim(),msg=$("lc-msg"),box=$("lc-res");box.innerHTML="";
   if(q&&(parseLL(q)||isGgLink(q))){$("lc-use").click();return}
