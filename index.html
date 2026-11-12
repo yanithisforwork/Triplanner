@@ -8,6 +8,8 @@
 <link rel="icon" type="image/png" href="icon-512.png">
 <meta name="apple-mobile-web-app-title" content="旅遊行程">
 <meta name="theme-color" content="#dc9aa6">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" data-leaf="1" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css'">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
 <meta name="description" content="旅遊行程規劃">
 <meta property="og:type" content="website">
 <meta property="og:title" content="旅遊行程規劃">
@@ -173,7 +175,10 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .lc-btns button.pri{background:var(--pri);color:var(--on);border-color:var(--pri)}
 .lc-res{display:flex;flex-direction:column;gap:6px}.lc-res button{text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px;font:inherit;cursor:pointer}.lc-res small{display:block;color:var(--mute)}
 .lc-msg{color:var(--mute);font-size:13px}
-@media (max-width:600px){#rdlg{width:100vw;height:100dvh;max-width:none;max-height:none;border-radius:0}}
+#rdlg,#ldlg{touch-action:pan-x pan-y;overscroll-behavior:contain}
+#rdlg .rt-top,#ldlg .rt-top{flex:none;position:sticky;top:0;z-index:2;background:var(--card)}
+.rt-x{width:44px;height:44px;min-width:44px}
+@media (max-width:600px){#rdlg{position:fixed;inset:0;margin:0;width:100%;max-width:100%;height:100dvh;max-height:100dvh;border-radius:0}#ldlg{max-width:96vw}}
 
 @media (max-width:480px){.dayhead input{width:6em;min-width:0}.dayhead input.date{width:5em}.stop{grid-template-columns:52px minmax(0,1fr);gap:8px}.time input{font-size:15px}.title{font-size:24px}}
 .titlebox{display:block}
@@ -247,6 +252,11 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .thumb img{width:100%;height:100%;object-fit:contain;display:block;border-radius:10px;border:1px solid var(--line);background:#fff;padding:2px}
 .thumb .x{position:absolute;top:-7px;right:-7px;width:18px;height:18px;padding:0;border-radius:50%;background:rgba(60,40,35,.72);color:#fff;border:0;font-size:10px;line-height:18px}
 .thumbadd{width:56px;height:56px;flex:none;border:1px dashed var(--rose);border-radius:10px;background:none;color:var(--pri);font-size:12px;padding:0}
+
+#rmap{touch-action:none}
+.rt-x{width:48px;height:48px;min-width:48px}
+.rt-top{padding-top:max(12px,env(safe-area-inset-top))}
+@media (max-width:600px){#rdlg{transform-origin:0 0}}
 </style>
 </head>
 <body>
@@ -287,7 +297,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 <div id="rmapwrap"><div id="rmap"></div><div id="rhint" hidden></div></div>
 <div class="rt-chips" id="rt-chips"></div>
 <div class="rt-cand" id="rt-cand" hidden></div>
-<div class="rt-foot"><button class="rt-all" id="rt-fit" type="button">看全部</button></div>
+<div class="rt-foot"><button class="rt-all" id="rt-fit" type="button">看全部</button><button class="rt-all" id="rt-close2" type="button">關閉</button></div>
 </div></dialog>
 <dialog id="ldlg"><div class="rt-top"><h2 id="lc-title">定位</h2><button class="rt-x" id="lc-close" type="button" aria-label="關閉">×</button></div>
 <div class="lc-body">
@@ -724,8 +734,12 @@ async function imgData(fid){if(pdfImg[fid]!==undefined)return pdfImg[fid];let d=
   if(!d){try{const res=await fetch(imgUrl(fid,800));if(res.ok)d=await b64(await res.blob())}catch(e){}}
   return pdfImg[fid]=d}
 const hasLL=it=>it&&typeof it.lat==="number"&&typeof it.lng==="number"&&isFinite(it.lat)&&isFinite(it.lng);
-const leafUrl="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.";
-async function leaflet(){if(!document.querySelector("link[data-leaf]")){const l=document.createElement("link");l.rel="stylesheet";l.href=leafUrl+"min.css";l.dataset.leaf="1";document.head.appendChild(l)}if(!window.L)await loadJs(leafUrl+"min.js");if(!window.L)throw new Error("Leaflet")}
+const leafSrcs=["https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js","https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js","https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"];
+const loadJs1=(src,ms)=>new Promise((ok,no)=>{const e=document.createElement("script"),t=setTimeout(()=>{e.remove();no(new Error("逾時"))},ms);e.src=src;e.onload=()=>{clearTimeout(t);ok()};e.onerror=()=>{clearTimeout(t);e.remove();no(new Error("載入失敗"))};document.head.appendChild(e)});
+async function leaflet(){if(window.L)return;
+  for(let i=0;i<12&&!window.L;i++)await new Promise(z=>setTimeout(z,250));
+  for(const u of leafSrcs){if(window.L)return;try{await loadJs1(u,8000)}catch(e){}if(window.L)return}
+  if(!window.L)throw new Error("Leaflet 未載入")}
 const rtPin=(n,cls)=>L.divIcon({className:"",html:`<div class="rt-pin ${cls||""}"><span>${n}</span></div>`,iconSize:[30,30],iconAnchor:[15,30]});
 const normN=s=>String(s||"").toLowerCase().replace(/[\s\-·・()（）]/g,"");
 const kmBetween=(a,b)=>{const dy=(a.lat-b.lat)*111,dx=(a.lng-b.lng)*111*Math.cos(a.lat*Math.PI/180);return Math.sqrt(dx*dx+dy*dy)};
@@ -758,37 +772,42 @@ async function drawRoute0(){
   rList=d.items.map((it,i)=>({it,i})).filter(x=>x.it.type!=="move"&&x.it.name);
   $("rt-title").textContent=(d.label||"")+(d.date?" "+d.date:"")+" 路線";
   rtStatus("");
-  try{await leaflet()}catch(e){rtPaint();rtStatus("地圖元件載入失敗，請確認網路連線");return}
-  if(!rmap){rmap=L.map("rmap");L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(rmap);rlayer=L.layerGroup().addTo(rmap)}
-  rtStatus("");rtPaint();setTimeout(()=>{rmap.invalidateSize();rtFit()},80);
-  const todo=rList.filter(x=>!hasLL(x.it));if(!todo.length)return;
-  if(RO){rtStatus("有 "+todo.length+" 個地點尚未定位，不會標在地圖上");return}
-  if(!cloud.url){rtStatus("需要連上雲端才能自動定位");return}
-  let found=0;
-  for(let n=0;n<todo.length;n++){
-    if(my!==rRun){if(found)save();return}
-    rtStatus("正在定位地點… "+(n+1)+"/"+todo.length);
-    const x=todo[n];
-    try{const r=await autoFind(x.it);if(r.c.length){x.it.lat=r.c[0].lat;x.it.lng=r.c[0].lng;rCand[x.i]={c:r.c,warn:r.warn};found++}else{x.fail=true;x.err=r.err}}catch(e){x.fail=true}
-    if(my!==rRun){if(found)save();return}
-    rtPaint();rtFit()}
+  let mapOk=true;
+  try{await leaflet()}catch(e){mapOk=false}
+  if(my!==rRun)return;
+  if(mapOk&&!rmap){rmap=L.map("rmap",{tap:false});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(rmap);rlayer=L.layerGroup().addTo(rmap)}
+  const note=mapOk?"":"（地圖底圖暫時載入失敗，定位結果仍會儲存，請稍後重新開啟路線圖）";
+  rtStatus(mapOk?"":note);rtPaint();if(rmap)setTimeout(()=>{rmap.invalidateSize();rtFit()},80);
+  const todo=rList.filter(x=>!hasLL(x.it));
+  if(!todo.length)return;
+  if(RO){rtStatus("有 "+todo.length+" 個地點尚未定位，不會標在地圖上"+note);return}
+  if(!cloud.url){rtStatus("需要連上雲端才能自動定位"+note);return}
+  let found=0,done=0,idx=0;
+  rtStatus("正在定位地點… 0/"+todo.length+note);
+  const work=async()=>{while(idx<todo.length){if(my!==rRun)return;const x=todo[idx++];
+    try{const r=await autoFind(x.it);if(my!==rRun)return;if(r.c.length){x.it.lat=r.c[0].lat;x.it.lng=r.c[0].lng;rCand[x.i]={c:r.c,warn:r.warn};found++}else{x.fail=true;x.err=r.err||""}}
+    catch(e){x.fail=true;x.err=String(e&&e.message||e)}
+    done++;if(my===rRun){rtStatus("正在定位地點… "+done+"/"+todo.length+note);rtPaint();rtFit()}}};
+  await Promise.all([work(),work(),work()]);
   if(found)save();
+  if(my!==rRun)return;
   const w=rList.filter(x=>rtState(x)==="warn").length,f=rList.filter(x=>rtState(x)==="fail").length;
-  rtStatus(w||f?[w?w+" 個地點有多個同名結果，已先選第一個，請確認（橘色）":"",f?f+" 個地點找不到，請點虛線項目手動搜尋":""].filter(Boolean).join("；"):"已完成定位")}
+  const msg=(w||f)?[w?w+" 個地點有多個同名結果，已先選第一個，請確認（橘色）":"",f?f+" 個地點找不到，請點虛線項目手動搜尋"+((rList.find(x=>x.err)||{}).err?"（原因："+rList.find(x=>x.err).err.slice(0,90)+"）":""):""].filter(Boolean).join("；"):"已完成定位";
+  rtStatus(msg+note)}
 function rtFocus(k){const x=rList[k];if(!x)return;rSel=k;const box=$("rt-cand"),cd=rCand[x.i];
-  if(RO){if(!hasLL(x.it))toast("這個地點尚未定位");else rmap.setView([x.it.lat,x.it.lng],16);rtPaint();return}
+  if(RO){if(!hasLL(x.it))toast("這個地點尚未定位");else if(rmap)rmap.setView([x.it.lat,x.it.lng],16);rtPaint();return}
   let html="";
   if(cd&&cd.warn&&cd.c.length>1)html+="<b>「"+esc(x.it.name)+"」有多個結果，請選擇正確的地點：</b>"+cd.c.slice(0,5).map((c,j)=>`<button type="button" data-rc="${j}">${esc(c.name)}${c.addr?"<small>"+esc(c.addr)+"</small>":""}</button>`).join("");
   html+=`<button type="button" class="rt-man" data-man>${hasLL(x.it)?"位置不對？手動搜尋或貼連結":"手動搜尋或貼上地圖連結"}</button>`;
   box.innerHTML=html;box.hidden=false;
-  if(hasLL(x.it))rmap.setView([x.it.lat,x.it.lng],16);rtPaint()}
+  if(hasLL(x.it)&&rmap)rmap.setView([x.it.lat,x.it.lng],16);rtPaint()}
 $("rt-cand").onclick=e=>{const x=rList[rSel];if(!x)return;
   if(e.target.closest("[data-man]")){cur=rDay;$("rdlg").close();openLoc(x.i,true);return}
   const b=e.target.closest("[data-rc]");if(!b)return;const c=rCand[x.i].c[+b.dataset.rc];
   x.it.lat=c.lat;x.it.lng=c.lng;rCand[x.i].warn=false;save();$("rt-cand").hidden=true;rtPaint();rtFit();rtStatus("已改為：「"+c.name+"」")};
 $("rt-chips").onclick=e=>{const b=e.target.closest("[data-ci]");if(b)rtFocus(+b.dataset.ci)};
 $("rt-fit").onclick=()=>{rSel=-1;$("rt-cand").hidden=true;rtPaint();rtFit()};
-$("rt-close").onclick=()=>{$("rdlg").close()};
+$("rt-close").onclick=()=>{$("rdlg").close()};$("rt-close2").onclick=()=>{$("rdlg").close()};
 $("rdlg").addEventListener("click",e=>{if(e.target===$("rdlg"))$("rdlg").close()});
 $("rdlg").addEventListener("close",()=>{rRun++;if(typeof render==="function"&&data)render()});
 /* 定位 */
@@ -814,10 +833,11 @@ async function locSearch(src){const q=$("lc-q").value.trim(),msg=$("lc-msg"),box
     L2.forEach(x=>{const b=document.createElement("button");b.type="button";b.innerHTML=esc(x.name)+(x.addr?"<small>"+esc(x.addr)+"</small>":"");b.onclick=()=>locSet(x.lat,x.lng);box.appendChild(b)})
   }catch(e){msg.textContent="搜尋失敗："+(e.message||e)}}
 $("lc-n").onclick=()=>locSearch("naver");$("lc-g").onclick=()=>locSearch("google");
-const isGgLink=v=>/^https?:\/\/(maps\.app\.goo\.gl|goo\.gl|(www\.)?google\.[a-z.]+)\//i.test(String(v||"").trim());
+const urlIn=v=>{const m=String(v||"").match(/https?:\/\/[^\s<>"']+/);return m?m[0]:String(v||"").trim()};
+const isGgLink=v=>/^https?:\/\/(maps\.app\.goo\.gl|goo\.gl|g\.co|share\.google|(www\.|maps\.)?google\.[a-z.]+)\//i.test(String(v||"").trim());
 let linkInfo="";
-async function linkLL(v){linkInfo="";const p=parseLL(v);if(p)return p;if(!isGgLink(v)||!cloud.url)return null;try{const r=await call({action:"geo",src:"link",q:String(v).trim(),id:tid,token:data.token||""});linkInfo=r.error||r.info||"";const x=(r.results||[])[0];return x?{lat:x.lat,lng:x.lng}:null}catch(e){linkInfo=String(e&&e.message||e);return null}}
-$("lc-use").onclick=async()=>{const v=$("lc-q").value;$("lc-msg").textContent="讀取中…";const p=await linkLL(v);if(!p){$("lc-msg").textContent="讀不到座標。請貼上 Google 地圖的分享連結，或輸入「緯度,經度」（Naver 連結目前無法讀取座標）"+(linkInfo?"。最後讀取到：「"+linkInfo.slice(0,120)+"」":"");return}locSet(p.lat,p.lng)};
+async function linkLL(v){v=urlIn(v);linkInfo="";const p=parseLL(v);if(p)return p;if(!isGgLink(v)||!cloud.url)return null;try{const r=await call({action:"geo",src:"link",q:String(v).trim(),id:tid,token:data.token||""});linkInfo=r.error||r.info||"";const x=(r.results||[])[0];return x?{lat:x.lat,lng:x.lng}:null}catch(e){linkInfo=String(e&&e.message||e);return null}}
+$("lc-use").onclick=async()=>{const v=$("lc-q").value;$("lc-msg").textContent="讀取中…";const p=await linkLL(v);if(!p){$("lc-msg").textContent="讀不到座標。請貼上 Google 地圖的分享連結，或在 Google 地圖長按地點複製「緯度,經度」貼上（Naver 連結目前無法讀取座標）"+(linkInfo?"。最後讀取到：「"+linkInfo.slice(0,120)+"」":"");return}locSet(p.lat,p.lng)};
 async function autoLoc(i){const it=data.days[cur].items[i];if(!it)return;const v=(it.kr||"").trim();if(!/^https?:\/\//i.test(v))return;
   const p=await linkLL(v);if(!p)return;if(hasLL(it)&&Math.abs(it.lat-p.lat)<1e-6&&Math.abs(it.lng-p.lng)<1e-6)return;
   snap();it.lat=p.lat;it.lng=p.lng;save();const b=document.querySelector('[data-loc="'+i+'"]');if(b){b.classList.add("on");b.textContent="📍 已定位"}toast("已從連結定位")}
@@ -826,6 +846,23 @@ $("lc-clear").onclick=()=>{const it=data.days[cur].items[locI];if(!it)return;sna
 $("lc-q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();const p=parseLL($("lc-q").value);if(p)locSet(p.lat,p.lng);else if(isGgLink($("lc-q").value))$("lc-use").click();else locSearch(/[\u3131-\u318e\uac00-\ud7a3]/.test($("lc-q").value)?"naver":"google")}});
 $("lc-close").onclick=()=>$("ldlg").close();
 $("ldlg").addEventListener("close",()=>{if(locBack){locBack=false;openRoute()}});
+
+/* 手機縮放自適應：頁面被雙指放大時，路線圖視窗仍保持滿版、關閉鈕不會跑出畫面 */
+(function(){const vv=window.visualViewport,dl=[$("rdlg"),$("ldlg")];
+  function fit(){dl.forEach(d=>{if(!d.open)return;
+    if(!vv||vv.scale<=1.01){d.style.transform="";if(d.id==="rdlg"&&innerWidth<=600){d.style.top=d.style.left=d.style.width=d.style.height=""}return}
+    if(d.id==="rdlg"&&innerWidth<=600){const k=vv.scale;
+      d.style.position="fixed";d.style.margin="0";d.style.inset="auto";
+      d.style.left=vv.offsetLeft+"px";d.style.top=vv.offsetTop+"px";
+      d.style.width=(vv.width*k)+"px";d.style.height=(vv.height*k)+"px";d.style.maxWidth="none";d.style.maxHeight="none";
+      d.style.transform="scale("+(1/k)+")"}})}
+  if(vv){vv.addEventListener("resize",fit);vv.addEventListener("scroll",fit)}
+  dl.forEach(d=>d.addEventListener("close",()=>{d.style.cssText=""}));
+  /* iOS Safari：視窗開啟時擋掉整頁縮放，地圖縮放交給 Leaflet 處理 */
+  document.addEventListener("gesturestart",e=>{if(dl.some(d=>d.open))e.preventDefault()},{passive:false});
+  document.addEventListener("touchmove",e=>{if(e.touches.length>1&&dl.some(d=>d.open)&&!e.target.closest("#rmap"))e.preventDefault()},{passive:false});
+  /* 雙擊關閉按鈕之外，Esc 也可關閉 */
+})();
 let pdfBusy=false;
 $("exp").onclick=async()=>{if(pdfBusy||!data)return;pdfBusy=true;const btn=$("exp"),txt=btn.textContent;btn.disabled=true;let box;
   try{
