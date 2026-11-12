@@ -817,14 +817,16 @@ async function autoFind(it){
   const v=(it.kr||"").trim(),isUrl=/^https?:\/\//i.test(v);
   if(isUrl){const p=await linkLL(v);if(p)return{c:[{name:it.name,addr:"",lat:p.lat,lng:p.lng}],warn:false}}
   const q=(isUrl||!v)?(it.name||""):v,kor=/[\u3131-\u318e\uac00-\ud7a3]/.test(q);
-  let src=kor?"naver":"google",r=await call({action:"geo",src,q,id:tid,token:data.token||""});
-  if(kor&&(r.error||!(r.results||[]).length)){const r2=await call({action:"geo",src:"google",q,id:tid,token:data.token||""});if(!r2.error&&(r2.results||[]).length){r=r2;src="google"}}
-  let c=r.results||[],warn=false;
+  const nr=rNear?rNear.lat+","+rNear.lng:"";
+  let src=kor?"naver":"google",r=await call({action:"geo",src,q,id:tid,token:data.token||"",near:nr});
+  if(kor&&(r.error||!(r.results||[]).length)){const r2=await call({action:"geo",src:"google",q,id:tid,token:data.token||"",near:nr});if(!r2.error&&(r2.results||[]).length){r=r2;src="google"}}
+  let c=r.results||[],warn=false,far=0;
+  if(rNear){const n0=c.length;c=c.filter(x=>kmBetween(x,rNear)<=500);far=n0-c.length}
   if(src==="google")warn=c.length>1;
   else{const qn=normN(q),same=c.filter(x=>{const n=normN(x.name);return n.includes(qn)||qn.includes(n)});
     if(!same.length)warn=c.length>0;else{c=same.concat(c.filter(x=>!same.includes(x)));warn=same.some(x=>kmBetween(x,same[0])>0.5)}}
-  return{c,warn,err:r.error}}
-let rmap=null,rlayer=null,rmk=[],rDay=0,rList=[],rSel=-1,rRun=0,rCand={};
+  return{c,warn,err:r.error||(far&&!c.length?"搜尋結果離這天其他地點太遠，已略過":"")}}
+let rNear=null,rmap=null,rlayer=null,rmk=[],rDay=0,rList=[],rSel=-1,rRun=0,rCand={};
 async function openRoute(){rDay=cur;$("rdlg").showModal();await drawRoute()}
 function rtState(x){return hasLL(x.it)?(rCand[x.i]&&rCand[x.i].warn?"warn":"ok"):(x.fail?"fail":"wait")}
 function rtPaint(){
@@ -845,8 +847,12 @@ async function drawRoute0(){
   if(!rmap){rmap=mkMap($("rmap"));rmap.onpin=k=>rtFocus(k);let warned=false;rmap.onbad=()=>{if(!warned&&rmap.ok===0&&rmap.bad>=6){warned=true;rtStatus("底圖載入失敗，請確認網路連線（定位結果仍會儲存）")}}}
   const note="";
   rtStatus("");rtPaint();setTimeout(()=>{rmap.draw();rtFit()},80);
+  rNear=null;
+  {const pts=rList.filter(x=>hasLL(x.it));
+   if(pts.length){const med=a=>a.slice().sort((p,q)=>p-q)[a.length>>1];rNear={lat:med(pts.map(x=>x.it.lat)),lng:med(pts.map(x=>x.it.lng))};
+     if(!RO&&pts.length>=3){pts.forEach(x=>{if(kmBetween(x.it,rNear)>500)rCand[x.i]={c:[],warn:true,far:true}});rtPaint()}}}
   const todo=rList.filter(x=>!hasLL(x.it));
-  if(!todo.length)return;
+  if(!todo.length){const fw=rList.filter(x=>rtState(x)==="warn").length;if(fw)rtStatus(fw+" 個地點離其他地點很遠，位置可能不對，請點橘色項目確認");return}
   if(RO){rtStatus("有 "+todo.length+" 個地點尚未定位，不會標在地圖上"+note);return}
   if(!cloud.url){rtStatus("需要連上雲端才能自動定位"+note);return}
   let found=0,done=0,idx=0;
@@ -859,7 +865,7 @@ async function drawRoute0(){
   if(found)save();
   if(my!==rRun)return;
   const w=rList.filter(x=>rtState(x)==="warn").length,f=rList.filter(x=>rtState(x)==="fail").length;
-  const msg=(w||f)?[w?w+" 個地點有多個同名結果，已先選第一個，請確認（橘色）":"",f?f+" 個地點找不到，請點虛線項目手動搜尋"+((rList.find(x=>x.err)||{}).err?"（原因："+rList.find(x=>x.err).err.slice(0,90)+"）":""):""].filter(Boolean).join("；"):"已完成定位";
+  const msg=(w||f)?[w?w+" 個地點位置需要確認（橘色）":"",f?f+" 個地點找不到，請點虛線項目手動搜尋"+((rList.find(x=>x.err)||{}).err?"（原因："+rList.find(x=>x.err).err.slice(0,90)+"）":""):""].filter(Boolean).join("；"):"已完成定位";
   rtStatus(msg+note)}
 function rtFocus(k){const x=rList[k];if(!x)return;rSel=k;const box=$("rt-cand"),cd=rCand[x.i];
   if(RO){if(!hasLL(x.it))toast("這個地點尚未定位");else if(rmap)rmap.setView(x.it.lat,x.it.lng,16);rtPaint();return}
@@ -909,7 +915,7 @@ let linkInfo="";
 async function linkLL(v){v=urlIn(v);linkInfo="";const p=parseLL(v);if(p)return p;if(!isGgLink(v)||!cloud.url)return null;try{const r=await call({action:"geo",src:"link",q:String(v).trim(),id:tid,token:data.token||""});linkInfo=r.error||r.info||"";const x=(r.results||[])[0];return x?{lat:x.lat,lng:x.lng}:null}catch(e){linkInfo=String(e&&e.message||e);return null}}
 $("lc-use").onclick=async()=>{const v=$("lc-q").value;$("lc-msg").textContent="讀取中…";const p=await linkLL(v);if(!p){$("lc-msg").textContent="讀不到座標。請貼上 Google 地圖的分享連結，或在 Google 地圖長按地點複製「緯度,經度」貼上（Naver 連結目前無法讀取座標）"+(linkInfo?"。最後讀取到：「"+linkInfo.slice(0,120)+"」":"");return}locSet(p.lat,p.lng)};
 async function autoLoc(i){const it=data.days[cur].items[i];if(!it)return;const v=(it.kr||"").trim();if(!/^https?:\/\//i.test(v))return;
-  const p=await linkLL(v);if(!p)return;if(hasLL(it)&&Math.abs(it.lat-p.lat)<1e-6&&Math.abs(it.lng-p.lng)<1e-6)return;
+  const p=await linkLL(v);if(!p){toast("讀不到這個連結的座標，請點「定位」按鈕查看原因",4000);return}if(hasLL(it)&&Math.abs(it.lat-p.lat)<1e-6&&Math.abs(it.lng-p.lng)<1e-6)return;
   snap();it.lat=p.lat;it.lng=p.lng;save();const b=document.querySelector('[data-loc="'+i+'"]');if(b){b.classList.add("on");b.textContent="📍 已定位"}toast("已從連結定位")}
 document.addEventListener("change",e=>{const t=e.target;if(RO||!data||!t.dataset||t.dataset.k!=="kr")return;autoLoc(+t.dataset.i)});
 $("lc-clear").onclick=()=>{const it=data.days[cur].items[locI];if(!it)return;snap();delete it.lat;delete it.lng;save();$("ldlg").close();render();toast("已清除定位")};
