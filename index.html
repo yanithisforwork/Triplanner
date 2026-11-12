@@ -537,7 +537,7 @@ function render(){
   {const on=document.querySelector(".tab.on"),T=$("tabs");if(on)T.scrollLeft=Math.max(0,on.offsetLeft-T.offsetLeft-(T.clientWidth-on.offsetWidth)/2)}
   if(view!=="day"){renderList();return}
   const d=data.days[cur];
-  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}</span><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button><button data-delday>刪除此天</button></div>`;
+  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}</span><span style="flex:1"></span><button data-route class="rtbtn">📍路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-route class="rtbtn">🗺 路線</button><button data-delday>刪除此天</button></div>`;
   d.items.forEach((it,i)=>{
     h+=`<div class="stop" data-idx="${i}"><div class="time"><input data-i="${i}" data-k="time" value="${esc(fmtT(it.time))}" inputmode="numeric" maxlength="5" placeholder="00:00" aria-label="時間"></div>
     <div class="card" data-t="${it.type}">
