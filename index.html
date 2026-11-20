@@ -15,7 +15,7 @@
 <meta property="og:image" content="https://trippplannner.vercel.app/icon-512.png">
 <meta property="og:locale" content="zh_TW">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f8ecec;--card:#fffbfa;--ink:#44302b;--mute:#947c78;--line:#ecd5d5;--pri:#6a4639;--on:#fff7f5;--rose:#dc9aa6;--soft:#f3d6da;
 --t-move:#a8948d;--t-food:#c4636f;--t-hotel:#9a6f8d;--t-spot:#b07a50;--t-shop:#e08fa3}
@@ -135,7 +135,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 #pv .pi{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:3px 0;break-inside:avoid}
 #pv .pi b{text-align:right}#pv .pi small{color:#666}#pv .mv{margin-left:64px;color:#777;font-size:12px;break-inside:avoid}#pv .pi img{width:110px;margin:6px 6px 0 0;border-radius:6px}
 #pv .pgb{break-before:page}#pv .lp{display:grid;grid-template-columns:28px 1fr;gap:6px;padding:7px 0;border-bottom:1px solid #ddd;break-inside:avoid;font-size:15px}#pv .lp .bl{height:20px}#pv .lp small{color:#666}#pv .pcv{width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:10px}#pv .lp img{width:46px;height:46px;object-fit:cover;border-radius:5px;margin-right:8px;vertical-align:middle}#pv .subs div{padding:1px 0}#pv .fli{margin:0 0 8px;font-size:14px}}
-#pdfbox{position:fixed;left:-10000px;top:0;width:688px;background:#fff;color:#000;font-family:"Noto Sans TC",sans-serif;font-size:15px;line-height:1.5}
+#pdfbox{position:fixed;left:-10000px;top:0;width:688px;background:#fff;color:#000;font-family:"Inter","Noto Sans TC","Noto Sans SC",sans-serif;font-size:15px;line-height:1.5}
 #pdfbox h1{font-size:24px;margin:0 0 2px}#pdfbox .sub{color:#666;margin-bottom:14px}
 #pdfbox h2{font:700 18px "Noto Serif TC",serif;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid #999;break-after:avoid}
 #pdfbox .pi{display:grid;grid-template-columns:56px 1fr;gap:8px;padding:3px 0;break-inside:avoid}
@@ -274,7 +274,7 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 :root{color-scheme:light;--bg:#FCF6F5;--card:#FFFFFF;--ink:#2E2E2E;--mute:#8E8B86;--line:#F0E2DF;--pri:#2E2E2E;--on:#FFFFFF;--rose:#D8B4AE;--soft:#F8EAE8;
 --t-move:#B8C4D0;--t-food:#E3B7A8;--t-hotel:#B7C4B1;--t-spot:#E6D3A8;--t-shop:#D8BFD0;
 --sh:0 1px 2px rgba(46,46,46,.04),0 8px 24px rgba(46,46,46,.05);
---sans:"Inter","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+--sans:"Inter","Noto Sans TC","Noto Sans SC","PingFang TC","PingFang SC","Microsoft JhengHei","Microsoft YaHei",sans-serif}
 body{font-family:var(--sans);letter-spacing:.01em;background:var(--bg);color:var(--ink)}
 h1,h3,.brand,.title,.hcap b,.hcap.fb,.ltitle,.rodate,.dayhead input,.rt-top h2,dialog h3{font-family:var(--sans)}
 .dayhead input.date{font-family:inherit}
@@ -301,13 +301,11 @@ a.nv,.locb{border-color:var(--line);color:var(--ink);background:var(--bg)}a.nv:h
 .locb.on{background:var(--soft)}
 dialog,#rdlg,#ldlg{border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 50px rgba(46,46,46,.18)}
 dialog::backdrop,#rdlg::backdrop,#ldlg::backdrop{background:rgba(46,46,46,.35)}
-/* 航班列：飛機從出發時間飛向抵達時間 */
-.fd{position:relative}
-.fd i{height:0;background:none;border-top:1.5px dashed #E0CFCB}
-.fd b{position:relative;z-index:1;background:var(--card);padding:0 6px}
-.fd::after{content:"";position:absolute;left:0;top:50%;width:20px;height:14px;margin-top:-7px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-15 -10 30 20'%3E%3Cpath d='M-12 0q0-2.4 3-2.4h16q5 0 7 2.4-2 2.4-7 2.4h-16q-3 0-3-2.4zM-2 0L-8-9H-4L5 0zM-2 0L-8 9H-4L5 0zM-10-1L-14-6H-11L-6-1z' fill='%232E2E2E'/%3E%3C/svg%3E") center/contain no-repeat;animation:flyx 4.5s ease-in-out infinite}
-@keyframes flyx{0%{left:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:calc(100% - 20px);opacity:0}}
 /* 首頁插圖動態 */
+.ill .sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+.ill .bob{transform-box:fill-box;transform-origin:50% 100%;animation:bob 4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-4px) rotate(1.5deg)}}
 .ill .jet{animation:jet 22s linear infinite}.ill .tw{animation:tw 2.4s ease-in-out infinite}
 @keyframes jet{0%{transform:translateX(-20px)}100%{transform:translateX(340px)}}
 @keyframes tw{0%,100%{opacity:1}50%{opacity:.15}}
@@ -325,7 +323,7 @@ dialog::backdrop,#rdlg::backdrop,#ldlg::backdrop{background:rgba(46,46,46,.35)}
 main.pop>*{animation:popin .42s cubic-bezier(.22,1,.36,1) both}
 main.pop>*:nth-child(2){animation-delay:.04s}main.pop>*:nth-child(3){animation-delay:.08s}main.pop>*:nth-child(4){animation-delay:.12s}main.pop>*:nth-child(5){animation-delay:.16s}main.pop>*:nth-child(6){animation-delay:.2s}main.pop>*:nth-child(n+7){animation-delay:.24s}
 .tab.on.pop{animation:tabpop .4s cubic-bezier(.34,1.56,.64,1)}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.fd::after{display:none}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media print{body{background:#fff}}
 </style>
 </head>
@@ -478,11 +476,20 @@ ${JET}
 <path d="M260 88C260 74 266 66 278 62C276 72 276 80 278 88Z" fill="#FBF8F2"/><path d="M274 88C274 77 280 70 290 67C288 75 288 82 290 88Z" fill="#EBCFC5"/><path d="M285 88C285 80 289 76 297 75V88Z" fill="#FBF8F2"/>
 <rect y="88" width="300" height="22" fill="#DCE4DA"/><rect y="98" width="300" height="12" fill="#C9D6C8"/></svg>`;
 const ART=scene();
-const coverArt=(p,k)=>scene();
+const SKY=["#F9EEEC","#EEF2F5","#F6F1E6","#EDF3EE"];
+const coverArt=(p,k)=>{k=k%4;const ar=(y,t)=>[0,1,2,3,4,5].map(i=>`<path d="M${88+i*7} ${y+t}V${y}q2-3 4 0V${y+t}Z"/>`).join("");return `<svg class="ill" viewBox="0 0 300 84" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="width:100%;height:100%;display:block"><rect width="300" height="84" fill="${SKY[k]}"/><circle class="sun" cx="214" cy="17" r="9" fill="#EFE3C8"/>
+<g class="drift"><rect x="56" y="14" width="34" height="9" rx="4.5" fill="#fff"/><rect x="65" y="9" width="17" height="11" rx="5.5" fill="#fff"/></g><g class="drift b"><rect x="132" y="8" width="28" height="8" rx="4" fill="#fff"/><rect x="140" y="3" width="14" height="10" rx="5" fill="#fff"/></g>
+<g class="drift b"><path d="M100 22q3-4 6 0q3-4 6 0" fill="none" stroke="#8E8B86" stroke-width="1.2" stroke-linecap="round"/></g>
+<g fill="#E7A99B"><rect x="54" y="40" width="4" height="28"/><rect x="68" y="40" width="4" height="28"/><path d="M50 40Q63 36 76 40L75 44H51Z"/><rect x="56" y="48" width="14" height="3"/></g>
+<path d="M84 68V48Q84 43 90 43H118L124 47H128L132 52V68Z" fill="#E8D9C4"/><g fill="#D5C3A5">${ar(55,4)}${ar(65,3)}</g>
+<g transform="rotate(6 144 68)"><g class="sway"><rect x="139" y="30" width="10" height="38" fill="#FBF8F2"/><rect x="140" y="26" width="8" height="4" fill="#E8D9C4"/><path d="M139 37H149M139 44H149M139 51H149M139 58H149" stroke="#D5C3A5" stroke-width="1"/></g></g>
+<path d="M158 68L161 48H169L172 68Z" fill="#C4D0DC"/><path d="M161 48L163 34H167L169 48Z" fill="#B3C2D1"/><path d="M163 34L164 22H166L167 34Z" fill="#C4D0DC"/><path d="M165 22V11" stroke="#8E8B86" stroke-width="1.2"/>
+<rect x="192" y="30" width="5" height="38" fill="#E7A99B"/><rect x="234" y="30" width="5" height="38" fill="#E7A99B"/><rect x="176" y="56" width="80" height="3" fill="#BDB3A8"/><path d="M176 54Q186 52 194.5 31Q215 58 236.5 31Q246 52 256 54" fill="none" stroke="#E7A99B" stroke-width="1.5" stroke-linecap="round"/>
+<rect y="68" width="300" height="16" fill="#DCE4DA"/><rect y="76" width="300" height="8" fill="#C9D6C8"/></svg>`};
 let heroTimer=null;
 function renderHero(){const h=$("hero");clearInterval(heroTimer);
   const own=(store.home||[]).map(f=>({f}));
-  const L0=(own.length?own:Object.values(store.trips).map(t=>({t,f:cover(t)})).filter(x=>x.f)).slice(0,8),L=L0.length?[{art:1}].concat(L0):L0;
+  const L0=(own.length?own:Object.values(store.trips).map(t=>({t,f:cover(t)})).filter(x=>x.f)).slice(0,8),L=L0;
   if(!L.length){h.innerHTML=ART+`<div class="hcap fb">下一站，去哪裡？</div>`;return}
   h.innerHTML=L.map((x,i)=>x.art?`<div class="hs ${i?"":"on"}">${ART}<div class="hcap fb">下一站，去哪裡？</div></div>`:x.t?`<a class="hs ${i?"":"on"}" href="#e=${x.t.id}"><img src="${imgUrl(x.f,1000)}" alt=""><div class="hcap"><b>${esc(x.t.title)}</b><span>${x.t.days.length}天${+x.t.nights||0}夜</span></div></a>`:`<div class="hs ${i?"":"on"}"><img src="${imgUrl(x.f,1000)}" alt=""></div>`).join("")+`<div class="dots">${L.map((_,i)=>`<i class="${i?"":"on"}"></i>`).join("")}</div>`;
   if(L.length<2)return;let n=0;
