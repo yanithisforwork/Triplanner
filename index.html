@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-512.png">
 <meta name="apple-mobile-web-app-title" content="旅遊行程">
-<meta name="theme-color" content="#dc9aa6">
+<meta name="theme-color" content="#FCF6F5">
 <meta name="description" content="旅遊行程規劃">
 <meta property="og:type" content="website">
 <meta property="og:title" content="旅遊行程規劃">
@@ -15,7 +15,7 @@
 <meta property="og:image" content="https://trippplannner.vercel.app/icon-512.png">
 <meta property="og:locale" content="zh_TW">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f8ecec;--card:#fffbfa;--ink:#44302b;--mute:#947c78;--line:#ecd5d5;--pri:#6a4639;--on:#fff7f5;--rose:#dc9aa6;--soft:#f3d6da;
 --t-move:#a8948d;--t-food:#c4636f;--t-hotel:#9a6f8d;--t-spot:#b07a50;--t-shop:#e08fa3}
@@ -270,6 +270,63 @@ dialog input{width:100%;border:1px solid var(--line);border-radius:8px;padding:8
 .mm-zoom{position:absolute;right:10px;bottom:30px;z-index:5;display:flex;flex-direction:column;gap:6px}
 .mm-zoom button{width:42px;height:42px;padding:0;border-radius:12px;font-size:22px;line-height:1;background:var(--card);color:var(--pri);border:1px solid var(--line);box-shadow:0 2px 6px rgba(0,0,0,.2)}
 .mm-attr{position:absolute;right:0;bottom:0;z-index:4;font-size:10px;padding:1px 6px;background:rgba(255,255,255,.75);color:#333;border-radius:6px 0 0 0;pointer-events:none}
+/* ===== 韓系簡約風：暖白底、細線、柔和陰影、低彩度 ===== */
+:root{color-scheme:light;--bg:#FCF6F5;--card:#FFFFFF;--ink:#2E2E2E;--mute:#8E8B86;--line:#F0E2DF;--pri:#2E2E2E;--on:#FFFFFF;--rose:#D8B4AE;--soft:#F8EAE8;
+--t-move:#B8C4D0;--t-food:#E3B7A8;--t-hotel:#B7C4B1;--t-spot:#E6D3A8;--t-shop:#D8BFD0;
+--sh:0 1px 2px rgba(46,46,46,.04),0 8px 24px rgba(46,46,46,.05);
+--sans:"Inter","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+body{font-family:var(--sans);letter-spacing:.01em;background:var(--bg);color:var(--ink)}
+h1,h3,.brand,.title,.hcap b,.hcap.fb,.ltitle,.rodate,.dayhead input,.rt-top h2,dialog h3{font-family:var(--sans)}
+.dayhead input.date{font-family:inherit}
+h1{font-weight:500;letter-spacing:.06em}
+.homehead h1::after{width:28px;height:2px;background:var(--rose)}
+.name,.time input,.dayhead input,.title,.fk,.lf .lt,.tc h3,h3,.ltitle,.rt-top h2,.hcap b{font-weight:500}
+.card,.tc,.fl,.li,.nc,.cvbar,.hero{border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh)}
+.hero{border-radius:20px;background:var(--soft)}
+.card{border-left:3px solid var(--c)}
+.tc{transition:transform .25s ease,border-color .2s}
+.tc:hover{border-color:var(--rose);transform:translateY(-2px)}
+.tc.new{border-style:dashed;box-shadow:none;background:transparent}
+.cv{border-bottom:1px solid var(--line)}
+.hero svg{filter:none}
+.hcap{background:rgba(255,255,255,.94);color:var(--ink);padding:10px 18px;border-top:1px solid var(--line)}
+.hcap.fb{inset:auto auto 14px 16px;width:auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 16px;font-size:14px;font-weight:500;letter-spacing:.08em;color:var(--ink)}
+.dots i{background:#fff;box-shadow:0 0 0 1px rgba(46,46,46,.25);opacity:.65}.dots i.on{opacity:1;width:16px}
+nav{background:rgba(252,246,245,.9);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.tab:hover{background:var(--soft)}
+.tab.on,.tab.on:hover{background:var(--ink);color:#fff;font-weight:500}
+button:hover{border-color:var(--ink)}button:active{transform:scale(.97)}
+button.primary:hover{background:#000}
+a.nv,.locb{border-color:var(--line);color:var(--ink);background:var(--bg)}a.nv:hover{border-color:var(--ink)}
+.locb.on{background:var(--soft)}
+dialog,#rdlg,#ldlg{border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 50px rgba(46,46,46,.18)}
+dialog::backdrop,#rdlg::backdrop,#ldlg::backdrop{background:rgba(46,46,46,.35)}
+/* 航班列：飛機從出發時間飛向抵達時間 */
+.fd{position:relative}
+.fd i{height:0;background:none;border-top:1.5px dashed #E0CFCB}
+.fd b{position:relative;z-index:1;background:var(--card);padding:0 6px}
+.fd::after{content:"";position:absolute;left:0;top:50%;width:20px;height:14px;margin-top:-7px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-15 -10 30 20'%3E%3Cpath d='M-12 0q0-2.4 3-2.4h16q5 0 7 2.4-2 2.4-7 2.4h-16q-3 0-3-2.4zM-2 0L-8-9H-4L5 0zM-2 0L-8 9H-4L5 0zM-10-1L-14-6H-11L-6-1z' fill='%232E2E2E'/%3E%3C/svg%3E") center/contain no-repeat;animation:flyx 4.5s ease-in-out infinite}
+@keyframes flyx{0%{left:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:calc(100% - 20px);opacity:0}}
+/* 首頁插圖動態 */
+.ill .jet{animation:jet 22s linear infinite}.ill .tw{animation:tw 2.4s ease-in-out infinite}
+@keyframes jet{0%{transform:translateX(-20px)}100%{transform:translateX(340px)}}
+@keyframes tw{0%,100%{opacity:1}50%{opacity:.15}}
+.ill *{vector-effect:non-scaling-stroke}
+.ill .drift,.ill .sun,.ill .ring{transform-box:fill-box;transform-origin:center}
+.ill .drift{animation:drift 7s ease-in-out infinite}.ill .drift.b{animation-duration:9s;animation-delay:-4s}
+.ill .sun{animation:pulse 4s ease-in-out infinite}
+.ill .ring{animation:ring 2.6s ease-out infinite}
+@keyframes drift{0%,100%{transform:translateX(0)}50%{transform:translateX(10px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes ring{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.6);opacity:0}}
+/* 切換日期：輕輕浮現 */
+@keyframes popin{0%{transform:translateY(10px);opacity:0}100%{transform:none;opacity:1}}
+@keyframes tabpop{0%{transform:scale(.92)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+main.pop>*{animation:popin .42s cubic-bezier(.22,1,.36,1) both}
+main.pop>*:nth-child(2){animation-delay:.04s}main.pop>*:nth-child(3){animation-delay:.08s}main.pop>*:nth-child(4){animation-delay:.12s}main.pop>*:nth-child(5){animation-delay:.16s}main.pop>*:nth-child(6){animation-delay:.2s}main.pop>*:nth-child(n+7){animation-delay:.24s}
+.tab.on.pop{animation:tabpop .4s cubic-bezier(.34,1.56,.64,1)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.fd::after{display:none}}
+@media print{body{background:#fff}}
 </style>
 </head>
 <body>
@@ -402,20 +459,32 @@ setInterval(()=>{const a=document.activeElement;if(tid&&!document.hidden&&!(a&&/
 /* home */
 const PAL=[["#f3d6da","#e8b4bc"],["#ecd9cf","#c9a58f"],["#f7e4df","#dc9aa6"],["#dcc6ba","#a87f68"]];
 const cover=t=>{if(t.cover)return t.cover;for(const d of t.days)for(const it of d.items)if(it.imgs&&it.imgs[0])return it.imgs[0];return null};
-const ART=`<svg viewBox="0 0 800 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dde0"/><stop offset="1" stop-color="#efd9d0"/></linearGradient></defs><rect width="800" height="220" fill="url(#hg)"/>
-<rect x="36" y="26" width="84" height="50" rx="10" fill="#dc9aa6" opacity=".55"/><rect x="132" y="44" width="34" height="34" rx="8" fill="#6a4639" opacity=".16"/><rect x="178" y="22" width="54" height="22" rx="6" fill="#c9a58f" opacity=".5"/>
-<rect x="470" y="18" width="58" height="98" rx="12" fill="#e8b4bc" opacity=".7"/><rect x="544" y="50" width="112" height="38" rx="10" fill="#6a4639" opacity=".14"/><rect x="678" y="22" width="66" height="66" rx="14" fill="#fff" opacity=".6"/>
-<rect x="636" y="128" width="124" height="58" rx="12" fill="#c9a58f" opacity=".5"/><rect x="386" y="150" width="46" height="46" rx="10" fill="#dc9aa6" opacity=".45"/><rect x="70" y="160" width="60" height="24" rx="6" fill="#6a4639" opacity=".12"/>
-<path d="M36 138H410" stroke="#6a4639" stroke-width="1" opacity=".4"/><path d="M36 148H250" stroke="#6a4639" stroke-width="1" opacity=".22"/><path d="M450 18V204" stroke="#6a4639" stroke-width="1" opacity=".2"/><path d="M544 106H760" stroke="#6a4639" stroke-width="1" opacity=".35"/>
-<path d="M-20 196C170 130 320 230 500 160S720 100 840 150" fill="none" stroke="#6a4639" stroke-width="1.6" stroke-dasharray="2 9" stroke-linecap="round" opacity=".6"/>
-<circle cx="150" cy="176" r="4" fill="#6a4639" opacity=".5"/><circle cx="168" cy="176" r="4" fill="#dc9aa6"/><circle cx="186" cy="176" r="4" fill="#6a4639" opacity=".25"/></svg>`;
-const coverArt=(p,k)=>`<svg viewBox="0 0 300 84" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="width:100%;height:100%;display:block"><rect width="300" height="84" fill="${p[0]}"/><rect x="${18+k*14}" y="12" width="66" height="38" rx="8" fill="${p[1]}" opacity=".7"/><rect x="${118+k*10}" y="32" width="36" height="36" rx="8" fill="#fff" opacity=".5"/><rect x="${204-k*8}" y="10" width="70" height="24" rx="7" fill="#6a4639" opacity=".16"/><rect x="${236-k*12}" y="46" width="42" height="28" rx="8" fill="${p[1]}" opacity=".5"/><path d="M14 64H190" stroke="#6a4639" stroke-width="1" opacity=".4"/><path d="M14 72H120" stroke="#6a4639" stroke-width="1" opacity=".22"/><path d="M180 6V78" stroke="#6a4639" stroke-width="1" opacity=".2"/><circle cx="${40+k*20}" cy="${24+k*4}" r="3" fill="#6a4639" opacity=".45"/></svg>`;
+const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
+const PL=`<path d="M-12 0q0-2.4 3-2.4h16q5 0 7 2.4-2 2.4-7 2.4h-16q-3 0-3-2.4zM-2 0L-8-9H-4L5 0zM-2 0L-8 9H-4L5 0zM-10-1L-14-6H-11L-6-1z" fill="#2E2E2E"/>`;
+const JET=RM?`<g transform="translate(120 24) scale(.55)">${PL}</g>`:`<g transform="translate(0 24)"><g class="jet"><path d="M-70 0H-16" stroke="#2E2E2E" stroke-opacity=".3" stroke-width="1.5" stroke-dasharray="2 5"/><g transform="scale(.55)">${PL}</g></g></g>`;
+const scene=()=>`<svg class="ill" viewBox="0 0 300 110" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="width:100%;height:100%;display:block"><rect width="300" height="110" fill="#F9EEEC"/>
+<circle class="sun" cx="150" cy="38" r="20" fill="#EFE3C8"/>
+<g class="drift"><rect x="14" y="30" width="40" height="11" rx="5.5" fill="#fff"/><rect x="25" y="24" width="20" height="13" rx="6.5" fill="#fff"/></g>
+<g class="drift b"><rect x="214" y="26" width="38" height="10" rx="5" fill="#fff"/><rect x="224" y="20" width="18" height="12" rx="6" fill="#fff"/></g>
+${JET}
+<path d="M178 88L206 48Q210 43 214 48L242 88Z" fill="#C4D0DC"/><path d="M201 55L206 48Q210 43 214 48L219 55L214 52L210 56L206 52Z" fill="#FBF8F2"/>
+<rect x="15" y="76" width="14" height="12" fill="#E8D9C4"/><path d="M16 76L19 58H25L28 76Z" fill="#C9D6C8"/><circle cx="22" cy="54" r="4" fill="#C9D6C8"/><path d="M18.5 51L20 46L22 50L24 46L25.5 51Z" fill="#C9D6C8"/><path d="M24 58H28L32 47L29 46Z" fill="#C9D6C8"/><circle class="sun" cx="30.5" cy="42" r="3" fill="#EBDDB3"/>
+<path d="M56 32L60 56L68 88H61Q56 76 51 88H44L52 56Z" fill="#BDB3A8"/><rect x="50" y="55" width="12" height="3" fill="#A89E93"/><rect x="53" y="42" width="6" height="2.5" fill="#A89E93"/><circle class="tw" cx="56" cy="30" r="1.8" fill="#E9B8A8"/>
+<rect x="80" y="50" width="12" height="38" fill="#E8D9C4"/><rect x="81" y="40" width="10" height="10" fill="#E8D9C4"/><path d="M81 40L86 28L91 40Z" fill="#BDB3A8"/><circle cx="86" cy="45" r="3.6" fill="#FBF8F2"/><path d="M86 42.8V45H87.8" stroke="#8E8B86" stroke-width="1" fill="none"/>
+<path d="M98 88L118 58L138 88Z" fill="#EBDDB3"/><path d="M122 88L136 68L150 88Z" fill="#E2CF9F"/>
+<rect x="152" y="62" width="3" height="26" fill="#EBCFC5"/><rect x="181" y="62" width="3" height="26" fill="#EBCFC5"/><circle cx="153.5" cy="61" r="2" fill="#EBCFC5"/><circle cx="182.5" cy="61" r="2" fill="#EBCFC5"/>
+<rect x="158" y="74" width="20" height="14" fill="#FBF8F2"/><path d="M160 74Q168 52 176 74Z" fill="#EBCFC5"/><path d="M168 56V50" stroke="#8E8B86" stroke-width="1.2"/><path d="M165 88V82Q168 78 171 82V88Z" fill="#E8DFD3"/>
+<g fill="#B9CDB8" stroke="#F9EEEC" stroke-width="1"><path d="M243 88H251L252 80H242Z"/><path d="M243 80H251L252 72H242Z"/><path d="M243 72H251L252 64H242Z"/><path d="M243 64H251L252 56H242Z"/><path d="M243 56H251L252 48H242Z"/><path d="M244 48H250L251 40H243Z"/></g><path d="M247 40V30" stroke="#8E8B86" stroke-width="1.5"/>
+<path d="M260 88C260 74 266 66 278 62C276 72 276 80 278 88Z" fill="#FBF8F2"/><path d="M274 88C274 77 280 70 290 67C288 75 288 82 290 88Z" fill="#EBCFC5"/><path d="M285 88C285 80 289 76 297 75V88Z" fill="#FBF8F2"/>
+<rect y="88" width="300" height="22" fill="#DCE4DA"/><rect y="98" width="300" height="12" fill="#C9D6C8"/></svg>`;
+const ART=scene();
+const coverArt=(p,k)=>scene();
 let heroTimer=null;
 function renderHero(){const h=$("hero");clearInterval(heroTimer);
   const own=(store.home||[]).map(f=>({f}));
-  const L=(own.length?own:Object.values(store.trips).map(t=>({t,f:cover(t)})).filter(x=>x.f)).slice(0,8);
+  const L0=(own.length?own:Object.values(store.trips).map(t=>({t,f:cover(t)})).filter(x=>x.f)).slice(0,8),L=L0.length?[{art:1}].concat(L0):L0;
   if(!L.length){h.innerHTML=ART+`<div class="hcap fb">下一站，去哪裡？</div>`;return}
-  h.innerHTML=L.map((x,i)=>x.t?`<a class="hs ${i?"":"on"}" href="#e=${x.t.id}"><img src="${imgUrl(x.f,1000)}" alt=""><div class="hcap"><b>${esc(x.t.title)}</b><span>${x.t.days.length}天${+x.t.nights||0}夜</span></div></a>`:`<div class="hs ${i?"":"on"}"><img src="${imgUrl(x.f,1000)}" alt=""></div>`).join("")+`<div class="dots">${L.map((_,i)=>`<i class="${i?"":"on"}"></i>`).join("")}</div>`;
+  h.innerHTML=L.map((x,i)=>x.art?`<div class="hs ${i?"":"on"}">${ART}<div class="hcap fb">下一站，去哪裡？</div></div>`:x.t?`<a class="hs ${i?"":"on"}" href="#e=${x.t.id}"><img src="${imgUrl(x.f,1000)}" alt=""><div class="hcap"><b>${esc(x.t.title)}</b><span>${x.t.days.length}天${+x.t.nights||0}夜</span></div></a>`:`<div class="hs ${i?"":"on"}"><img src="${imgUrl(x.f,1000)}" alt=""></div>`).join("")+`<div class="dots">${L.map((_,i)=>`<i class="${i?"":"on"}"></i>`).join("")}</div>`;
   if(L.length<2)return;let n=0;
   heroTimer=setInterval(()=>{if(document.hidden||$("home").hidden)return;const s=h.querySelectorAll(".hs"),d=h.querySelectorAll(".dots i");
     s[n].classList.remove("on");d[n].classList.remove("on");n=(n+1)%s.length;s[n].classList.add("on");d[n].classList.add("on")},4500)}
@@ -488,7 +557,7 @@ const normTime=v=>{v=String(v||"").trim().replace(/[：.\s]/g,":");if(!v)return 
 const fmtT=v=>{const n=normTime(v);return n===null?v:n};
 const kw=it=>/^https?:/i.test(it.kr||"")?it.name:(it.kr||it.name);
 const nvUrl=it=>/naver\.(com|me)/i.test(it.kr||"")?it.kr:"https://map.naver.com/p/search/"+encodeURIComponent(kw(it));
-const ggUrl=it=>/google\.[a-z.]+\/maps|goo\.gl|maps\.app/i.test(it.kr||"")?it.kr:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(kw(it));
+const ggUrl=it=>/google\.[a-z.]+\/maps|maps\.google\.|goo\.gl|maps\.app|g\.co\/kgs|g\.page/i.test(it.kr||"")?it.kr:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(kw(it));
 const rtUrl=(a,b)=>"https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(kw(a))+"&destination="+encodeURIComponent(kw(b))+"&travelmode=transit";
 function refreshLinks(){const a=data.days[cur].items;
   document.querySelectorAll("[data-nv]").forEach(e=>e.href=nvUrl(a[+e.dataset.nv]));
@@ -558,13 +627,13 @@ function render(){
       <div class="row">
         ${RO?`<span class="tv">${TYPES[it.type]||""}</span>`:`<select data-i="${i}" data-k="type" aria-label="類型">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${k==it.type?"selected":""}>${v}</option>`).join("")}</select>`}
         ${RO?(it.stay?`<span>停留</span><span class="stayv">${esc(it.stay)}</span>`:""):`<span>停留</span><textarea class="stay" rows="1" data-i="${i}" data-k="stay" aria-label="停留時間">${esc(it.stay)}</textarea>`}
-        <textarea class="kr" rows="1" data-i="${i}" data-k="kr" placeholder="韓文店名或地圖連結（選填，搜尋更準）" aria-label="韓文搜尋名稱">${esc(it.kr)}</textarea><span class="lk"><a class="nv" target="_blank" rel="noopener" data-nv="${i}" href="${nvUrl(it)}">Naver 地圖</a><a class="nv" target="_blank" rel="noopener" data-gg="${i}" href="${ggUrl(it)}">Google 地圖</a></span>
+        <textarea class="kr" rows="1" data-i="${i}" data-k="kr" placeholder="Naver/Google地圖連結（選填，搜尋更準）" aria-label="Naver 或 Google 地圖連結">${esc(it.kr)}</textarea><span class="lk"><a class="nv" target="_blank" rel="noopener" data-gg="${i}" href="${ggUrl(it)}">Google 地圖</a><a class="nv" target="_blank" rel="noopener" data-nv="${i}" href="${nvUrl(it)}">Naver 地圖</a></span>
         <span class="acts"><span class="grip" data-grip title="按住拖曳排序">⠿</span><button data-up="${i}" title="上移">↑</button><button data-down="${i}" title="下移">↓</button><button data-del="${i}" title="刪除">✕</button></span>
       </div>
       <textarea class="note" data-i="${i}" data-k="note" placeholder="備註（訂位、票價、車次…）" rows="1">${esc(it.note)}</textarea>
       <div class="pics">${(it.imgs||[]).map((f,j)=>`<div class="pic" data-z="${i}:${j}"><img src="${imgUrl(f,300)}" alt="備註圖片" loading="lazy"><button class="cvb ${data.cover===f?"on":""}" data-cv="${i}:${j}" aria-label="設為封面" title="設為封面">★</button><button class="x" data-pd="${i}:${j}" aria-label="移除圖片">✕</button></div>`).join("")}<button class="addimg" data-addimg="${i}">＋ 圖片</button></div>
     </div></div>`;
-    if(i<d.items.length-1)h+=`<div class="gap">移動 ${RO?`<span class="nextv">${esc(it.next)}</span>`:`<textarea rows="1" data-i="${i}" data-k="next" placeholder="交通方式與時間" aria-label="移動方式與時間">${esc(it.next)}</textarea>`} <a class="nv" target="_blank" rel="noopener" data-nr="${i}" href="https://map.naver.com/p/directions/-/-/-/transit">Naver 路線</a> <a class="nv" target="_blank" rel="noopener" data-rt="${i}" href="${rtUrl(it,d.items[i+1])}">Google 路線</a></div>`;
+    if(i<d.items.length-1)h+=`<div class="gap">移動 ${RO?`<span class="nextv">${esc(it.next)}</span>`:`<textarea rows="1" data-i="${i}" data-k="next" placeholder="交通方式與時間" aria-label="移動方式與時間">${esc(it.next)}</textarea>`} <a class="nv" target="_blank" rel="noopener" data-rt="${i}" href="${rtUrl(it,d.items[i+1])}">Google 路線</a> <a class="nv" target="_blank" rel="noopener" data-nr="${i}" href="https://map.naver.com/p/directions/-/-/-/transit">Naver 路線</a></div>`;
   });
   h+=`<button class="add" data-add>＋ 新增行程</button>`;
   $("main").innerHTML=h;
@@ -661,7 +730,7 @@ document.addEventListener("click",e=>{
   if(ds.loc!==undefined&&!RO){openLoc(+ds.loc);return}
   if(RO&&ds.tab===undefined)return;
   if(ds.del!==undefined||ds.up!==undefined||ds.down!==undefined||ds.add!==undefined||ds.adddays!==undefined)snap();
-  if(ds.tab!==undefined){cur=+ds.tab;view="day"}
+  if(ds.tab!==undefined){cur=+ds.tab;view="day";popNext=1}
   else if(ds.adddays!==undefined){data.days.push({label:"第"+(data.days.length+1)+"天",date:nextDate(data.days[data.days.length-1].date),items:[]});cur=data.days.length-1}
   else if(ds.delday!==undefined){if(!confirm("確定刪除「"+d.label+"」？"))return;snap();data.days.splice(cur,1);if(!data.days.length)data.days.push({label:"第1天",date:"",items:[]});cur=0}
   else if(ds.add!==undefined){d.items.push({time:"",name:"",type:"spot",stay:"",next:"",note:"",kr:""})}
@@ -675,6 +744,8 @@ document.addEventListener("click",e=>{
   if(ds.tab===undefined){if(ds.up!==undefined||ds.down!==undefined||ds.del!==undefined)recalc(d);save()}
   render();
 });
+let popNext=0;const _render=render;render=function(){const p=popNext;popNext=0;_render();if(p)popIt()};
+function popIt(){const m=$("main"),t=document.querySelector(".tab.on");m.classList.remove("pop");if(t)t.classList.remove("pop");void m.offsetWidth;m.classList.add("pop");if(t)t.classList.add("pop");setTimeout(()=>{m.classList.remove("pop");if(t)t.classList.remove("pop")},900)}
 let drag=null;
 document.addEventListener("pointerdown",e=>{const g=e.target.closest("[data-grip]");if(!g||RO)return;e.preventDefault();const s=g.closest(".stop"),i=+s.dataset.idx;drag={from:i,to:i};s.classList.add("dragging")});
 document.addEventListener("pointermove",e=>{if(!drag)return;
