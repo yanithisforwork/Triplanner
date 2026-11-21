@@ -454,12 +454,12 @@ async function saveOnce(id){const t=store.trips[id];if(!t)return;store.ver=store
 function saveCloud(id){if(inflight[id]){if(((store.ver||{})[id]||0)>(sv[id]||0))again[id]=1;return inflight[id]}
   return inflight[id]=(async()=>{try{do{again[id]=0;await saveOnce(id)}while(again[id])}finally{delete inflight[id]}})()}
 function schedule(id){if(!cloud.url)return;sync("尚未存檔…");clearTimeout(tm);tm=setTimeout(()=>saveCloud(id),1500)}
-function save(){store.ver=store.ver||{};store.ver[tid]=(store.ver[tid]||0)+1;store.dirty[tid]=1;persist();schedule(tid)}
+function save(){if(tid&&data)store.trips[tid]=data;store.ver=store.ver||{};store.ver[tid]=(store.ver[tid]||0)+1;store.dirty[tid]=1;persist();schedule(tid)}
 async function pull(){if(!cloud.url||!cloud.key)return;pullState="loading";
   try{const r=await call({action:"all"});if(r.error||!r.rows)throw 0;const T=group(r.rows);if(Array.isArray(r.home))store.home=r.home;
-    for(const id in T)if(!store.dirty[id]){const old=store.trips[id];if(old&&old.flights&&T[id].flights===undefined)T[id].flights=old.flights;store.trips[id]=T[id]}
+    for(const id in T)if(!store.dirty[id]&&id!==tid){const old=store.trips[id];if(old&&old.flights&&T[id].flights===undefined)T[id].flights=old.flights;store.trips[id]=T[id]}
     if(r.lists)for(const id in r.lists)if(!store.ldirty[id])store.lists[id]=r.lists[id];
-    for(const id in store.trips)if(!T[id]&&!store.dirty[id])delete store.trips[id];
+    for(const id in store.trips)if(!T[id]&&!store.dirty[id]&&id!==tid)delete store.trips[id];
     pullState=Object.keys(T).length?"ok":"empty";persist();if(!tid)renderHome()}catch(e){pullState="fail";toast("無法連線雲端，目前顯示本機資料");if(!tid)renderHome()}}
 async function refreshTrip(id){if(!cloud.url||RO||store.dirty[id]||inflight[id])return;
   try{const r=await call({action:"view",id}),T=group(r.rows||[])[id];
@@ -801,7 +801,7 @@ function cpOpen(url,id,file){cpId=id;cpFile=file;
   let x=50,y=50;if(id&&id===cvParts(data)[0]){const m=cvPos(data).match(/(\d+)% (\d+)%/);if(m){x=+m[1];y=+m[2]}}
   const im=$("cpimg");im.onload=()=>{cpA=(im.naturalWidth/im.naturalHeight)||1.5;cpSet(x,y)};
   im.src=url;document.querySelectorAll("#cpdlg .cpv img").forEach(i=>i.src=url);cpSet(x,y);$("cpdlg").showModal()}
-$("cvbar").onclick=()=>{if(RO)return;const id=cover(data);if(id)cpOpen(imgUrl(id,900),id,null)};
+$("cvbar").onclick=e=>{if(RO||e.target.closest("button"))return;const id=cover(data);if(id)cpOpen(imgUrl(id,900),id,null)};
 $("cpbox").addEventListener("pointerdown",e=>{e.preventDefault();cpDrag=true;try{$("cpbox").setPointerCapture(e.pointerId)}catch(x){}cpMove(e)});
 $("cpbox").addEventListener("pointermove",e=>{if(cpDrag)cpMove(e)});
 $("cpbox").addEventListener("pointerup",()=>{cpDrag=false});
