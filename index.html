@@ -301,17 +301,15 @@ a.nv,.locb{border-color:var(--line);color:var(--ink);background:var(--bg)}a.nv:h
 .locb.on{background:var(--soft)}
 dialog,#rdlg,#ldlg{border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 50px rgba(46,46,46,.18)}
 dialog::backdrop,#rdlg::backdrop,#ldlg::backdrop{background:rgba(46,46,46,.35)}
-/* 輸入格：不再用整塊粉底擠在卡片邊，改成底線提示、欄位白底細框 */
-.card .name{margin:0;width:100%;padding:4px 0 6px}
-.card .name:focus-visible,.time input:focus-visible,.dayhead input:focus-visible,.gap input:focus-visible,.gap textarea:focus-visible,.lf input:focus-visible,.lf textarea:focus-visible,.sub textarea:focus-visible,.title:focus-visible{background:transparent;border-radius:0;box-shadow:0 1px 0 var(--ink)}
-.row{gap:8px 10px;margin-top:4px}
-.row select,.row input,.row textarea,.note{background:#fff;border:1px solid #E9DDDA}
+/* 輸入格：保留原本的框與編輯底色，只調整間距 */
+.card .name{padding:5px 6px;margin:0 -6px 6px;width:calc(100% + 12px)}
+.row{gap:8px 10px;margin-top:2px}
 /* 封面構圖調整 */
-#cvr,#cvx,#cvp{font-size:13px;padding:2px 12px}
+#cvr,#cvx{font-size:13px;padding:2px 12px}
 #cpdlg{width:min(94vw,560px)}
-.cpbox{position:relative;display:block;width:fit-content;max-width:100%;margin:0 auto;border-radius:12px;overflow:hidden;line-height:0;touch-action:none;cursor:crosshair;user-select:none;-webkit-user-select:none}
+.cvbar{cursor:pointer}.cpbox{position:relative;display:block;width:fit-content;max-width:100%;margin:0 auto;border-radius:12px;overflow:hidden;line-height:0;touch-action:none;cursor:crosshair;user-select:none;-webkit-user-select:none}
 .cpbox img{display:block;max-width:100%;max-height:40vh;-webkit-user-drag:none}
-.cpdot{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:3px solid #fff;background:rgba(46,46,46,.45);box-shadow:0 0 0 1px rgba(46,46,46,.5);pointer-events:none}
+.cpframe{position:absolute;border:2px solid #fff;border-radius:6px;box-shadow:0 0 0 9999px rgba(46,46,46,.42);pointer-events:none}
 .cpprev{display:grid;gap:8px;margin-top:12px}.cpprev small{color:var(--mute);font-size:12px}
 .cpv{overflow:hidden;border-radius:10px;border:1px solid var(--line);background:var(--soft)}.cpv img{width:100%;height:100%;object-fit:cover;display:block}
 .cpv.a{aspect-ratio:6.7/1}.cpv.b{aspect-ratio:2.5/1;max-width:60%}.cpv.c{aspect-ratio:3.9/1}
@@ -353,8 +351,8 @@ main.pop>*:nth-child(2){animation-delay:.04s}main.pop>*:nth-child(3){animation-d
   <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button><button id="undo" class="undo" disabled title="上一步" aria-label="上一步"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button></div>
   <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span></div>
-  <div class="cvbar" id="cvbar" hidden><img id="cvimg" alt=""></div>
-  <div class="cvtools"><button id="cvp" hidden>調整構圖</button><button id="cvr">設定封面</button><button id="cvx">清除封面</button></div>
+  <div class="cvbar" id="cvbar" hidden title="點一下可調整封面構圖"><img id="cvimg" alt=""></div>
+  <div class="cvtools"><button id="cvr">設定封面</button><button id="cvx">清除封面</button></div>
   <div class="flbox" id="flbox" hidden></div>
 </div>
 <nav><div class="tabs" id="tabs"></div></nav>
@@ -366,8 +364,8 @@ main.pop>*:nth-child(2){animation-delay:.04s}main.pop>*:nth-child(3){animation-d
   <label for="nnt">夜數</label><input id="nnt" type="number" min="0" max="30" value="2">
   <label for="nstart">出發日期（選填，會自動填入每一天的日期）</label><input id="nstart" type="date">
   <div class="dact"><button id="dcancel">取消</button><button id="dok" class="primary">建立</button></div></dialog>
-<dialog id="cpdlg"><h3>調整封面構圖</h3><p class="hint" style="margin:0 0 10px">點一下或拖曳照片，選擇想保留的重點位置，下方可即時預覽各處的裁切結果。</p>
-  <div class="cpbox" id="cpbox"><img id="cpimg" alt=""><i class="cpdot" id="cpdot"></i></div>
+<dialog id="cpdlg"><h3>調整封面構圖</h3><p class="hint" style="margin:0 0 10px">拖曳白色框，選擇想顯示的位置；框內是「行程頁封面」的顯示範圍，下方可預覽其他位置。</p>
+  <div class="cpbox" id="cpbox"><img id="cpimg" alt=""><i class="cpframe" id="cpframe"></i></div>
   <div class="cpprev"><div><small>行程頁封面</small><div class="cpv a"><img alt=""></div></div><div><small>首頁行程卡</small><div class="cpv b"><img alt=""></div></div><div><small>首頁輪播</small><div class="cpv c"><img alt=""></div></div></div>
   <div class="dact"><button id="cpreset">置中</button><button id="cpcancel">取消</button><button id="cpok" class="primary">完成</button></div></dialog>
 <dialog id="hdlg"><h3>首頁輪播照片</h3><p class="hint" style="margin:0 0 10px">上傳後會優先輪播這些照片；全部移除時，會自動使用各行程的封面。</p><div class="pics" id="hl"></div><div class="dact"><button id="hdone" class="primary">完成</button></div></dialog>
@@ -638,7 +636,7 @@ function flPrint(){if(!data)return "";let h="";FL().forEach((D,di)=>{const ix=D.
   return h?`<div class="fli">${h}</div>`:""}
 function render(){
   renderFlights();
-  const cvSrc=cover(data);$("cvbar").hidden=!cvSrc;if(cvSrc){$("cvimg").src=imgUrl(cvSrc,900);$("cvimg").style.objectPosition=cvPos(data)}$("cvp").hidden=RO||!cvSrc;
+  const cvSrc=cover(data);$("cvbar").hidden=!cvSrc;if(cvSrc){$("cvimg").src=imgUrl(cvSrc,900);$("cvimg").style.objectPosition=cvPos(data)}
   $("cvr").hidden=RO;$("cvr").textContent=data.cover?"更換封面":"設定封面";$("cvx").hidden=RO||!data.cover;
   if(document.activeElement!==$("ndays"))$("ndays").value=data.days.length;
   if(RO)view="day";const LC=RO?null:lists();
@@ -765,7 +763,7 @@ document.addEventListener("click",e=>{
   else if(ds.up!==undefined){const i=+ds.up;if(i>0)[d.items[i-1],d.items[i]]=[d.items[i],d.items[i-1]]}
   else if(ds.down!==undefined){const i=+ds.down;if(i<d.items.length-1)[d.items[i+1],d.items[i]]=[d.items[i],d.items[i+1]]}
   else if(ds.addimg!==undefined){pickIdx=+ds.addimg;pickMode="item";$("pf").click();return}
-  else if(ds.cv!==undefined){const [ci,cj]=ds.cv.split(":").map(Number),cf=d.items[ci].imgs[cj];data.cover=cvParts(data)[0]===cf?"":cf;toast(data.cover?"已設為封面":"已取消封面")}
+  else if(ds.cv!==undefined){const [ci,cj]=ds.cv.split(":").map(Number),cf=d.items[ci].imgs[cj];if(cvParts(data)[0]===cf){data.cover="";toast("已取消封面")}else cpOpen(imgUrl(cf,900),cf,null)}
   else if(ds.pd!==undefined){const [pi,pj]=ds.pd.split(":").map(Number);if(!confirm("要移除這張圖片嗎？"))return;snap();d.items[pi].imgs.splice(pj,1)}
   else return;
   if(ds.tab===undefined){if(ds.up!==undefined||ds.down!==undefined||ds.del!==undefined)recalc(d);save()}
@@ -790,33 +788,40 @@ function setHome(){persist();renderHero();if(cloud.url&&cloud.key)call({action:"
 $("homepics").onclick=()=>{drawH();$("hdlg").showModal()};
 $("hdone").onclick=()=>$("hdlg").close();
 $("cvr").onclick=()=>{pickMode="cover";$("pf").click()};
-/* 封面構圖：選取重點位置（存成「照片ID|x|y」） */
-let cpX=50,cpY=50,cpId="",cpDrag=false;
+/* 封面構圖：選照片時框選位置（存成「照片ID|x|y」） */
+let cpX=50,cpY=50,cpId="",cpFile=null,cpDrag=false,cpA=1.5,cpWf=1,cpHf=.22;
 function cpSet(x,y){cpX=Math.round(Math.max(0,Math.min(100,x)));cpY=Math.round(Math.max(0,Math.min(100,y)));
-  $("cpdot").style.left=cpX+"%";$("cpdot").style.top=cpY+"%";
+  const R=6.7;cpWf=cpA>R?R/cpA:1;cpHf=cpA>R?1:cpA/R;const f=$("cpframe").style;
+  f.width=cpWf*100+"%";f.height=cpHf*100+"%";f.left=(1-cpWf)*cpX+"%";f.top=(1-cpHf)*cpY+"%";
   document.querySelectorAll("#cpdlg .cpv img").forEach(i=>i.style.objectPosition=cpX+"% "+cpY+"%")}
-function cpMove(e){const r=$("cpbox").getBoundingClientRect();if(r.width&&r.height)cpSet((e.clientX-r.left)/r.width*100,(e.clientY-r.top)/r.height*100)}
-$("cvp").onclick=()=>{cpId=cover(data);if(!cpId)return;const u=imgUrl(cpId,900);$("cpimg").src=u;
-  document.querySelectorAll("#cpdlg .cpv img").forEach(i=>i.src=u);
-  const m=cvPos(data).match(/(\d+)% (\d+)%/);cpSet(m?+m[1]:50,m?+m[2]:50);$("cpdlg").showModal()};
+function cpMove(e){const r=$("cpbox").getBoundingClientRect();if(!r.width||!r.height)return;
+  const px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+  cpSet(cpWf<.999?(px-cpWf/2)/(1-cpWf)*100:50,cpHf<.999?(py-cpHf/2)/(1-cpHf)*100:50)}
+function cpOpen(url,id,file){cpId=id;cpFile=file;
+  let x=50,y=50;if(id&&id===cvParts(data)[0]){const m=cvPos(data).match(/(\d+)% (\d+)%/);if(m){x=+m[1];y=+m[2]}}
+  const im=$("cpimg");im.onload=()=>{cpA=(im.naturalWidth/im.naturalHeight)||1.5;cpSet(x,y)};
+  im.src=url;document.querySelectorAll("#cpdlg .cpv img").forEach(i=>i.src=url);cpSet(x,y);$("cpdlg").showModal()}
+$("cvbar").onclick=()=>{if(RO)return;const id=cover(data);if(id)cpOpen(imgUrl(id,900),id,null)};
 $("cpbox").addEventListener("pointerdown",e=>{e.preventDefault();cpDrag=true;try{$("cpbox").setPointerCapture(e.pointerId)}catch(x){}cpMove(e)});
 $("cpbox").addEventListener("pointermove",e=>{if(cpDrag)cpMove(e)});
 $("cpbox").addEventListener("pointerup",()=>{cpDrag=false});
 $("cpbox").addEventListener("pointercancel",()=>{cpDrag=false});
 $("cpreset").onclick=()=>cpSet(50,50);
-$("cpcancel").onclick=()=>$("cpdlg").close();
-$("cpok").onclick=()=>{const v=cpId+(cpX===50&&cpY===50?"":"|"+cpX+"|"+cpY);
-  if(v!==(data.cover||"")&&!(!data.cover&&cpX===50&&cpY===50)){snap();data.cover=v;save();render();toast("已更新封面構圖")}
-  $("cpdlg").close()};
+$("cpcancel").onclick=()=>{cpFile=null;$("cpdlg").close()};
+$("cpok").onclick=()=>{const pos=cpX===50&&cpY===50?"":"|"+cpX+"|"+cpY;$("cpdlg").close();
+  if(cpFile){const f=cpFile;cpFile=null;upFile(f,pos);return}
+  const v=cpId+pos;if(v!==(data.cover||"")&&!(!data.cover&&!pos)){snap();data.cover=v;save();render();toast("已更新封面構圖")}};
 $("cvx").onclick=()=>{data.cover="";save();render();toast("已清除封面")};
 $("pf").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f||RO)return;
   if(!cloud.url){toast("請先到頁面最下方設定雲端");return}
-  const im=new Image();im.onload=async()=>{const k=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement("canvas");
+  if(pickMode==="cover"){cpOpen(URL.createObjectURL(f),"",f);return}
+  upFile(f)};
+function upFile(f,pos){const im=new Image();im.onload=async()=>{const k=Math.min(1,800/Math.max(im.width,im.height)),c=document.createElement("canvas");
     c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);toast("圖片上傳中…");
     try{const nonce=uid(),pl={action:"upload",id:pickMode==="home"?"home":tid,token:pickMode==="home"?"":data.token,data:c.toDataURL("image/jpeg",.72),nonce};let r;
       try{r=await call(pl,true)}catch(x){toast("確認上傳結果…");let fid=null;for(let k=0;k<6&&!fid;k++){await new Promise(z=>setTimeout(z,1500));try{const v=await call({action:"up",nonce});fid=v&&v.fid||null}catch(e2){}}if(fid)r={ok:true,fid};else throw x}
       if(!r.ok)throw new Error(r.error);if(pickMode==="home"){store.home.push(r.fid);setHome();drawH()}
-      else if(pickMode==="cover"){data.cover=r.fid;save();render()}
+      else if(pickMode==="cover"){data.cover=r.fid+(pos||"");save();render()}
       else if(pickMode==="listimg"){lists().shop[pickIdx].img=r.fid;listSave();render()}
       else{const it=data.days[cur].items[pickIdx];(it.imgs=it.imgs||[]).push(r.fid);save();render()}
       toast("已加入圖片")}
