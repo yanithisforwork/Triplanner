@@ -70,6 +70,7 @@ main{max-width:780px;margin:auto;padding:18px 20px 80px}
 .dayhead{display:flex;gap:8px;align-items:center;margin-bottom:14px}
 .dayhead input{border:0;border-bottom:1px dashed var(--line);background:none;padding:4px 2px;font-size:18px;font-weight:700;width:9em;font-family:"Noto Serif TC",serif}
 .dayhead input.date{font-weight:500;font-size:15px;color:var(--mute);width:7em;font-family:inherit}
+.dayhead .wd{font-weight:500;font-size:15px;color:var(--mute);white-space:nowrap;margin-left:2px}
 .stop{display:grid;grid-template-columns:64px minmax(0,1fr);gap:12px}
 .card,.gap{min-width:0}
 .time{padding-top:14px;text-align:right}
@@ -573,6 +574,8 @@ const fit=el=>{el.style.height="auto";const h=el.scrollHeight;if(!h){el.style.he
 const pad2=n=>String(n).padStart(2,"0");
 const parseMD=t=>{const m=String(t||"").match(/(?:(\d{4})[\/\-.])?(\d{1,2})[\/\-.](\d{1,2})/);if(!m)return null;let y=m[1]?+m[1]:null;const mo=+m[2],d=+m[3];if(mo<1||mo>12||d<1||d>31)return null;
   if(!y){const n=new Date();y=n.getFullYear();if(new Date(y,mo-1,d)<new Date(n.getFullYear(),n.getMonth(),n.getDate()-60))y++}return new Date(y,mo-1,d)};
+const WD=["日","一","二","三","四","五","六"];
+const wdOf=t=>{const d=parseMD(t);return d?"週"+WD[d.getDay()]:""};
 const fmtMD=dt=>(dt.getMonth()+1)+"/"+dt.getDate();
 const nextDate=t=>{const d=parseMD(t);if(!d)return "";d.setDate(d.getDate()+1);return fmtMD(d)};
 const startDate=i=>{const v=$("nstart").value;if(!v)return "";const [y,m,d]=v.split("-").map(Number);return fmtMD(new Date(y,m-1,d+i))};
@@ -644,7 +647,7 @@ function render(){
   {const on=document.querySelector(".tab.on"),T=$("tabs");if(on)T.scrollLeft=Math.max(0,on.offsetLeft-T.offsetLeft-(T.clientWidth-on.offsetWidth)/2)}
   if(view!=="day"){renderList();return}
   const d=data.days[cur];
-  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}</span><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button><button data-delday>刪除此天</button></div>`;
+  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}${wdOf(d.date)?"（"+wdOf(d.date)+"）":""}</span><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span class="wd" data-wd>${wdOf(d.date)}</span><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button><button data-delday>刪除此天</button></div>`;
   d.items.forEach((it,i)=>{
     h+=`<div class="stop" data-idx="${i}"><div class="time"><input data-i="${i}" data-k="time" value="${esc(fmtT(it.time))}" inputmode="numeric" maxlength="5" placeholder="00:00" aria-label="時間"></div>
     <div class="card" data-t="${it.type}">
@@ -681,7 +684,7 @@ document.addEventListener("input",e=>{
     return}
   if(t.id==="title"){fit(t);data.title=t.value;document.title=t.value||"旅遊行程規劃";save();return}
   if(t.id==="nights"){data.nights=+t.value||0;save();return}
-  if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f==="date")renderFlights();if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
+  if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f==="date"){renderFlights();const w=t.parentNode.querySelector("[data-wd]");if(w)w.textContent=wdOf(t.value)}if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
   if(t.dataset.k==="time")return;
   if(t.dataset.k){const it=data.days[cur].items[+t.dataset.i];it[t.dataset.k]=t.value;if(t.dataset.k==="name"||t.dataset.k==="kr")refreshLinks();
     if(t.dataset.k=="type")t.closest(".card").dataset.t=t.value;
@@ -841,7 +844,7 @@ function listPrint(k){const L=(store.lists[tid]||{})[k]||[],T=LT[k];
 let printMode="all";
 function buildPrint(){if(!data)return;
   $("pv").innerHTML=(cover(data)?`<img class="pcv" src="${imgUrl(cover(data),700)}" alt="" style="object-position:${cvPos(data)}">`:"")+`<h1>${esc(data.title)}</h1><div class="sub">${data.days.length}天${+data.nights||0}夜</div>`+flPrint()+data.days.map(d=>
-    `<h2>${esc(d.label)}${d.date?"　"+esc(d.date):""}</h2>`+d.items.map((it,i)=>
+    `<h2>${esc(d.label)}${d.date?"　"+esc(d.date)+(wdOf(d.date)?"（"+wdOf(d.date)+"）":""):""}</h2>`+d.items.map((it,i)=>
       `<div class="pi"><b>${esc(it.time)}</b><div>${esc(it.name)}<br><small>${TYPES[it.type]||""}${it.stay?"・停留 "+esc(it.stay):""}</small>${it.note?`<br><small>${esc(it.note)}</small>`:""}${(it.imgs||[]).length?"<br>"+it.imgs.map(f=>`<img src="${imgUrl(f,300)}" alt="">`).join(""):""}</div></div>`+
       (it.next&&i<d.items.length-1?`<div class="mv">↓ ${esc(it.next)}</div>`:"")).join("")).join("")+(RO||!tid||printMode==="trip"?"":listPrint("gift")+listPrint("shop")+listPrint("pack")+listPrint("todo"))}
 addEventListener("beforeprint",buildPrint);
@@ -957,7 +960,7 @@ async function drawRoute(){try{await drawRoute0()}catch(e){console.error(e);rtSt
 async function drawRoute0(){
   const my=++rRun,d=data.days[rDay];rSel=-1;rCand={};$("rt-cand").hidden=true;
   rList=d.items.map((it,i)=>({it,i})).filter(x=>x.it.type!=="move"&&x.it.name);
-  $("rt-title").textContent=(d.label||"")+(d.date?" "+d.date:"")+" 路線";
+  $("rt-title").textContent=(d.label||"")+(d.date?" "+d.date+(wdOf(d.date)?"（"+wdOf(d.date)+"）":""):"")+" 路線";
   rtStatus("");
   if(!rmap){rmap=mkMap($("rmap"));rmap.onpin=k=>rtFocus(k);let warned=false;rmap.onbad=()=>{if(!warned&&rmap.ok===0&&rmap.bad>=6){warned=true;rtStatus("底圖載入失敗，請確認網路連線（定位結果仍會儲存）")}}}
   const note="";
