@@ -400,6 +400,19 @@ body.hasbtab{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 #sync{display:block;font-size:12px;color:var(--mute);text-align:right;padding:0 6px 8px}#sync:empty{display:none}
 .ro .bar .bar2{flex:none}.ro .bar .bar2 button{flex:none;padding:0 16px}.ro .bar .bar2 button span{display:inline}
 @media (min-width:560px){.bar .bar2 button span{display:inline}}
+/* 存檔狀態放進存檔鈕，不再多出一排 */
+#sync{display:none!important}
+#sclose{width:36px;height:36px;min-width:36px;font-size:20px}#sclose:focus-visible{outline:none}
+.shtop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}.shtop h3{margin:0}
+.dayhead input.date{padding-right:2px}
+.dayhead .wd{margin-left:-2px}
+#save{position:relative}
+#save .spn{display:none}
+#save[data-st="busy"] .ck{display:none}
+#save[data-st="busy"] .spn{display:block;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#save[data-st="dirty"]::after,#save[data-st="err"]::after{content:"";position:absolute;top:7px;right:8px;width:9px;height:9px;border-radius:50%;background:#F2C879;border:2px solid var(--ink,#2E2E2E)}
+#save[data-st="err"]::after{background:#E27B7B}
 @media print{body{background:#fff}.btab{display:none!important}body.hasbtab{padding-bottom:0}}
 </style>
 </head>
@@ -430,7 +443,7 @@ body.hasbtab{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 <div class="btab" id="btab" role="navigation" aria-label="主要分頁" hidden><button data-tab="home" class="on"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="5" y="11" width="14" height="9.5" rx="1" fill="#E8D9C4"/><path d="M2.8 12 12 4l9.2 8z" fill="#E7A99B" stroke="#E7A99B" stroke-width="1" stroke-linejoin="round"/><rect x="10.2" y="14.2" width="3.6" height="6.3" rx=".8" fill="#C4D0DC"/><rect x="16" y="5.5" width="2" height="4" fill="#D5C3A5"/></svg><span>首頁</span></button><button data-tab="trips"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3" fill="#FBF8F2" stroke="#D5C3A5" stroke-width="1"/><path d="M3.5 8a3 3 0 0 1 3-3h11a3 3 0 0 1 3 3v2.5h-17z" fill="#E7A99B"/><rect x="7.5" y="3" width="2" height="4" rx="1" fill="#8E8B86"/><rect x="14.5" y="3" width="2" height="4" rx="1" fill="#8E8B86"/><g fill="#C4D0DC"><rect x="7" y="13" width="3" height="2.6" rx=".6"/><rect x="10.5" y="13" width="3" height="2.6" rx=".6"/><rect x="14" y="13" width="3" height="2.6" rx=".6" fill="#E8D9C4"/><rect x="7" y="16.6" width="3" height="2.6" rx=".6" fill="#E8D9C4"/><rect x="10.5" y="16.6" width="3" height="2.6" rx=".6"/></g></svg><span>行程</span></button></div>
 </section>
 <section id="editor" hidden><div class="wrap">
-  <div class="bar"><button id="back" class="ibtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg><span>返回</span></button><div class="bar2"><button id="share" title="分享" aria-label="分享"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2.5 11 21.5 3.5 17 20.5l-5-5.2z" fill="#C4D0DC"/><path d="M2.5 11l9.5 4.3L21.5 3.5z" fill="#B3C2D1"/><path d="M12 15.3v5l2.6-3.2z" fill="#8E8B86" opacity=".7"/></svg><span>分享</span></button><button id="inv" title="邀請共編" aria-label="邀請共編"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="9" cy="8" r="3.6" fill="#C4D0DC"/><path d="M2.5 19.5c0-4 2.9-6.2 6.5-6.2s6.5 2.2 6.5 6.2z" fill="#C4D0DC"/><circle cx="16.5" cy="9.5" r="3.2" fill="#E7A99B"/><path d="M11.5 20c.3-3.5 2.4-5.3 5-5.3 2.8 0 4.8 1.9 5 5.3z" fill="#E7A99B"/></svg><span>邀請共編</span></button><button id="exp" title="匯出" aria-label="匯出"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 3.5h8l4 4V20a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 5 20V5A1.5 1.5 0 0 1 6 3.5z" fill="#FBF8F2" stroke="#D5C3A5" stroke-width="1"/><path d="M14 3.5v4h4z" fill="#E8D9C4"/><path d="M12 10v6M9.2 13.6l2.8 2.8 2.8-2.8" fill="none" stroke="#E7A99B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>匯出</span></button><button id="print" title="列印" aria-label="列印"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="7" y="3" width="10" height="6" rx="1" fill="#FBF8F2" stroke="#D5C3A5" stroke-width="1"/><rect x="3" y="8.5" width="18" height="8.5" rx="2.5" fill="#E8D9C4"/><rect x="7" y="13.5" width="10" height="7" rx="1" fill="#fff" stroke="#D5C3A5" stroke-width="1"/><circle cx="17.5" cy="11.5" r="1" fill="#E7A99B"/></svg><span>列印</span></button><button id="undo" class="undo" disabled title="上一步" aria-label="上一步"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5 4.5 9.5 9 14" fill="none" stroke="#8E8B86" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5h9a5 5 0 0 1 0 10h-3" fill="none" stroke="#8E8B86" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>上一步</span></button></div><button id="save" class="primary ibtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg><span>存檔</span></button></div>
+  <div class="bar"><button id="back" class="ibtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg><span>返回</span></button><div class="bar2"><button id="share" title="分享" aria-label="分享"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2.5 11 21.5 3.5 17 20.5l-5-5.2z" fill="#C4D0DC"/><path d="M2.5 11l9.5 4.3L21.5 3.5z" fill="#B3C2D1"/><path d="M12 15.3v5l2.6-3.2z" fill="#8E8B86" opacity=".7"/></svg><span>分享</span></button><button id="inv" title="邀請共編" aria-label="邀請共編"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="9" cy="8" r="3.6" fill="#C4D0DC"/><path d="M2.5 19.5c0-4 2.9-6.2 6.5-6.2s6.5 2.2 6.5 6.2z" fill="#C4D0DC"/><circle cx="16.5" cy="9.5" r="3.2" fill="#E7A99B"/><path d="M11.5 20c.3-3.5 2.4-5.3 5-5.3 2.8 0 4.8 1.9 5 5.3z" fill="#E7A99B"/></svg><span>邀請共編</span></button><button id="exp" title="匯出" aria-label="匯出"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 3.5h8l4 4V20a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 5 20V5A1.5 1.5 0 0 1 6 3.5z" fill="#FBF8F2" stroke="#D5C3A5" stroke-width="1"/><path d="M14 3.5v4h4z" fill="#E8D9C4"/><path d="M12 10v6M9.2 13.6l2.8 2.8 2.8-2.8" fill="none" stroke="#E7A99B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>匯出</span></button><button id="print" title="列印" aria-label="列印"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="7" y="3" width="10" height="6" rx="1" fill="#FBF8F2" stroke="#D5C3A5" stroke-width="1"/><rect x="3" y="8.5" width="18" height="8.5" rx="2.5" fill="#E8D9C4"/><rect x="7" y="13.5" width="10" height="7" rx="1" fill="#fff" stroke="#D5C3A5" stroke-width="1"/><circle cx="17.5" cy="11.5" r="1" fill="#E7A99B"/></svg><span>列印</span></button><button id="undo" class="undo" disabled title="上一步" aria-label="上一步"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9 5 4.5 9.5 9 14" fill="none" stroke="#8E8B86" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5h9a5 5 0 0 1 0 10h-3" fill="none" stroke="#8E8B86" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>上一步</span></button></div><button id="save" class="primary ibtn"><svg class="ck" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg><svg class="spn" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 4a8 8 0 1 0 8 8"/></svg><span>存檔</span></button></div>
   <span id="sync" class="sync"></span>
   <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span></div>
@@ -452,9 +465,9 @@ body.hasbtab{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
   <div class="cpprev"><div><small>行程頁封面</small><div class="cpv a"><img alt=""></div></div><div><small>首頁行程卡</small><div class="cpv b"><img alt=""></div></div><div><small>首頁輪播</small><div class="cpv c"><img alt=""></div></div></div>
   <div class="dact"><button id="cpreset">置中</button><button id="cpcancel">取消</button><button id="cpok" class="primary">完成</button></div></dialog>
 <dialog id="hdlg"><h3>首頁輪播照片</h3><p class="hint" style="margin:0 0 10px">上傳後會優先輪播這些照片；全部移除時，會自動使用各行程的封面。</p><div class="pics" id="hl"></div><div class="dact"><button id="hdone" class="primary">完成</button></div></dialog>
-<dialog id="shr"><h3 id="sh3">分享行程</h3><p class="hint" id="shint" style="margin:0 0 10px"></p>
+<dialog id="shr"><div class="shtop"><h3 id="sh3">分享行程</h3><button class="rt-x" id="sclose" type="button" aria-label="關閉">×</button></div><p class="hint" id="shint" style="margin:0 0 10px"></p>
   <input id="lnk" readonly aria-label="分享連結">
-  <div class="dact"><button id="cp">複製連結</button><button id="sys" hidden>其他方式</button><button id="line" class="primary">分享到 LINE</button><button id="sclose">關閉</button></div></dialog>
+  <div class="dact"><button id="cp">複製連結</button><button id="sys" hidden>其他方式</button><button id="line" class="primary">分享到 LINE</button></div></dialog>
 <div class="lb" id="lb"><button aria-label="關閉">✕</button><img id="big" alt=""></div>
 <input type="file" accept="image/*" id="pf" hidden>
 <div id="pv"></div>
@@ -495,7 +508,9 @@ const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).sli
 const persist=()=>{try{localStorage.setItem(SK,JSON.stringify(store))}catch(e){}};
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function toast(m,ms){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),ms||(m.length>20?6000:1800))}
-const sync=t=>$("sync").textContent=t;
+const sync=t=>{t=t||"";$("sync").textContent=t;const b=$("save");if(!b)return;
+  const st=/^存檔失敗/.test(t)?"err":/^存檔中/.test(t)?"busy":/^尚未/.test(t)?"dirty":/^已存檔/.test(t)?"ok":"";
+  b.dataset.st=st;b.title=t||"存檔";if(st==="err")toast(t,5000)};
 async function why(x){const m=errMsg(x);if(!/連不到後端/.test(m))return m;
   try{await fetch(cloud.url+"?action=view&id=test",{mode:"no-cors"});
     return "能連到 Google，但回應被瀏覽器擋下。多半是公司（Workspace）帳號不允許公開存取，或後端網址被導向登入頁。請用無痕視窗開啟「網址?action=view&id=test」，看到登入畫面就是這個原因"}
@@ -657,6 +672,8 @@ const pad2=n=>String(n).padStart(2,"0");
 const parseMD=t=>{const m=String(t||"").match(/(?:(\d{4})[\/\-.])?(\d{1,2})[\/\-.](\d{1,2})/);if(!m)return null;let y=m[1]?+m[1]:null;const mo=+m[2],d=+m[3];if(mo<1||mo>12||d<1||d>31)return null;
   if(!y){const n=new Date();y=n.getFullYear();if(new Date(y,mo-1,d)<new Date(n.getFullYear(),n.getMonth(),n.getDate()-60))y++}return new Date(y,mo-1,d)};
 const WD=["日","一","二","三","四","五","六"];
+const _cx=document.createElement("canvas").getContext("2d");
+const dw=v=>{if(!v)return"9em";_cx.font='500 16px Inter,"Noto Sans TC",sans-serif';return Math.ceil(_cx.measureText(String(v)).width)+14+"px"};
 const wdOf=t=>{const d=parseMD(t);return d?"週"+WD[d.getDay()]:""};
 const fmtMD=dt=>(dt.getMonth()+1)+"/"+dt.getDate();
 const nextDate=t=>{const d=parseMD(t);if(!d)return "";d.setDate(d.getDate()+1);return fmtMD(d)};
@@ -729,7 +746,7 @@ function render(){
   {const on=document.querySelector(".tab.on"),T=$("tabs");if(on)T.scrollLeft=Math.max(0,on.offsetLeft-T.offsetLeft-(T.clientWidth-on.offsetWidth)/2)}
   if(view!=="day"){renderList();return}
   const d=data.days[cur];
-  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}${wdOf(d.date)?"（"+wdOf(d.date)+"）":""}</span><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span class="wd" data-wd>${wdOf(d.date)}</span><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button><button data-delday>刪除此天</button></div>`;
+  let h=RO?`<div class="dayhead"><span class="rodate">${esc(d.date||"")}${wdOf(d.date)?"（"+wdOf(d.date)+"）":""}</span><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button></div>`:`<div class="dayhead"><input class="date" data-f="date" style="width:${dw(d.date)}" value="${esc(d.date)}" placeholder="日期，例如 11/15" aria-label="日期"><span class="wd" data-wd>${wdOf(d.date)}</span><span style="flex:1"></span><button data-route class="rtbtn"><svg class="rti" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/></svg>路線</button><button data-delday>刪除此天</button></div>`;
   d.items.forEach((it,i)=>{
     h+=`<div class="stop" data-idx="${i}"><div class="time"><input data-i="${i}" data-k="time" value="${esc(fmtT(it.time))}" inputmode="numeric" maxlength="5" placeholder="00:00" aria-label="時間"></div>
     <div class="card" data-t="${it.type}">
@@ -766,7 +783,7 @@ document.addEventListener("input",e=>{
     return}
   if(t.id==="title"){fit(t);data.title=t.value;document.title=t.value||"旅遊行程規劃";save();return}
   if(t.id==="nights"){data.nights=+t.value||0;save();return}
-  if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f==="date"){renderFlights();const w=t.parentNode.querySelector("[data-wd]");if(w)w.textContent=wdOf(t.value)}if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
+  if(t.dataset.f){data.days[cur][t.dataset.f]=t.value;if(t.dataset.f==="date"){t.style.width=dw(t.value);renderFlights();const w=t.parentNode.querySelector("[data-wd]");if(w)w.textContent=wdOf(t.value)}if(t.dataset.f=="label")document.querySelector(".tab.on").textContent=t.value;save();return}
   if(t.dataset.k==="time")return;
   if(t.dataset.k){const it=data.days[cur].items[+t.dataset.i];it[t.dataset.k]=t.value;if(t.dataset.k==="name"||t.dataset.k==="kr")refreshLinks();
     if(t.dataset.k=="type")t.closest(".card").dataset.t=t.value;
