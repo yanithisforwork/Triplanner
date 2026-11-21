@@ -337,18 +337,77 @@ main.pop>*{animation:popin .42s cubic-bezier(.22,1,.36,1) both}
 main.pop>*:nth-child(2){animation-delay:.04s}main.pop>*:nth-child(3){animation-delay:.08s}main.pop>*:nth-child(4){animation-delay:.12s}main.pop>*:nth-child(5){animation-delay:.16s}main.pop>*:nth-child(6){animation-delay:.2s}main.pop>*:nth-child(n+7){animation-delay:.24s}
 .tab.on.pop{animation:tabpop .4s cubic-bezier(.34,1.56,.64,1)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-@media print{body{background:#fff}}
+
+/* ===== 底部分頁、匯率、行程工具列 ===== */
+body.hasbtab{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+.btab{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;gap:8px;padding:8px 16px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+.btab[hidden]{display:none!important}
+.btab button{flex:1;max-width:200px;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:transparent;border-radius:14px;padding:7px 10px;color:var(--mute);font-size:12px;letter-spacing:.06em}
+.btab button:hover{border:0;color:var(--ink)}
+.btab button.on{background:var(--soft);color:var(--ink);font-weight:500}
+.btab button svg{display:block}
+.btab button:not(.on) svg{opacity:.6}
+.tbanner{position:relative;height:112px;margin:36px 0 16px;border-radius:20px;overflow:hidden;background:#F6E6E2;border:1px solid var(--line);box-shadow:var(--sh);display:flex;align-items:center;padding:0 22px}
+.tbanner h1{position:relative;z-index:1;font-size:26px;flex:none}
+.tbanner h1::after{content:"";display:block;width:28px;height:2px;background:var(--rose);margin-top:8px}
+.tb-art{position:absolute;right:0;top:0;height:100%;width:68%}
+.fxbox{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:16px 16px 14px;margin:0 0 22px}
+.fxhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+.fxt{font-weight:500;font-size:16px;letter-spacing:.06em}
+.fxs{font-size:12px;color:var(--mute)}
+.fxs button{border:0;background:none;padding:0;color:var(--mute);text-decoration:underline;font-size:12px}
+.fxgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:620px){.fxgrid{grid-template-columns:1fr}.fxpair{display:flex;gap:8px}.fxpair .fxio{flex:1;min-width:0}.fxio i{width:1.6em}}
+.fxc{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--bg);min-width:0}
+.fxtop{display:flex;align-items:center;gap:10px}
+.fxico{flex:none;width:38px;height:38px}
+.fxname{font-weight:500;line-height:1.25}
+.fxname small{display:block;color:var(--mute);font-size:12px;font-weight:400}
+.fxc select{margin-top:2px;max-width:100%;border:0;background:transparent;font-weight:500;padding:0;cursor:pointer}
+.fxio{display:flex;align-items:center;gap:8px;margin-top:10px}
+.fxio input{flex:1;min-width:0;width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:7px 10px;font-size:15px}
+.fxio input:focus-visible{outline:none;border-color:var(--rose);box-shadow:0 0 0 2px var(--soft)}
+.fxio i{flex:none;color:var(--mute);font-style:normal;font-size:12px;width:2.2em;text-align:center}
+.fxr{margin-top:8px;color:var(--mute);font-size:12px}
+.tbar{display:flex;align-items:center;gap:10px;padding:0 0 14px}
+.tbtn{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 16px}
+.sortbox{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;color:var(--mute);cursor:pointer}
+.sortbox select{border:0;background:transparent;padding:0;cursor:pointer;color:var(--ink);font-size:14px;outline:none}
+.tc{position:relative}
+.tcact button{display:inline-flex;align-items:center;gap:5px}
+.tcact button svg{flex:none}
+.grid{padding-bottom:30px}
+@media print{body{background:#fff}.btab{display:none!important}body.hasbtab{padding-bottom:0}}
 </style>
 </head>
 <body>
 <section id="home" hidden><div class="wrap">
-  <div class="homehead"><h1>旅遊行程規劃</h1><button id="homepics">輪播照片</button></div>
-  <div class="hero" id="hero"></div>
-  <div class="grid" id="grid"></div>
+  <div class="pane" id="pane-home">
+    <div class="homehead"><h1>旅遊行程規劃</h1><button id="homepics">輪播照片</button></div>
+    <div class="hero" id="hero"></div>
+    <div class="fxbox"><div class="fxhead"><span class="fxt">匯率換算</span><span class="fxs" id="fxs"></span></div><div class="fxgrid" id="fxgrid"></div></div>
+  </div>
+  <div class="pane" id="pane-trips" hidden>
+    <div class="tbanner"><h1>我的行程</h1><svg class="tb-art" viewBox="0 0 220 112" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+<circle cx="168" cy="58" r="62" fill="#FBF3F1"/>
+<g fill="#fff"><rect x="96" y="14" width="30" height="8" rx="4"/><rect x="104" y="9" width="15" height="10" rx="5"/><rect x="176" y="90" width="28" height="8" rx="4"/><rect x="183" y="85" width="14" height="10" rx="5"/></g>
+<circle cx="204" cy="22" r="8" fill="#E8D9C4"/>
+<path d="M88 92Q124 24 186 20" fill="none" stroke="#8E8B86" stroke-width="1.2" stroke-dasharray="2 4" stroke-linecap="round" opacity=".6"/>
+<g transform="translate(186 20) rotate(8)"><path d="M-8 0 8-6 4 8-1 3z" fill="#E7A99B"/><path d="M-8 0 1 3 8-6z" fill="#D8928A"/></g>
+<circle cx="164" cy="64" r="32" fill="#C4D0DC"/>
+<g fill="#DCE4DA"><path d="M142 52q8-9 19-5q5 7-2 11q-8 2-12 9q-7-3-5-15z"/><path d="M172 66q10-5 17 2q2 11-8 15q-9-3-9-17z"/><path d="M160 86q5-3 9 0q-2 5-9 4z"/></g>
+<ellipse cx="164" cy="64" rx="13" ry="32" fill="none" stroke="#FBF8F2" stroke-width="1" opacity=".7"/><path d="M132 64h64M137 50h54M137 78h54" stroke="#FBF8F2" stroke-width="1" opacity=".55"/>
+<path d="M118 86c-9-10-10-13-10-18a10 10 0 0 1 20 0c0 5-1 8-10 18z" fill="#E7A99B"/><circle cx="118" cy="68" r="3.6" fill="#FBF8F2"/><ellipse cx="118" cy="90" rx="7" ry="1.8" fill="#2e2e2e" opacity=".08"/>
+</svg></div>
+    <div class="tbar"><button id="newtrip" class="primary tbtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>新增行程</button><span class="sp"></span><label class="sortbox"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></svg><select id="sortsel" aria-label="行程排序"><option value="new">由新到舊</option><option value="old">由舊到新</option></select></label></div>
+    <div class="grid" id="grid"></div>
+  </div>
   <div id="homenote"></div>
-</div></section>
+</div>
+<div class="btab" id="btab" role="navigation" aria-label="主要分頁" hidden><button data-tab="home" class="on"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="5" y="11" width="14" height="9.5" rx="1" fill="#E8D9C4"/><path d="M2.8 12 12 4l9.2 8z" fill="#E7A99B" stroke="#E7A99B" stroke-width="1" stroke-linejoin="round"/><rect x="10.2" y="14.2" width="3.6" height="6.3" rx=".8" fill="#C4D0DC"/><rect x="16" y="5.5" width="2" height="4" fill="#D5C3A5"/></svg><span>首頁</span></button><button data-tab="trips"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3" fill="#FBF8F2" stroke="#D5C3A5" stroke-width="1"/><path d="M3.5 8a3 3 0 0 1 3-3h11a3 3 0 0 1 3 3v2.5h-17z" fill="#E7A99B"/><rect x="7.5" y="3" width="2" height="4" rx="1" fill="#8E8B86"/><rect x="14.5" y="3" width="2" height="4" rx="1" fill="#8E8B86"/><g fill="#C4D0DC"><rect x="7" y="13" width="3" height="2.6" rx=".6"/><rect x="10.5" y="13" width="3" height="2.6" rx=".6"/><rect x="14" y="13" width="3" height="2.6" rx=".6" fill="#E8D9C4"/><rect x="7" y="16.6" width="3" height="2.6" rx=".6" fill="#E8D9C4"/><rect x="10.5" y="16.6" width="3" height="2.6" rx=".6"/></g></svg><span>行程</span></button></div>
+</section>
 <section id="editor" hidden><div class="wrap">
-  <div class="bar"><button id="back">← 首頁</button><span id="sync" class="sync"></span><button id="save" class="primary">存檔</button></div>
+  <div class="bar"><button id="back">← 返回</button><span id="sync" class="sync"></span><button id="save" class="primary">存檔</button></div>
   <div class="bar2"><button id="share">分享</button><button id="inv">邀請共同編輯</button><button id="exp">匯出</button><button id="print">列印</button><button id="undo" class="undo" disabled title="上一步" aria-label="上一步"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button></div>
   <div class="titlebox"><textarea id="title" class="title" rows="1" aria-label="行程名稱" placeholder="行程名稱"></textarea>
     <span class="meta"><input id="ndays" type="number" min="1" max="30" aria-label="天數">天<input id="nights" type="number" min="0" max="30" aria-label="夜數">夜</span></div>
@@ -514,14 +573,14 @@ function renderHero(){const h=$("hero");clearInterval(heroTimer);
   if(L.length<2)return;let n=0;
   heroTimer=setInterval(()=>{if(document.hidden||$("home").hidden)return;const s=h.querySelectorAll(".hs"),d=h.querySelectorAll(".dots i");
     s[n].classList.remove("on");d[n].classList.remove("on");n=(n+1)%s.length;s[n].classList.add("on");d[n].classList.add("on")},4500)}
-function renderHome(){const own=cloud.key||!cloud.url;$("grid").innerHTML=(own?`<button class="tc new" id="newtrip">＋ 新增行程</button>`:"")+Object.values(store.trips).map(t=>{const c=cover(t),k=[...t.id].reduce((a,ch)=>a+ch.charCodeAt(0),0)%PAL.length,p=PAL[k];return `<article class="tc" data-open="${t.id}" tabindex="0"><div class="cv">${c?`<img src="${imgUrl(c,500)}" alt="" loading="lazy" style="object-position:${cvPos(t)}">`:coverArt(p,k)}</div><h3>${esc(t.title)}</h3><p>${t.days.length}天${+t.nights||0}夜${store.dirty[t.id]&&cloud.url?" · 尚未同步":""}</p><div class="tcact"><button data-share="${t.id}">分享</button>${own?`<button data-del="${t.id}">刪除</button>`:""}</div></article>`}).join("");$("homepics").hidden=!own;renderHero();renderNote()}
+function renderHome(){const own=cloud.key||!cloud.url;$("grid").innerHTML=sortedTrips().map(t=>{const c=cover(t),k=[...t.id].reduce((a,ch)=>a+ch.charCodeAt(0),0)%PAL.length,p=PAL[k];return `<article class="tc" data-open="${t.id}" tabindex="0"><div class="cv">${c?`<img src="${imgUrl(c,500)}" alt="" loading="lazy" style="object-position:${cvPos(t)}">`:coverArt(p,k)}</div><h3>${esc(t.title)}</h3><p>${t.days.length}天${+t.nights||0}夜${store.dirty[t.id]&&cloud.url?" · 尚未同步":""}</p><div class="tcact"><button data-share="${t.id}">${ICO.share}分享</button>${own?`<button data-del="${t.id}">${ICO.trash}刪除</button>`:""}</div></article>`}).join("");$("homepics").hidden=!own;$("newtrip").hidden=!own;$("sortsel").value=sortMode;renderHero();renderNote()}
 function renderNote(){const el=$("homenote");let h="";const none=!Object.keys(store.trips).length;
   if(!cloud.url)h=`<div class="nc"><b>這台裝置還沒連接雲端</b><p>你存在 Google Sheet 的行程不會自動出現，要先連接才看得到，行程並沒有不見。</p><button class="primary" id="cfghome">連接雲端</button></div>`;
   else if(pullState==="fail")h=`<div class="nc"><b>無法連線雲端</b><p>目前顯示的是這台裝置上的資料，可能不是最新的。</p><button class="primary" id="retry">重試</button><button id="cfghome">雲端設定</button></div>`;
   else if(pullState==="empty"&&none)h=`<div class="nc"><b>雲端上目前沒有行程</b><p>如果你以為這裡應該有行程，請確認密碼和網址是不是連到正確的 Google Sheet。</p><button id="cfghome">雲端設定</button></div>`;
   el.innerHTML=h}
-function showHome(){tid=null;data=null;$("editor").hidden=true;$("home").hidden=false;document.title="旅遊行程規劃";renderHome()}
-function showEditor(){$("home").hidden=true;$("editor").hidden=false;$("title").value=data.title;fit($("title"));$("nights").value=data.nights||0;document.title=data.title;sync("");$("inv").hidden=RO||!cloud.key;updUndo();$("foot").hidden=RO||(!cloud.key&&!!cloud.url);render()}
+function showHome(){tid=null;data=null;$("editor").hidden=true;$("home").hidden=false;document.title="旅遊行程規劃";$("btab").hidden=false;document.body.classList.add("hasbtab");setTab(homeTab,true);renderHome()}
+function showEditor(){$("btab").hidden=true;document.body.classList.remove("hasbtab");$("home").hidden=true;$("editor").hidden=false;$("title").value=data.title;fit($("title"));$("nights").value=data.nights||0;document.title=data.title;sync("");$("inv").hidden=RO||!cloud.key;updUndo();$("foot").hidden=RO||(!cloud.key&&!!cloud.url);render()}
 function lockShare(on,msg){["cp","line","sys"].forEach(i=>$(i).disabled=on);if(msg)$("shint").textContent=msg}
 async function syncThen(id,okMsg){if(!store.dirty[id]&&!inflight[id])return;
   lockShare(true,"正在同步最新內容…");await saveCloud(id);
@@ -715,6 +774,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.dataset&&e.
 document.addEventListener("click",e=>{
   const b=e.target.closest("button"),ds=b?b.dataset:{};
   if(!$("home").hidden){
+    if(b&&ds.tab&&b.closest("#btab")){setTab(ds.tab);return}
     if(b&&b.id==="hadd"){pickMode="home";$("pf").click();return}
     if(ds.hx!==undefined){store.home.splice(+ds.hx,1);setHome();drawH();return}
     if(b&&b.id==="cfghome"){cloudSetup();return}
@@ -1096,6 +1156,76 @@ $("sclose").onclick=()=>$("shr").close();
 $("cp").onclick=async()=>{try{await navigator.clipboard.writeText(shareUrl);toast("已複製連結")}catch(e){$("lnk").select();toast("請手動複製連結")}};
 $("line").onclick=()=>window.open("https://social-plugins.line.me/lineit/share?url="+encodeURIComponent(shareUrl),"_blank");
 $("sys").onclick=()=>navigator.share({title:store.trips[tid]?store.trips[tid].title:"旅遊行程",url:shareUrl}).catch(()=>{});
+
+/* ===== 首頁／行程分頁、匯率、行程排序 ===== */
+let homeTab="home",sortMode="new";
+try{sortMode=localStorage.getItem("trip-sort")==="old"?"old":"new"}catch(e){}
+function setTab(t,keep){homeTab=t==="trips"?"trips":"home";
+  $("pane-home").hidden=homeTab!=="home";$("pane-trips").hidden=homeTab!=="trips";
+  document.querySelectorAll("#btab button").forEach(b=>b.classList.toggle("on",b.dataset.tab===homeTab));
+  if(!keep)window.scrollTo(0,0)}
+function sortedTrips(){const L=Object.values(store.trips).map((t,i)=>({t,i,d:parseMD(t.days&&t.days[0]&&t.days[0].date)}));
+  const dated=L.filter(x=>x.d).sort((a,b)=>(a.d-b.d)||(a.i-b.i));
+  if(sortMode==="new")dated.reverse();
+  return dated.concat(L.filter(x=>!x.d)).map(x=>x.t)}
+$("sortsel").onchange=e=>{sortMode=e.target.value==="old"?"old":"new";try{localStorage.setItem("trip-sort",sortMode)}catch(x){}renderHome()};
+const IA='fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+const ICO={share:`<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M2.5 11 21.5 3.5 17 20.5l-5-5.2z" fill="#C4D0DC"/><path d="M2.5 11l9.5 4.3L21.5 3.5z" fill="#B3C2D1"/><path d="M12 15.3v5l2.6-3.2z" fill="#8E8B86" opacity=".7"/></svg>`,
+  trash:`<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 8h12l-1 12.2a1.3 1.3 0 0 1-1.3 1.2H8.3A1.3 1.3 0 0 1 7 20.2z" fill="#E8D9C4"/><rect x="4.5" y="5.5" width="15" height="2.8" rx="1.4" fill="#E7A99B"/><rect x="9.5" y="3" width="5" height="3" rx="1.2" fill="#D5C3A5"/><path d="M10 11v7M14 11v7" stroke="#D5C3A5" stroke-width="1.2" stroke-linecap="round"/></svg>`};
+
+
+/* 匯率：每天自動更新一次，快取在這台裝置 */
+const FXK="fx-cache-v1",FXC="fx-custom-v1";
+const FXLIST=[["USD","美元","$"],["EUR","歐元","€"],["CNY","人民幣","¥"],["HKD","港幣","HK$"],["GBP","英鎊","£"],["THB","泰銖","฿"],["SGD","新加坡幣","S$"],["AUD","澳幣","A$"],["CAD","加幣","C$"],["VND","越南盾","₫"],["MYR","馬來西亞令吉","RM"],["PHP","菲律賓披索","₱"],["IDR","印尼盾","Rp"],["CHF","瑞士法郎","Fr"],["NZD","紐西蘭幣","NZ$"],["MOP","澳門幣","MOP$"],["TRY","土耳其里拉","₺"]];
+const FXBIG=["JPY","KRW","VND","IDR"];
+let fx={day:"",rates:null,ts:0},fxState="";
+try{fx=JSON.parse(localStorage.getItem(FXK))||fx}catch(e){}
+let fxCustom="USD";try{fxCustom=localStorage.getItem(FXC)||"USD"}catch(e){}
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate())};
+const twdPer=c=>fx.rates&&fx.rates[c]?1/fx.rates[c]:null;
+async function fxLoad(force){
+  if(!force&&fx.rates&&fx.day===today()){fxState="ok";renderFx();return}
+  fxState="loading";fxStatus();
+  const tryFetch=async(url,pick)=>{const c=new AbortController(),tm=setTimeout(()=>c.abort(),8000);
+    try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw 0;return pick(await r.json())}finally{clearTimeout(tm)}};
+  let rates=null;
+  try{rates=await tryFetch("https://open.er-api.com/v6/latest/TWD",j=>{if(j.result!=="success"||!j.rates)throw 0;return j.rates})}catch(e){}
+  if(!rates){try{rates=await tryFetch("https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/twd.json",j=>{const o={};Object.keys(j.twd||{}).forEach(k=>o[k.toUpperCase()]=j.twd[k]);if(!o.JPY)throw 0;return o})}catch(e){}}
+  if(rates){fx={day:today(),rates,ts:Date.now()};try{localStorage.setItem(FXK,JSON.stringify(fx))}catch(e){}fxState="ok"}
+  else fxState=fx.rates?"stale":"fail";
+  renderFx()}
+function fxStatus(){const el=$("fxs");if(!el)return;const md=fx.day?(+fx.day.slice(5,7))+"/"+(+fx.day.slice(8)):"";
+  el.innerHTML=fxState==="loading"?"更新中…":fxState==="ok"?"每天自動更新・"+md:fxState==="stale"?"目前無法更新，使用 "+md+" 的匯率 <button type=\"button\" id=\"fxretry\">重試</button>":"無法取得匯率 <button type=\"button\" id=\"fxretry\">重試</button>"}
+const symSize=s=>s.length<=1?16:s.length===2?12:s.length===3?10:8.5;
+const icoCoin=(sym,fill)=>`<svg class="fxico" viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="35" rx="11" ry="2" fill="#2e2e2e" opacity=".08"/><circle cx="20" cy="19" r="15.5" fill="${fill}" stroke="#2E2E2E" stroke-width="1.4"/><circle cx="20" cy="19" r="11.2" fill="none" stroke="#2E2E2E" stroke-width="1" stroke-dasharray="1.6 2.4" opacity=".45"/><text x="20" y="${19+symSize(sym)*.36}" text-anchor="middle" font-size="${symSize(sym)}" font-weight="500" fill="#2E2E2E" font-family="Inter,sans-serif">${sym}</text><path d="M9.5 13.5a11.5 11.5 0 0 1 5-5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".9"/><path d="M33.5 5v4M31.5 7h4" stroke="#2E2E2E" stroke-width="1.2" stroke-linecap="round" opacity=".55"/></svg>`;
+const icoNote=(sym,fill)=>`<svg class="fxico" viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="35" rx="13" ry="2" fill="#2e2e2e" opacity=".08"/><rect x="3" y="9" width="34" height="22" rx="4" fill="${fill}" stroke="#2E2E2E" stroke-width="1.4"/><circle cx="20" cy="20" r="6.8" fill="#fff" fill-opacity=".65" stroke="#2E2E2E" stroke-width="1.1"/><text x="20" y="${20+symSize(sym)*.32}" text-anchor="middle" font-size="${Math.min(symSize(sym),11)}" font-weight="500" fill="#2E2E2E" font-family="Inter,sans-serif">${sym}</text><path d="M7 13.5h.01M33 26.5h.01" stroke="#2E2E2E" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+const icoStack=(sym,fill)=>`<svg class="fxico" viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="35" rx="12" ry="2" fill="#2e2e2e" opacity=".08"/><circle cx="25" cy="15" r="11" fill="#fff" stroke="#2E2E2E" stroke-width="1.2"/><circle cx="17" cy="21" r="13" fill="${fill}" stroke="#2E2E2E" stroke-width="1.4"/><circle cx="17" cy="21" r="9.4" fill="none" stroke="#2E2E2E" stroke-width="1" stroke-dasharray="1.6 2.4" opacity=".45"/><text x="17" y="${21+symSize(sym)*.34}" text-anchor="middle" font-size="${symSize(sym)}" font-weight="500" fill="#2E2E2E" font-family="Inter,sans-serif">${sym}</text></svg>`;
+const fxNum=(c,v)=>{if(!isFinite(v))return"";const d=FXBIG.includes(c)?0:2;return(Math.round(v*10**d)/10**d).toLocaleString("en-US",{maximumFractionDigits:d})};
+const twNum=v=>isFinite(v)?(Math.round(v*100)/100).toLocaleString("en-US",{maximumFractionDigits:2}):"";
+const num=v=>parseFloat(String(v).replace(/,/g,""));
+function fxCard(i,code,name,sym,ico,sel){
+  return `<div class="fxc" data-i="${i}" data-c="${code}"><div class="fxtop">${ico}<div class="fxname">${sel||name}<small class="fxcode">${code} → TWD</small></div></div>
+  <div class="fxpair"><div class="fxio"><input inputmode="decimal" data-fx="f" placeholder="輸入${sel?"外幣":name}" aria-label="${name}金額"><i>${sym}</i></div>
+  <div class="fxio"><input inputmode="decimal" data-fx="t" placeholder="輸入台幣" aria-label="台幣金額"><i>NT$</i></div></div>
+  <div class="fxr" data-fr></div></div>`}
+function renderFx(){fxStatus();const g=$("fxgrid");if(!g)return;
+  const keep=[...g.querySelectorAll("input")].map(x=>x.value);
+  const cu=FXLIST.find(x=>x[0]===fxCustom)||FXLIST[0];
+  const opts=`<select id="fxsel" aria-label="選擇幣別">${FXLIST.map(x=>`<option value="${x[0]}" ${x[0]===cu[0]?"selected":""}>${x[1]}</option>`).join("")}</select>`;
+  g.innerHTML=fxCard(0,"JPY","日圓","¥",icoCoin("¥","#F8E1DA"))+fxCard(1,"KRW","韓元","₩",icoNote("₩","#DDE8D9"))+fxCard(2,cu[0],cu[1],cu[2],icoStack(cu[2],"#E6DCEB"),opts);
+  const ins=g.querySelectorAll("input");keep.forEach((v,k)=>{if(ins[k])ins[k].value=v});
+  g.querySelectorAll(".fxc").forEach(c=>{const r=twdPer(c.dataset.c),fr=c.querySelector("[data-fr]"),fi=c.querySelector('[data-fx="f"]'),ti=c.querySelector('[data-fx="t"]');
+    fr.textContent=r?"1 "+(FXLIST.find(x=>x[0]===c.dataset.c)||[0,0,c.dataset.c==="JPY"?"¥":"₩"])[2]+" ＝ NT$ "+(r>=1?r.toFixed(3):r.toFixed(4)):(fxState==="loading"?"匯率載入中…":"尚無匯率");
+    fi.disabled=ti.disabled=!r;
+    if(r&&fi.value)ti.value=twNum(num(fi.value)*r)})}
+$("fxgrid").addEventListener("input",e=>{const t=e.target;if(!t.dataset.fx)return;const c=t.closest(".fxc"),r=twdPer(c.dataset.c);if(!r)return;
+  const f=c.querySelector('[data-fx="f"]'),w=c.querySelector('[data-fx="t"]'),v=num(t.value);
+  if(t===f)w.value=isFinite(v)?twNum(v*r):"";else f.value=isFinite(v)?fxNum(c.dataset.c,v/r):""});
+$("fxgrid").addEventListener("change",e=>{if(e.target.id!=="fxsel")return;fxCustom=e.target.value;try{localStorage.setItem(FXC,fxCustom)}catch(x){}
+  const c=e.target.closest(".fxc");c.querySelectorAll("input").forEach(i=>i.value="");renderFx()});
+$("fxs").addEventListener("click",e=>{if(e.target.id==="fxretry")fxLoad(true)});
+fxLoad(false);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&fx.day!==today())fxLoad(false)});
 /* routing */
 async function openView(id,s){RO=true;document.body.classList.add("ro");$("title").readOnly=true;$("nights").readOnly=true;$("ndays").readOnly=true;
   $("home").hidden=true;$("editor").hidden=false;$("main").innerHTML='<p style="color:var(--mute)">載入中…</p>';
