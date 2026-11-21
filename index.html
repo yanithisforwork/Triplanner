@@ -402,7 +402,7 @@ body.hasbtab{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 @media (min-width:560px){.bar .bar2 button span{display:inline}}
 /* 存檔狀態放進存檔鈕，不再多出一排 */
 #sync{display:none!important}
-#sclose{width:36px;height:36px;min-width:36px;font-size:20px}#sclose:focus-visible{outline:none}
+#sclose{width:36px;height:36px;min-width:36px;padding:0}#sclose svg{display:block}#sclose:focus-visible{outline:none}
 .shtop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}.shtop h3{margin:0}
 .dayhead input.date{padding-right:2px}
 .dayhead .wd{margin-left:-2px}
@@ -465,7 +465,7 @@ body.hasbtab{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
   <div class="cpprev"><div><small>行程頁封面</small><div class="cpv a"><img alt=""></div></div><div><small>首頁行程卡</small><div class="cpv b"><img alt=""></div></div><div><small>首頁輪播</small><div class="cpv c"><img alt=""></div></div></div>
   <div class="dact"><button id="cpreset">置中</button><button id="cpcancel">取消</button><button id="cpok" class="primary">完成</button></div></dialog>
 <dialog id="hdlg"><h3>首頁輪播照片</h3><p class="hint" style="margin:0 0 10px">上傳後會優先輪播這些照片；全部移除時，會自動使用各行程的封面。</p><div class="pics" id="hl"></div><div class="dact"><button id="hdone" class="primary">完成</button></div></dialog>
-<dialog id="shr"><div class="shtop"><h3 id="sh3">分享行程</h3><button class="rt-x" id="sclose" type="button" aria-label="關閉">×</button></div><p class="hint" id="shint" style="margin:0 0 10px"></p>
+<dialog id="shr"><div class="shtop"><h3 id="sh3">分享行程</h3><button class="rt-x" id="sclose" type="button" aria-label="關閉"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><p class="hint" id="shint" style="margin:0 0 10px"></p>
   <input id="lnk" readonly aria-label="分享連結">
   <div class="dact"><button id="cp">複製連結</button><button id="sys" hidden>其他方式</button><button id="line" class="primary">分享到 LINE</button></div></dialog>
 <div class="lb" id="lb"><button aria-label="關閉">✕</button><img id="big" alt=""></div>
@@ -1150,7 +1150,7 @@ $("exp").onclick=async()=>{if(pdfBusy||!data)return;pdfBusy=true;const btn=$("ex
     lab.textContent="製作中…";toast("正在匯出 PDF，圖片較多時需要一點時間",4000);
     await libs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
     printMode="trip";buildPrint();printMode="all";
-    box=document.createElement("div");box.id="pdfbox";box.innerHTML=$("pv").innerHTML;document.body.appendChild(box);
+    box=document.createElement("div");box.id="pdfbox";box.innerHTML=$("pv").innerHTML;box.querySelectorAll(".pcv").forEach(e=>e.remove());document.body.appendChild(box);
     const imgs=[...box.querySelectorAll("img")],ids=[...new Set(imgs.map(i=>{try{return new URL(i.src).searchParams.get("id")}catch(e){return null}}).filter(Boolean))];
     let miss=0,q=ids.slice();await Promise.all(Array.from({length:4},async()=>{while(q.length){const f=q.shift();if(!(await imgData(f)))miss++}}));
     imgs.forEach(i=>{let f=null;try{f=new URL(i.src).searchParams.get("id")}catch(e){}const d=f&&pdfImg[f];if(d)i.src=d;else i.remove()});
