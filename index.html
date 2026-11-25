@@ -576,7 +576,7 @@ setInterval(()=>{const a=document.activeElement;if(tid&&!document.hidden&&!(a&&/
 const PAL=[["#f3d6da","#e8b4bc"],["#ecd9cf","#c9a58f"],["#f7e4df","#dc9aa6"],["#dcc6ba","#a87f68"]];
 const cvParts=t=>String(t.cover||"").split("|");
 const cvPos=t=>{const p=cvParts(t);return p.length>2?(+p[1]||0)+"% "+(+p[2]||0)+"%":"50% 50%"};
-const cover=t=>{if(t.cover)return cvParts(t)[0];for(const d of t.days)for(const it of d.items)if(it.imgs&&it.imgs[0])return it.imgs[0];return null};
+const cover=t=>t.cover?cvParts(t)[0]:null;
 const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
 const PL=`<path d="M-12 0q0-2.4 3-2.4h16q5 0 7 2.4-2 2.4-7 2.4h-16q-3 0-3-2.4zM-2 0L-8-9H-4L5 0zM-2 0L-8 9H-4L5 0zM-10-1L-14-6H-11L-6-1z" fill="#2E2E2E"/>`;
 const JET=RM?`<g transform="translate(120 24) scale(.55)">${PL}</g>`:`<g transform="translate(0 24)"><g class="jet"><path d="M-70 0H-16" stroke="#2E2E2E" stroke-opacity=".3" stroke-width="1.5" stroke-dasharray="2 5"/><g transform="scale(.55)">${PL}</g></g></g>`;
